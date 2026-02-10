@@ -1,29 +1,31 @@
-import React from "react";
+﻿import type { Sesion } from "../../types";
 
-type Sesion = {
-  id: string;
-  tipo: "fuerza" | "resistencia" | "tecnica" | "recuperacion";
-  fecha: string;
-  atleta: string;
-  observaciones?: string;
+type Props = {
+  sesiones: Sesion[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
 };
 
-const SesionList: React.FC<{ sesiones: Sesion[] }> = ({ sesiones }) => {
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Sesiones de entrenamiento</h2>
-      <ul className="space-y-2">
-        {sesiones.map((sesion) => (
-          <li key={sesion.id} className="border p-2 rounded shadow">
-            <p>Tipo: {sesion.tipo}</p>
-            <p>Fecha: {sesion.fecha}</p>
-            <p>Atleta: {sesion.atleta}</p>
-            {sesion.observaciones && <p>Notas: {sesion.observaciones}</p>}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+const SesionList = ({ sesiones, selectedId, onSelect }: Props) => (
+  <ul className="space-y-3">
+    {sesiones.map((sesion) => {
+      const isSelected = sesion.id === selectedId;
+      return (
+        <li
+          key={sesion.id}
+          className={`rounded-lg border p-3 transition ${
+            isSelected ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white"
+          }`}
+        >
+          <button className="w-full text-left" type="button" onClick={() => onSelect(sesion.id)}>
+            <p className="font-semibold text-slate-900">{sesion.atleta}</p>
+            <p className="text-sm capitalize text-slate-600">{sesion.tipo}</p>
+            <p className="text-sm text-slate-600">{sesion.fecha}</p>
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+);
 
 export default SesionList;

@@ -1,31 +1,31 @@
-import React from "react";
+﻿import type { Ficha } from "../../types";
 
-type Ficha = {
-  id: string;
-  nombre: string;
-  apellido: string;
-  edad: number;
-  peso: number;
-  altura: number;
-  posicion: string;
-  lesiones?: string;
+type Props = {
+  fichas: Ficha[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
 };
 
-const FichaList: React.FC<{ fichas: Ficha[] }> = ({ fichas }) => {
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Fichas de atletas</h2>
-      <ul className="space-y-2">
-        {fichas.map((ficha) => (
-          <li key={ficha.id} className="border p-2 rounded shadow">
-            <p>{ficha.nombre} {ficha.apellido}</p>
-            <p>Edad: {ficha.edad} | Peso: {ficha.peso}kg | Altura: {ficha.altura}cm</p>
-            <p>Posición: {ficha.posicion}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+const FichaList = ({ fichas, selectedId, onSelect }: Props) => (
+  <ul className="space-y-3">
+    {fichas.map((ficha) => {
+      const isSelected = ficha.id === selectedId;
+      return (
+        <li
+          key={ficha.id}
+          className={`rounded-lg border p-3 transition ${
+            isSelected ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white"
+          }`}
+        >
+          <button className="w-full text-left" type="button" onClick={() => onSelect(ficha.id)}>
+            <p className="font-semibold text-slate-900">{ficha.nombre} {ficha.apellido}</p>
+            <p className="text-sm text-slate-600">{ficha.posicion}</p>
+            <p className="text-sm text-slate-600">{ficha.edad} años · {ficha.peso} kg · {ficha.altura} cm</p>
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+);
 
 export default FichaList;
