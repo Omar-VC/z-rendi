@@ -1,21 +1,17 @@
-// src/firebase.ts
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// Configuración de Firebase (tus credenciales)
 const firebaseConfig = {
-  apiKey: "AIzaSyBs9hQzLSfO-kHaNmpt3G-2NJ5msCUum1A",
-  authDomain: "z-rendi.firebaseapp.com",
-  projectId: "z-rendi",
-  storageBucket: "z-rendi.firebasestorage.app",
-  messagingSenderId: "324495153278",
-  appId: "1:324495153278:web:d2b83413fe49a0bb31202f"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? "AIzaSyBs9hQzLSfO-kHaNmpt3G-2NJ5msCUum1A",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? "z-rendi.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? "z-rendi",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? "z-rendi.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? "324495153278",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? "1:324495153278:web:d2b83413fe49a0bb31202f",
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 
-// Exportar servicios
 export const db = getFirestore(app);
 export const auth = getAuth(app);
