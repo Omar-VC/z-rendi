@@ -1,10 +1,10 @@
-﻿import { addDoc, collection, doc, getDocs, updateDoc } from "firebase/firestore";
+﻿import { addDoc, collection, doc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import CuotaDetail from "../components/Cuotas/CuotaDetail";
 import CuotaList from "../components/Cuotas/CuotaList";
 import { cuotasIniciales } from "../data/mockData";
 import { db } from "../firebase";
-import type { Cuota, CuotaEstado } from "../types";
+import type { Cuota, CuotaEstado, Ficha } from "../types";
 
 type CuotaForm = Omit<Cuota, "id">;
 
@@ -16,6 +16,8 @@ const initialForm: CuotaForm = {
   ultimoPago: "",
 };
 
+
+
 const CuotasPage = () => {
   const [cuotas, setCuotas] = useState<Cuota[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -24,6 +26,35 @@ const CuotasPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CuotaForm>(initialForm);
+  const [clientes, setClientes] = useState<Ficha[]>([]);
+
+  const loadClientes = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "fichas"));
+      const data = snapshot.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<Ficha, "id">) }));
+      setClientes(data);
+    } catch (error) {
+      console.error("Error al cargar clientes:", error);
+    }
+  };
+
+  useEffect(() => {
+    void loadClientes();
+  }, []);
+
+
+
+
+  const borrarCuota = async () => {
+    if (!selectedId) return;
+    try {
+      await deleteDoc(doc(db, "cuotas", selectedId));
+      await loadCuotas();
+    } catch {
+      setError("No tenés permisos para borrar cuotas en Firestore.");
+    }
+  };  
+
 
   const loadCuotas = async () => {
     setLoading(true);
@@ -71,11 +102,10 @@ const CuotasPage = () => {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-
     const payload: CuotaForm = {
       ...form,
       ultimoPago: form.ultimoPago?.trim() ? form.ultimoPago : undefined,
-    };
+    };  
 
     try {
       if (editingId) {
@@ -101,12 +131,24 @@ const CuotasPage = () => {
           <button className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white" type="button" onClick={startCreate}>
             + Nueva cuota
           </button>
+          <button className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-60" type="button" onClick={borrarCuota} disabled={!selectedCuota}>
+            Borrar seleccionada
+          </button> 
         </div>
       </header>
 
       {showForm && (
         <form className="rounded-lg border border-slate-200 bg-white p-4 grid gap-3 md:grid-cols-2" onSubmit={handleSubmit}>
-          <input className="rounded border p-2" placeholder="Cliente / Atleta" value={form.atleta} onChange={(e) => setForm((p) => ({ ...p, atleta: e.target.value }))} required />
+          <select className="rounded border p-2" value={form.atleta} onChange={(e) => setForm((p) => ({ ...p, atleta: e.target.value }))} required>
+            <option value="" disabled>
+              Selecciona un cliente
+            </option>
+            {clientes.map((cliente) => (
+              <option key={cliente.id} value={cliente.nombre}>
+                {cliente.nombre}
+              </option>
+            ))}
+          </select>
           <select className="rounded border p-2" value={form.estado} onChange={(e) => setForm((p) => ({ ...p, estado: e.target.value as CuotaEstado }))}>
             <option value="pendiente">Pendiente</option>
             <option value="pagado">Pagado</option>

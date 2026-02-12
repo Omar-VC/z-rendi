@@ -1,4 +1,4 @@
-﻿import { addDoc, collection, doc, getDocs, updateDoc } from "firebase/firestore";
+﻿import { addDoc, collection, doc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import FichaDetail from "../components/fichas/FichaDetail";
 import FichaList from "../components/fichas/FichaList";
@@ -20,6 +20,8 @@ const initialForm: FichaForm = {
   evaluacionActual: "",
 };
 
+ 
+
 const FichasPage = () => {
   const [fichas, setFichas] = useState<Ficha[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -28,6 +30,17 @@ const FichasPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FichaForm>(initialForm);
+
+  const borrarFicha = async () => {
+    if (!selectedId) return;
+    try {
+      await deleteDoc(doc(db, "fichas", selectedId));
+      await loadFichas();
+    } catch {
+      setError("No tenés permisos para borrar fichas en Firestore.");
+    }
+  };  
+  
 
   const loadFichas = async () => {
     setLoading(true);
@@ -98,6 +111,9 @@ const FichasPage = () => {
           </button>
           <button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white" type="button" onClick={startCreate}>
             + Nueva ficha
+          </button>
+          <button className="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-60" type="button" onClick={borrarFicha} disabled={!selectedFicha}>
+            Borrar seleccionada
           </button>
         </div>
       </header>

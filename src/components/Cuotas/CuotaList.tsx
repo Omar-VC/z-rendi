@@ -30,4 +30,6 @@ const CuotaList = ({ cuotas, selectedId, onSelect }: Props) => (
   </ul>
 );
 
-export default CuotaList;
+export default CuotaList; 
+
+
