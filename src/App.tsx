@@ -1,4 +1,5 @@
-﻿import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+﻿
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Dashboard from "./pages/Dashboard";
@@ -6,26 +7,33 @@ import FichasPage from "./pages/FichasPage";
 import SesionesPage from "./pages/SesionesPage";
 import CuotasPage from "./pages/CuotasPage";
 import LoginPage from "./pages/LoginPage";
+import ClienteDashboard from "./pages/ClienteDashboard"; // 👈 nueva página
 import { useEffect, useState } from "react";
+import RegistroCliente from "./pages/RegistroCliente";
+import ClientesAdmin from "./pages/ClientesAdmin"; // 👈 importa la nueva página
+
 
 function App() {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const [role, setRole] = useState<string | null>(null);
 
- useEffect(() => {
-  const fetchUserRole = async () => {
-    if (user) {
-      const idTokenResult = await user.getIdTokenResult();
-      const userRole = idTokenResult.claims.role as string | undefined; 
-      setRole(userRole ?? "cliente"); // 👈 siempre string o null
-      console.log("Claims:", idTokenResult.claims);
-    } else {
-      setRole(null);
-    }
-  };
-  fetchUserRole();
-}, [user]);
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
+        const idTokenResult = await user.getIdTokenResult(true); // refresca claims
+        const userRole = idTokenResult.claims.role as string | undefined;
+        setRole(userRole ?? "cliente");
+        console.log("Claims:", idTokenResult.claims);
+      } else {
+        setRole(null);
+      }
+    };
+    fetchUserRole();
+  }, [user]);
 
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+  }
 
   return (
     <Router>
@@ -50,38 +58,51 @@ function App() {
         {/* Menú condicional según rol */}
         {user && role === "admin" && (
           <nav className="mx-auto max-w-6xl px-4 py-4 flex flex-wrap gap-2">
-            <Link to="/dashboard" className="rounded-full px-4 py-2 bg-white border">Dashboard</Link>
+            <Link to="/dashboard" className="rounded-full px-4 py-2 bg-white border">Dashboard</Link> 
             <Link to="/fichas" className="rounded-full px-4 py-2 bg-white border">Fichas</Link>
             <Link to="/sesiones" className="rounded-full px-4 py-2 bg-white border">Sesiones</Link>
             <Link to="/cuotas" className="rounded-full px-4 py-2 bg-white border">Cuotas</Link>
+            <Link to="/clientes-admin" className="rounded-full px-4 py-2 bg-white border">Clientes</Link> {/* Nuevo enlace */}
           </nav>
         )}
 
         {user && role === "cliente" && (
           <nav className="mx-auto max-w-6xl px-4 py-4 flex flex-wrap gap-2">
-            <Link to="/sesiones" className="rounded-full px-4 py-2 bg-white border">Mis Sesiones</Link>
-            <Link to="/cuotas" className="rounded-full px-4 py-2 bg-white border">Mis Cuotas</Link>
+            <Link to="/cliente-dashboard" className="rounded-full px-4 py-2 bg-white border">Mi Panel</Link>
           </nav>
         )}
 
         <main className="mx-auto max-w-6xl px-4 pb-8">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/registro-cliente" element={<RegistroCliente />} />
+
+            {/* Admin */}
             {user && role === "admin" && (
               <>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/clientes-admin" element={<ClientesAdmin />} />
                 <Route path="/fichas" element={<FichasPage />} />
                 <Route path="/sesiones" element={<SesionesPage />} />
                 <Route path="/cuotas" element={<CuotasPage />} />
               </>
             )}
+
+            {/* Cliente */}
             {user && role === "cliente" && (
-              <>
-                <Route path="/sesiones" element={<SesionesPage />} />
-                <Route path="/cuotas" element={<CuotasPage />} />
-              </>
+              <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
             )}
-            <Route path="*" element={<Navigate to={user ? (role === "admin" ? "/dashboard" : "/sesiones") : "/login"} replace />} />
+
+            {/* Redirecciones */}
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to={user ? (role === "admin" ? "/dashboard" : "/cliente-dashboard") : "/login"}
+                  replace
+                />
+              }
+            />
           </Routes>
         </main>
       </div>
