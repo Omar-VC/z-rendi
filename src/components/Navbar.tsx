@@ -5,7 +5,7 @@ interface NavbarProps {
   role?: string | null;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ role }) => {
+const Navbar: React.FC<NavbarProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
