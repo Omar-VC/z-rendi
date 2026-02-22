@@ -80,11 +80,13 @@ const ClienteDetail: React.FC = () => {
   const [isEditingFicha, setIsEditingFicha] = useState(false);
   const [fichaEdit, setFichaEdit] = useState<Ficha | null>(null);
 
-  // Cuotas
-  const [editingCuotaId, setEditingCuotaId] = useState<string | null>(null);
-  const [cuotaEdits, setCuotaEdits] = useState<Record<string, Partial<Cuota>>>(
-    {},
-  );
+  // Cuotas (form)
+  const [showCuotaForm, setShowCuotaForm] = useState(false);
+  const [newCuota, setNewCuota] = useState({
+    monto: 0,
+    estado: "pendiente",
+    vencimiento: "",
+  });
 
   // Sesiones (form)
   const [showSesionForm, setShowSesionForm] = useState(false);
@@ -186,45 +188,6 @@ const ClienteDetail: React.FC = () => {
   };
 
   // ---------- CUOTAS: Editar / Guardar / Eliminar ----------
-  const startEditCuota = (cuota: Cuota) => {
-    setEditingCuotaId(cuota.id);
-    setCuotaEdits((prev) => ({ ...prev, [cuota.id]: { ...cuota } }));
-  };
-
-  const cancelEditCuota = (cuotaId: string) => {
-    setEditingCuotaId(null);
-    setCuotaEdits((prev) => {
-      const copy = { ...prev };
-      delete copy[cuotaId];
-      return copy;
-    });
-  };
-
-  const handleCuotaChange = (
-    cuotaId: string,
-    field: keyof Cuota,
-    value: any,
-  ) => {
-    setCuotaEdits((prev) => ({
-      ...prev,
-      [cuotaId]: { ...(prev[cuotaId] ?? {}), [field]: value },
-    }));
-  };
-
-  const saveCuota = async (cuotaId: string) => {
-    const edits = cuotaEdits[cuotaId];
-    if (!edits) return;
-    try {
-      await updateDoc(doc(db, "cuotas", cuotaId), edits as any);
-      setCuotas((prev) =>
-        prev.map((c) => (c.id === cuotaId ? { ...c, ...(edits as any) } : c)),
-      );
-      cancelEditCuota(cuotaId);
-    } catch (error) {
-      console.error("Error actualizando cuota:", error);
-      alert("Error actualizando cuota. Revisá la consola.");
-    }
-  };
 
   const deleteCuota = async (cuotaId: string) => {
     const ok = window.confirm(
@@ -315,6 +278,35 @@ const ClienteDetail: React.FC = () => {
     } catch (error) {
       console.error("Error eliminando sesión:", error);
       alert("Error eliminando sesión. Revisá la consola.");
+    }
+  };
+
+  // ---------- CUOTAS: Agregar nueva cuota ----------
+  const handleAddCuota = async () => {
+    if (!newCuota.monto || newCuota.monto <= 0) {
+      alert("Ingresá un monto válido.");
+      return;
+    }
+    if (!newCuota.vencimiento) {
+      alert("Ingresá una fecha de vencimiento.");
+      return;
+    }
+
+    const nuevaCuota = {
+      clienteId: id!,
+      monto: newCuota.monto,
+      estado: newCuota.estado,
+      vencimiento: newCuota.vencimiento,
+    };
+
+    try {
+      const ref = await addDoc(collection(db, "cuotas"), nuevaCuota);
+      setCuotas((prev) => [{ id: ref.id, ...nuevaCuota }, ...prev]);
+      setShowCuotaForm(false);
+      setNewCuota({ monto: 0, estado: "pendiente", vencimiento: "" });
+    } catch (error) {
+      console.error("Error guardando cuota:", error);
+      alert("Error guardando cuota. Revisá la consola.");
     }
   };
 
@@ -631,131 +623,121 @@ const ClienteDetail: React.FC = () => {
           {/* CUOTAS */}
           {activeTab === "cuotas" && (
             <section>
-              {cuotas.length > 0 ? (
-                <div className="space-y-3">
-                  {cuotas.map((c) => {
-                    const isEditing = editingCuotaId === c.id;
-                    const edits = cuotaEdits[c.id] ?? {};
-                    return (
-                      <div
-                        key={c.id}
-                        className="bg-white shadow rounded p-4 flex flex-col md:flex-row md:items-center md:justify-between"
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-xl font-semibold">Cuotas</h3>
+                <button
+                  onClick={() => setShowCuotaForm((s) => !s)}
+                  className="bg-green-600 text-white px-3 py-1 rounded"
+                >
+                  {showCuotaForm ? "Cerrar" : "Asignar cuota"}
+                </button>
+              </div>
+              {/* Formulario nueva cuota */}
+              {showCuotaForm && (
+                <div className="bg-white shadow rounded p-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-sm text-gray-600">
+                        Monto
+                      </label>
+                      <input
+                        type="number"
+                        value={newCuota.monto}
+                        onChange={(e) =>
+                          setNewCuota({
+                            ...newCuota,
+                            monto: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600">
+                        Estado
+                      </label>
+                      <select
+                        value={newCuota.estado}
+                        onChange={(e) =>
+                          setNewCuota({ ...newCuota, estado: e.target.value })
+                        }
+                        className="w-full p-2 border rounded"
                       >
-                        <div className="flex-1">
-                          {isEditing ? (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              <div>
-                                <label className="block text-sm text-gray-600">
-                                  Monto
-                                </label>
-                                <input
-                                  type="number"
-                                  value={edits.monto ?? c.monto ?? ""}
-                                  onChange={(e) =>
-                                    handleCuotaChange(
-                                      c.id,
-                                      "monto",
-                                      Number(e.target.value),
-                                    )
-                                  }
-                                  className="w-full border rounded px-2 py-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm text-gray-600">
-                                  Estado
-                                </label>
-                                <select
-                                  value={
-                                    edits.estado ?? c.estado ?? "pendiente"
-                                  }
-                                  onChange={(e) =>
-                                    handleCuotaChange(
-                                      c.id,
-                                      "estado",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full border rounded px-2 py-1"
-                                >
-                                  <option value="pendiente">pendiente</option>
-                                  <option value="pagada">pagada</option>
-                                  <option value="vencida">vencida</option>
-                                </select>
-                              </div>
-                              <div>
-                                <label className="block text-sm text-gray-600">
-                                  Vencimiento
-                                </label>
-                                <input
-                                  type="date"
-                                  value={
-                                    edits.vencimiento ?? c.vencimiento ?? ""
-                                  }
-                                  onChange={(e) =>
-                                    handleCuotaChange(
-                                      c.id,
-                                      "vencimiento",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full border rounded px-2 py-1"
-                                />
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="font-medium">
-                                Monto: ${c.monto ?? "-"}
-                              </p>
-                              <p>Estado: {c.estado ?? "-"}</p>
-                              <p>Vencimiento: {c.vencimiento ?? "-"}</p>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mt-3 md:mt-0 md:ml-4 flex gap-2">
-                          {isEditing ? (
-                            <>
-                              <button
-                                onClick={() => saveCuota(c.id)}
-                                className="bg-blue-600 text-white px-3 py-1 rounded"
-                              >
-                                Guardar
-                              </button>
-                              <button
-                                onClick={() => cancelEditCuota(c.id)}
-                                className="bg-gray-400 text-white px-3 py-1 rounded"
-                              >
-                                Cancelar
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => startEditCuota(c)}
-                                className="bg-yellow-500 text-white px-3 py-1 rounded"
-                              >
-                                Editar
-                              </button>
-                              <button
-                                onClick={() => deleteCuota(c.id)}
-                                className="bg-red-600 text-white px-3 py-1 rounded"
-                              >
-                                Eliminar
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                        <option value="pendiente">Pendiente</option>
+                        <option value="pagada">Pagada</option>
+                        <option value="vencida">Vencida</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600">
+                        Vencimiento
+                      </label>
+                      <input
+                        type="date"
+                        value={newCuota.vencimiento}
+                        onChange={(e) =>
+                          setNewCuota({
+                            ...newCuota,
+                            vencimiento: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-3">
+                    <button
+                      onClick={handleAddCuota}
+                      className="bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                      Guardar cuota
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowCuotaForm(false);
+                        setNewCuota({
+                          monto: 0,
+                          estado: "pendiente",
+                          vencimiento: "",
+                        });
+                      }}
+                      className="bg-gray-400 text-white px-4 py-2 rounded"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-gray-500">
-                  No hay cuotas registradas para este cliente.
-                </p>
               )}
+              {/* Listado de cuotas */}
+              <div className="space-y-3">
+                {cuotas.length > 0 ? (
+                  cuotas.map((c) => (
+                    <div
+                      key={c.id}
+                      className="bg-white shadow rounded p-4 flex flex-col md:flex-row md:items-center md:justify-between"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium">Monto: ${c.monto ?? "-"}</p>
+                        <p>Estado: {c.estado ?? "-"}</p>
+                        <p>Vencimiento: {c.vencimiento ?? "-"}</p>
+                      </div>
+
+                      <div className="mt-3 md:mt-0 md:ml-4 flex gap-2">
+                        <button
+                          onClick={() => deleteCuota(c.id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">
+                    No hay cuotas registradas para este cliente.
+                  </p>
+                )}
+              </div>
             </section>
           )}
 
@@ -968,3 +950,16 @@ const ClienteDetail: React.FC = () => {
 };
 
 export default ClienteDetail;
+
+//¿si yo quiero agregar un boton para asignar cuota, ¿en que porcion del codigo tenemos que hacer foco?
+//Para agregar un botón de "Asignar cuota", deberíamos enfocarnos en la sección de "CUOTAS". Específicamente, podríamos agregar el botón dentro del bloque que se muestra cuando el usuario está viendo las cuotas (dentro del bloque `{activeTab === "cuotas" && ( ... )}`).
+
+//Podríamos colocar el botón justo antes de la lista de cuotas, para que sea fácilmente accesible. Al hacer clic en ese botón, podríamos mostrar un formulario para ingresar los detalles de la nueva cuota (monto, estado, vencimiento) y luego guardar esa información en Firestore, similar a cómo se manejan las sesiones.
+
+//coloquemos ese boton debajo del titulo "Cuotas" y hagamos que al hacer click se despliegue un formulario para agregar una nueva cuota, con los campos monto, estado y vencimiento.
+
+//Para agregar el botón de "Asignar cuota" debajo del título "Cuotas" y mostrar un formulario al hacer clic, podemos seguir estos pasos:
+//1. Agregar un estado para controlar la visibilidad del formulario de nueva cuota.
+//2. Colocar el botón debajo del título "Cuotas".
+//3. Crear el formulario para ingresar los detalles de la nueva cuota (monto, estado, vencimiento).
+//4. Implementar la función para guardar la nueva cuota en Firestore y actualizar el estado local.
