@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { db } from "../firebase";
 import type { Cuota, Ficha, Sesion } from "../types";
 import React from "react";
-import Navbar from "../components/Navbar";
 import CardMetric from "../components/CardMetric";
 
 const Home: React.FC = () => {
@@ -67,7 +66,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      <Navbar />
+      
     </div>
   );
 };
