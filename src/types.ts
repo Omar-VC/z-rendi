@@ -1,5 +1,6 @@
 ﻿export type Ficha = {
   id: string;
+  clienteId?: string;
   nombre: string;
   apellido: string;
   edad: number;

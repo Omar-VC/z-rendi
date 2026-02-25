@@ -21,3 +21,9 @@ const FichaDetail = ({ ficha }: Props) => {
 };
 
 export default FichaDetail;
+
+
+
+
+
+

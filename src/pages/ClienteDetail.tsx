@@ -8,7 +8,6 @@ import {
   query,
   where,
   updateDoc,
-  setDoc,
   addDoc,
   deleteDoc,
   serverTimestamp,
@@ -69,7 +68,6 @@ interface Sesion {
 const ClienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [cliente, setCliente] = useState<Cliente | null>(null);
-  const [fichas, setFichas] = useState<Ficha[]>([]);
   const [cuotas, setCuotas] = useState<Cuota[]>([]);
   const [sesiones, setSesiones] = useState<Sesion[]>([]);
   const [activeTab, setActiveTab] = useState<"ficha" | "cuotas" | "sesiones">(
@@ -77,8 +75,8 @@ const ClienteDetail: React.FC = () => {
   );
 
   // Ficha
-  const [isEditingFicha, setIsEditingFicha] = useState(false);
   const [fichaEdit, setFichaEdit] = useState<Ficha | null>(null);
+  const [showFichaForm, setShowFichaForm] = useState(false);
 
   // Cuotas (form)
   const [showCuotaForm, setShowCuotaForm] = useState(false);
@@ -124,7 +122,6 @@ const ClienteDetail: React.FC = () => {
             ...(d.data() as any),
           }));
         }
-        setFichas(fichasData);
         setFichaEdit(fichasData.length > 0 ? fichasData[0] : null);
 
         // Cuotas por clienteId
@@ -159,33 +156,35 @@ const ClienteDetail: React.FC = () => {
   }, [id]);
 
   // ---------- FICHA: Guardar (update o create) ----------
+
   const handleSaveFicha = async () => {
-    if (!fichaEdit) return;
-    try {
-      const fichaId = fichaEdit.id ?? id!;
-      const fichaRef = doc(db, "fichas", fichaId);
-      const payload = { ...fichaEdit, clienteId: id };
-      if (fichaEdit.id) {
-        await updateDoc(fichaRef, payload);
-      } else {
-        await setDoc(fichaRef, payload);
-      }
+  if (!fichaEdit) return;
+  if (!(fichaEdit.nombre ?? "").trim() || !(fichaEdit.apellido ?? "").trim()) {
+    alert("El nombre y apellido son obligatorios.");
+    return;
+  }
 
-      setFichas((prev) => {
-        const exists = prev.some((f) => f.id === fichaId);
-        if (exists) {
-          return prev.map((f) => (f.id === fichaId ? { ...f, ...payload } : f));
-        }
-        return [{ id: fichaId, ...(payload as any) }, ...prev];
+  try {
+    if (fichaEdit.id) {
+      const fichaRef = doc(db, "fichas", fichaEdit.id);
+      await updateDoc(fichaRef, {
+        ...fichaEdit,
+        clienteId: fichaEdit.clienteId ?? id!, // 🔑 aseguramos que quede guardado
       });
-
-      setIsEditingFicha(false);
-      setFichaEdit((prev) => ({ ...(prev ?? {}), id: fichaId }));
-    } catch (error) {
-      console.error("Error guardando ficha:", error);
-      alert("Error guardando ficha. Revisá la consola.");
+      alert("Ficha actualizada.");
+    } else {
+      const nuevaFicha = { ...fichaEdit, clienteId: id! };
+      const ref = await addDoc(collection(db, "fichas"), nuevaFicha);
+      alert("Ficha creada.");
+      setFichaEdit({ ...nuevaFicha, id: ref.id });
     }
-  };
+    setShowFichaForm(false);
+  } catch (error) {
+    console.error("Error guardando ficha:", error);
+    alert("Error guardando ficha. Revisá la consola.");
+  }
+};
+
 
   // ---------- CUOTAS: Editar / Guardar / Eliminar ----------
 
@@ -204,6 +203,7 @@ const ClienteDetail: React.FC = () => {
   };
 
   // ---------- SESIONES: Bloques dinámicos y guardado ----------
+
   const addBloque = () => {
     setBloques((prev) => [
       ...prev,
@@ -282,6 +282,7 @@ const ClienteDetail: React.FC = () => {
   };
 
   // ---------- CUOTAS: Agregar nueva cuota ----------
+
   const handleAddCuota = async () => {
     if (!newCuota.monto || newCuota.monto <= 0) {
       alert("Ingresá un monto válido.");
@@ -362,263 +363,196 @@ const ClienteDetail: React.FC = () => {
           </div>
 
           {/* FICHA */}
-          {activeTab === "ficha" && (
-            <section>
-              <div className="bg-white shadow rounded p-4">
-                {fichaEdit && !isEditingFicha && (
-                  <div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <p>
-                        <strong>Nombre:</strong>{" "}
-                        {fichaEdit.nombre ?? cliente.nombre ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Apellido:</strong>{" "}
-                        {fichaEdit.apellido ?? cliente.apellido ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Edad:</strong> {fichaEdit.edad ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Peso (kg):</strong> {fichaEdit.peso ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Altura (cm):</strong> {fichaEdit.altura ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Teléfono:</strong>{" "}
-                        {fichaEdit.telefono ?? cliente.telefono ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Deporte:</strong> {fichaEdit.deporte ?? "-"}
-                      </p>
-                      <p>
-                        <strong>Posición:</strong> {fichaEdit.posicion ?? "-"}
-                      </p>
-                    </div>
+{activeTab === "ficha" && (
+  <section>
+    <div className="mb-4 flex items-center justify-between">
+      <h3 className="text-xl font-semibold">Ficha de atleta</h3>
+      {!fichaEdit && (
+        <button
+          onClick={() => {
+            setFichaEdit({
+              clienteId: id!,
+              nombre: cliente.nombre ?? "",
+              apellido: cliente.apellido ?? "",
+            });
+            setShowFichaForm(true);
+          }}
+          className="bg-green-600 text-white px-3 py-1 rounded"
+        >
+          Agregar ficha
+        </button>
+      )}
+    </div>
 
-                    <div className="mt-3">
-                      <p>
-                        <strong>Historial de lesiones:</strong>
-                      </p>
-                      <p className="mb-2">
-                        {fichaEdit.historialLesiones ?? "-"}
-                      </p>
+    {showFichaForm ? (
+      // Formulario con inputs
+      <div className="bg-white shadow rounded p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-sm text-gray-600">Nombre</label>
+            <input
+              type="text"
+              value={fichaEdit?.nombre ?? ""}
+              onChange={(e) =>
+                setFichaEdit({ ...fichaEdit!, nombre: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Apellido</label>
+            <input
+              type="text"
+              value={fichaEdit?.apellido ?? ""}
+              onChange={(e) =>
+                setFichaEdit({ ...fichaEdit!, apellido: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Edad</label>
+            <input
+              type="number"
+              value={fichaEdit?.edad ?? ""}
+              onChange={(e) =>
+                setFichaEdit({
+                  ...fichaEdit!,
+                  edad: parseInt(e.target.value) || undefined,
+                })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Peso (kg)</label>
+            <input
+              type="number"
+              value={fichaEdit?.peso ?? ""}
+              onChange={(e) =>
+                setFichaEdit({
+                  ...fichaEdit!,
+                  peso: parseFloat(e.target.value) || undefined,
+                })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Altura (cm)</label>
+            <input
+              type="number"
+              value={fichaEdit?.altura ?? ""}
+              onChange={(e) =>
+                setFichaEdit({
+                  ...fichaEdit!,
+                  altura: parseFloat(e.target.value) || undefined,
+                })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">
+              Historial de lesiones
+            </label>
+            <textarea
+              value={fichaEdit?.historialLesiones ?? ""}
+              onChange={(e) =>
+                setFichaEdit({
+                  ...fichaEdit!,
+                  historialLesiones: e.target.value,
+                })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Deporte</label>
+            <input
+              type="text"
+              value={fichaEdit?.deporte ?? ""}
+              onChange={(e) =>
+                setFichaEdit({ ...fichaEdit!, deporte: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Posición</label>
+            <input
+              type="text"
+              value={fichaEdit?.posicion ?? ""}
+              onChange={(e) =>
+                setFichaEdit({ ...fichaEdit!, posicion: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Observaciones</label>
+            <textarea
+              value={fichaEdit?.observaciones ?? ""}
+              onChange={(e) =>
+                setFichaEdit({ ...fichaEdit!, observaciones: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600">Teléfono</label>
+            <input
+              type="text"
+              value={fichaEdit?.telefono ?? ""}
+              onChange={(e) =>
+                setFichaEdit({ ...fichaEdit!, telefono: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex gap-3">
+          <button
+            onClick={handleSaveFicha}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Guardar ficha
+          </button>
+          <button
+            onClick={() => setShowFichaForm(false)}
+            className="bg-gray-600 text-white px-4 py-2 rounded"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ) : fichaEdit ? (
+      // Tarjeta con datos
+      <div className="bg-white shadow rounded p-4">
+        <p><strong>Nombre:</strong> {fichaEdit.nombre}</p>
+        <p><strong>Apellido:</strong> {fichaEdit.apellido}</p>
+        <p><strong>Edad:</strong> {fichaEdit.edad ?? "-"}</p>
+        <p><strong>Peso:</strong> {fichaEdit.peso ?? "-"}</p>
+        <p><strong>Altura:</strong> {fichaEdit.altura ?? "-"}</p>
+        <p><strong>Deporte:</strong> {fichaEdit.deporte ?? "-"}</p>
+        <p><strong>Posición:</strong> {fichaEdit.posicion ?? "-"}</p>
+        <p><strong>Observaciones:</strong> {fichaEdit.observaciones ?? "-"}</p>
+        <p><strong>Teléfono:</strong> {fichaEdit.telefono ?? "-"}</p>
+        <button
+          onClick={() => setShowFichaForm(true)}
+          className="mt-3 bg-yellow-600 text-white px-3 py-1 rounded"
+        >
+          Editar ficha
+        </button>
+      </div>
+    ) : (
+      <div className="rounded-lg border border-dashed border-slate-300 p-4 text-slate-500">
+        No hay ficha registrada para este cliente. Hacé clic en "Agregar ficha" para crear una nueva.
+      </div>
+    )}
+  </section>
+)}
 
-                      <p>
-                        <strong>Observaciones:</strong>
-                      </p>
-                      <p>{fichaEdit.observaciones ?? "-"}</p>
-                    </div>
-
-                    <div className="mt-4">
-                      <button
-                        onClick={() => setIsEditingFicha(true)}
-                        className="bg-yellow-500 text-white px-4 py-2 rounded"
-                      >
-                        Editar Ficha
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Formulario de edición / creación */}
-                {(isEditingFicha || !fichaEdit) && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Nombre
-                        </label>
-                        <input
-                          type="text"
-                          value={fichaEdit?.nombre ?? cliente?.nombre ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              nombre: e.target.value,
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Apellido
-                        </label>
-                        <input
-                          type="text"
-                          value={fichaEdit?.apellido ?? cliente?.apellido ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              apellido: e.target.value,
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Edad
-                        </label>
-                        <input
-                          type="number"
-                          value={fichaEdit?.edad ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              edad: Number(e.target.value),
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Peso (kg)
-                        </label>
-                        <input
-                          type="number"
-                          value={fichaEdit?.peso ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              peso: Number(e.target.value),
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Altura (cm)
-                        </label>
-                        <input
-                          type="number"
-                          value={fichaEdit?.altura ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              altura: Number(e.target.value),
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Teléfono
-                        </label>
-                        <input
-                          type="text"
-                          value={fichaEdit?.telefono ?? cliente?.telefono ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              telefono: e.target.value,
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Deporte
-                        </label>
-                        <input
-                          type="text"
-                          value={fichaEdit?.deporte ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              deporte: e.target.value,
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm text-gray-600">
-                          Posición
-                        </label>
-                        <input
-                          type="text"
-                          value={fichaEdit?.posicion ?? ""}
-                          onChange={(e) =>
-                            setFichaEdit({
-                              ...(fichaEdit ?? { id: id! }),
-                              posicion: e.target.value,
-                            })
-                          }
-                          className="w-full border rounded px-2 py-1"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-600">
-                        Historial de lesiones
-                      </label>
-                      <textarea
-                        value={fichaEdit?.historialLesiones ?? ""}
-                        onChange={(e) =>
-                          setFichaEdit({
-                            ...(fichaEdit ?? { id: id! }),
-                            historialLesiones: e.target.value,
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm text-gray-600">
-                        Observaciones
-                      </label>
-                      <textarea
-                        value={fichaEdit?.observaciones ?? ""}
-                        onChange={(e) =>
-                          setFichaEdit({
-                            ...(fichaEdit ?? { id: id! }),
-                            observaciones: e.target.value,
-                          })
-                        }
-                        className="w-full border rounded px-2 py-1"
-                      />
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleSaveFicha}
-                        className="bg-blue-600 text-white px-4 py-2 rounded"
-                      >
-                        Guardar ficha
-                      </button>
-                      <button
-                        onClick={() => {
-                          const original = fichas.find(
-                            (f) => f.id === (fichaEdit?.id ?? id),
-                          );
-                          setFichaEdit(original ?? null);
-                          setIsEditingFicha(false);
-                        }}
-                        className="bg-gray-400 text-white px-4 py-2 rounded"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
 
           {/* CUOTAS */}
           {activeTab === "cuotas" && (
@@ -950,16 +884,3 @@ const ClienteDetail: React.FC = () => {
 };
 
 export default ClienteDetail;
-
-//¿si yo quiero agregar un boton para asignar cuota, ¿en que porcion del codigo tenemos que hacer foco?
-//Para agregar un botón de "Asignar cuota", deberíamos enfocarnos en la sección de "CUOTAS". Específicamente, podríamos agregar el botón dentro del bloque que se muestra cuando el usuario está viendo las cuotas (dentro del bloque `{activeTab === "cuotas" && ( ... )}`).
-
-//Podríamos colocar el botón justo antes de la lista de cuotas, para que sea fácilmente accesible. Al hacer clic en ese botón, podríamos mostrar un formulario para ingresar los detalles de la nueva cuota (monto, estado, vencimiento) y luego guardar esa información en Firestore, similar a cómo se manejan las sesiones.
-
-//coloquemos ese boton debajo del titulo "Cuotas" y hagamos que al hacer click se despliegue un formulario para agregar una nueva cuota, con los campos monto, estado y vencimiento.
-
-//Para agregar el botón de "Asignar cuota" debajo del título "Cuotas" y mostrar un formulario al hacer clic, podemos seguir estos pasos:
-//1. Agregar un estado para controlar la visibilidad del formulario de nueva cuota.
-//2. Colocar el botón debajo del título "Cuotas".
-//3. Crear el formulario para ingresar los detalles de la nueva cuota (monto, estado, vencimiento).
-//4. Implementar la función para guardar la nueva cuota en Firestore y actualizar el estado local.

@@ -1,6 +1,6 @@
 TAREAS PENDIENTES: 
 
-> Agregar un boton para "asignar cuota" a cada cliente
+>una ves creada la ficha, deberia quedar en forma de tarjeta, y ser vista como una tarjeta con todos los datos, en caso de que presionee "editar" ahi recien volver a mostrar como formulario.
 
 > Modificar el navbar cuando inicia sesion un cliente-usuario, actualmente se muetra el mismo navbar tanto para el administrador como para el cliente. El cliente solo deberia ver alg asi como: "Mi panel".alias
 

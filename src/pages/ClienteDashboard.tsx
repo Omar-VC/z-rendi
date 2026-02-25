@@ -1,7 +1,12 @@
-
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { doc, getDoc, collection, query, where, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs,
+} from "firebase/firestore";
 import type { Ficha, Sesion, Cuota } from "../types";
 
 const ClienteDashboard = () => {
@@ -14,11 +19,13 @@ const ClienteDashboard = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Ficha única del cliente
+    // Ficha única del cliente (busca por clienteId == uid)
     const loadFicha = async () => {
-      const docSnap = await getDoc(doc(db, "fichas", user.uid));
-      if (docSnap.exists()) {
-        setFicha({ id: docSnap.id, ...(docSnap.data() as Omit<Ficha, "id">) });
+      const qFicha = query(collection(db, "fichas"), where("clienteId", "==", user.uid));
+      const fichaSnap = await getDocs(qFicha);
+      if (!fichaSnap.empty) {
+        const d = fichaSnap.docs[0];
+        setFicha({ id: d.id, ...(d.data() as Omit<Ficha, "id">) });
       }
     };
 
@@ -59,9 +66,12 @@ const ClienteDashboard = () => {
             <li>Altura: {ficha.altura} cm</li>
             <li>Posición: {ficha.posicion}</li>
             <li>Lesiones: {ficha.lesiones}</li>
+            <li>Evaluación inicial: {ficha.evaluacionInicial}</li>
             <li>Evaluación actual: {ficha.evaluacionActual}</li>
           </ul>
-        ) : <p>No hay ficha cargada.</p>}
+        ) : (
+          <p>No hay ficha cargada.</p>
+        )}
       </div>
 
       {/* Sesiones */}
@@ -70,10 +80,12 @@ const ClienteDashboard = () => {
         {sesiones.length > 0 ? (
           <ul className="list-disc pl-5 text-sm text-slate-700">
             {sesiones.map((s) => (
-              <li key={s.id}>{s.fecha} - {s.tipo}</li>
+              <li key={s.id}>{s.fecha} - {s.tipo} • {s.observaciones}</li>
             ))}
           </ul>
-        ) : <p>No hay sesiones registradas.</p>}
+        ) : (
+          <p>No hay sesiones registradas.</p>
+        )}
       </div>
 
       {/* Cuotas */}
@@ -83,11 +95,13 @@ const ClienteDashboard = () => {
           <ul className="list-disc pl-5 text-sm text-slate-700">
             {cuotas.map((c) => (
               <li key={c.id}>
-                ${c.monto} - {c.estado}
+                ${c.monto} - {c.estado} (vence: {c.fechaVencimiento})
               </li>
             ))}
           </ul>
-        ) : <p>No hay cuotas registradas.</p>}
+        ) : (
+          <p>No hay cuotas registradas.</p>
+        )}
       </div>
     </section>
   );
