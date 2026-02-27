@@ -37,17 +37,26 @@ const FichaList = ({ fichas, selectedId, onSelect }: Props) => {
           const isSelected = ficha.id === selectedId;
           return (
             <li
-              key={ficha.id}
-              className={`rounded-lg border p-4 transition shadow-md ${
-                isSelected ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white"
-              }`}
-            >
-              <button className="w-full text-left" type="button" onClick={() => handleSelect(ficha)}>
-                <p className="font-semibold text-slate-900">{ficha.nombre} {ficha.apellido}</p>
-                <p className="text-sm text-slate-600">{ficha.posicion}</p>
-                <p className="text-sm text-slate-600">{ficha.edad} años · {ficha.peso} kg · {ficha.altura} cm</p>
-              </button>
-            </li>
+  key={ficha.id}
+  className={`rounded-xl border p-4 transition shadow-lg cursor-pointer ${
+    isSelected
+      ? "border-highlight bg-highlight/30 backdrop-blur-md"
+      : "border-white/20 bg-secondary/40 backdrop-blur-md"
+  }`}
+>
+  <button
+    className="w-full text-left text-white"
+    type="button"
+    onClick={() => handleSelect(ficha)}
+  >
+    <p className="font-semibold truncate">{ficha.nombre} {ficha.apellido}</p>
+    <p className="text-sm text-gray-300">{ficha.posicion}</p>
+    <p className="text-sm text-gray-400">
+      {ficha.edad} años · {ficha.peso} kg · {ficha.altura} cm
+    </p>
+  </button>
+</li>
+
           );
         })}
       </ul>

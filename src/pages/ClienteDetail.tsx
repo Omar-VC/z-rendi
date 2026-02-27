@@ -8,26 +8,38 @@ const ClienteDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<"fichas" | "cuotas" | "sesiones">("fichas");
 
-  if (!id) return <div>No se encontró el cliente</div>;
+  if (!id) return <div className="text-red-500">No se encontró el cliente</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-primary/90 backdrop-blur-sm p-6 text-white">
       {/* Tabs */}
-      <div className="flex space-x-4 border-b pb-2">
+      <div className="flex space-x-4 border-b border-white/20 pb-2 mb-6">
         <button
-          className={activeTab === "fichas" ? "font-bold text-blue-600" : ""}
+          className={`px-4 py-2 rounded-t-lg transition-colors duration-300 ${
+            activeTab === "fichas"
+              ? "bg-highlight text-white font-bold"
+              : "text-gray-300 hover:text-white"
+          }`}
           onClick={() => setActiveTab("fichas")}
         >
           Fichas
         </button>
         <button
-          className={activeTab === "cuotas" ? "font-bold text-blue-600" : ""}
+          className={`px-4 py-2 rounded-t-lg transition-colors duration-300 ${
+            activeTab === "cuotas"
+              ? "bg-highlight text-white font-bold"
+              : "text-gray-300 hover:text-white"
+          }`}
           onClick={() => setActiveTab("cuotas")}
         >
           Cuotas
         </button>
         <button
-          className={activeTab === "sesiones" ? "font-bold text-blue-600" : ""}
+          className={`px-4 py-2 rounded-t-lg transition-colors duration-300 ${
+            activeTab === "sesiones"
+              ? "bg-highlight text-white font-bold"
+              : "text-gray-300 hover:text-white"
+          }`}
           onClick={() => setActiveTab("sesiones")}
         >
           Sesiones
@@ -35,12 +47,13 @@ const ClienteDetail = () => {
       </div>
 
       {/* Contenido según tab */}
-      {activeTab === "fichas" && <FichasCliente clienteId={id} />}
-      {activeTab === "cuotas" && <CuotasCliente clienteId={id} />}
-      {activeTab === "sesiones" && (
-        <SesionesCliente clienteId={id} clientes={[]} /> 
-        // 👆 acá podés pasar la lista de fichas si querés mostrar nombre/apellido en sesiones
-      )}
+      <div className="bg-secondary/40 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-6">
+        {activeTab === "fichas" && <FichasCliente clienteId={id} />}
+        {activeTab === "cuotas" && <CuotasCliente clienteId={id} />}
+        {activeTab === "sesiones" && (
+          <SesionesCliente clienteId={id} clientes={[]} />
+        )}
+      </div>
     </div>
   );
 };

@@ -1,0 +1,46 @@
+/* Estilos globales */
+body {
+  @apply bg-primary text-white font-sans;
+}
+
+/* Encabezados */
+h1, h2, h3 {
+  @apply font-bold tracking-wide;
+}
+
+/* Botón base */
+.btn {
+  @apply px-4 py-2 rounded-lg font-semibold transition duration-300;
+  @apply flex items-center justify-center;
+}
+
+/* Variantes */
+.btn-primary {
+  @apply bg-red-700 text-white hover:bg-red-800 shadow-md;
+}
+
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700 shadow-md;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 shadow-md;
+}
+
+.btn-secondary {
+  @apply bg-gray-500 text-white hover:bg-gray-600 shadow-md;
+}
+
+/* Tarjetas */
+.card {
+  @apply rounded-xl p-6 shadow-lg transform transition duration-300 bg-secondary/40 backdrop-blur-md border border-white/20 text-white;
+}
+.card:hover {
+  @apply scale-105 shadow-2xl;
+}
+
+/* Inputs */
+.input {
+  @apply w-full px-3 py-2 rounded-lg border border-white/20 bg-secondary/30 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-highlight;
+}

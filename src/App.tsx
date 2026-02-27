@@ -6,16 +6,20 @@
 } from "react-router-dom";
 import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useEffect, useState } from "react";
+import "./styles/global.css";
+
+
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
-import ClienteDashboard from "./pages/ClienteDashboard";
-import ClienteSesiones from "./pages/ClienteSesiones"; // 👈 nueva página
-import { useEffect, useState } from "react";
 import RegistroCliente from "./pages/RegistroCliente";
 import ClientesPage from "./pages/ClientesPage";
 import ClienteDetail from "./pages/ClienteDetail";
-import Navbar from "./components/Navbar";
-import NavbarCliente from "./components/NavbarCliente"; // 👈 import nuevo
+import ClienteDashboard from "./pages/ClienteDashboard";
+import ClienteSesiones from "./pages/ClienteSesiones";
+
+import AdminLayout from "./layouts/AdminLayout";
+import NavbarCliente from "./components/NavbarCliente";
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -45,75 +49,48 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-slate-100">
-        {/* Header común */}
-        <header className="border-b border-slate-200 bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">Z-Rendi 🏋️‍♂️</h1>
-              <p className="text-sm text-slate-600">
-                Gestión de fichas, sesiones y cuotas
-              </p>
-            </div>
-            {user && (
-              <button
-                onClick={() => auth.signOut()}
-                className="bg-red-600 text-white px-3 py-1 rounded"
-              >
-                Salir
-              </button>
-            )}
-          </div>
-        </header>
+      <Routes>
+        {/* Login y registro */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro-cliente" element={<RegistroCliente />} />
 
-        {/* Navbar según rol */}
-        {user && role === "admin" && <Navbar role={role} />}
-        {user && role === "cliente" && <NavbarCliente />}
+        {/* Admin con AdminLayout */}
+        {user && role === "admin" && (
+          <Route element={<AdminLayout />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/clientes" element={<ClientesPage />} />
+            <Route path="/clientes/:id" element={<ClienteDetail />} />
+          </Route>
+        )}
 
-        <main className="mx-auto max-w-6xl px-4 pb-8">
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/registro-cliente" element={<RegistroCliente />} />
-
-            {/* Admin */}
-            {user && role === "admin" && (
-              <>
-                <Route path="/home" element={<Home />} />
-                <Route path="/clientes" element={<ClientesPage />} />
-                <Route path="/clientes/:id" element={<ClienteDetail />} />
-              </>
-            )}
-
-            {/* Cliente */}
-            {user && role === "cliente" && (
-              <>
-                <Route
-                  path="/cliente-dashboard"
-                  element={<ClienteDashboard clienteId={user.uid} />}
-                />
-                <Route path="/mis-sesiones" element={<ClienteSesiones />} />
-              </>
-            )}
-
-            {/* Redirecciones */}
+        {/* Cliente con NavbarCliente */}
+        {user && role === "cliente" && (
+          <>
             <Route
-              path="*"
-              element={
-                <Navigate
-                  to={
-                    user
-                      ? role === "admin"
-                        ? "/home"
-                        : "/cliente-dashboard"
-                      : "/login"
-                  }
-                  replace
-                />
-              }
+              path="/cliente-dashboard"
+              element={<ClienteDashboard clienteId={user.uid} />}
             />
-          </Routes>
-        </main>
-      </div>
+            <Route path="/mis-sesiones" element={<ClienteSesiones />} />
+          </>
+        )}
+
+        {/* Redirecciones */}
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to={
+                user
+                  ? role === "admin"
+                    ? "/home"
+                    : "/cliente-dashboard"
+                  : "/login"
+              }
+              replace
+            />
+          }
+        />
+      </Routes>
     </Router>
   );
 }
