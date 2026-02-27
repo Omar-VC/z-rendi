@@ -1,19 +1,21 @@
-﻿
-
-
-//ten el cuenta el codigo de arriba, y abajo de este comentario quiero que me generes un codigo limpio y actualizado para que el navbar no se muestre en la pagina de login y registro, solo una vez el usuario haya iniciado sesión, y que el navbar tenga un diseño moderno y responsivo utilizando Tailwind CSS. Además, asegúrate de que el navbar tenga enlaces a las páginas principales según el rol del usuario (admin o cliente).
-
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+﻿import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import ClienteDashboard from "./pages/ClienteDashboard";
+import ClienteSesiones from "./pages/ClienteSesiones"; // 👈 nueva página
 import { useEffect, useState } from "react";
 import RegistroCliente from "./pages/RegistroCliente";
 import ClientesPage from "./pages/ClientesPage";
 import ClienteDetail from "./pages/ClienteDetail";
-import Navbar from "./components/Navbar"; // 👈 Importamos la navbar
+import Navbar from "./components/Navbar";
+import NavbarCliente from "./components/NavbarCliente"; // 👈 import nuevo
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -34,17 +36,24 @@ function App() {
   }, [user]);
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Cargando...
+      </div>
+    );
   }
 
   return (
     <Router>
       <div className="min-h-screen bg-slate-100">
+        {/* Header común */}
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
-            <div> 
+            <div>
               <h1 className="text-3xl font-bold text-slate-900">Z-Rendi 🏋️‍♂️</h1>
-              <p className="text-sm text-slate-600">Gestión de fichas, sesiones y cuotas</p>
+              <p className="text-sm text-slate-600">
+                Gestión de fichas, sesiones y cuotas
+              </p>
             </div>
             {user && (
               <button
@@ -57,31 +66,47 @@ function App() {
           </div>
         </header>
 
-        {/* Mostrar Navbar solo si el usuario ha iniciado sesión */}
-        {user && <Navbar role={role} />} {/* Pasamos el rol al Navbar */} 
+        {/* Navbar según rol */}
+        {user && role === "admin" && <Navbar role={role} />}
+        {user && role === "cliente" && <NavbarCliente />}
+
         <main className="mx-auto max-w-6xl px-4 pb-8">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/registro-cliente" element={<RegistroCliente />} />
+
             {/* Admin */}
             {user && role === "admin" && (
               <>
-
                 <Route path="/home" element={<Home />} />
                 <Route path="/clientes" element={<ClientesPage />} />
                 <Route path="/clientes/:id" element={<ClienteDetail />} />
               </>
             )}
+
             {/* Cliente */}
             {user && role === "cliente" && (
-              <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
+              <>
+                <Route
+                  path="/cliente-dashboard"
+                  element={<ClienteDashboard clienteId={user.uid} />}
+                />
+                <Route path="/mis-sesiones" element={<ClienteSesiones />} />
+              </>
             )}
+
             {/* Redirecciones */}
             <Route
               path="*"
               element={
                 <Navigate
-                  to={user ? (role === "admin" ? "/home" : "/cliente-dashboard") : "/login"}
+                  to={
+                    user
+                      ? role === "admin"
+                        ? "/home"
+                        : "/cliente-dashboard"
+                      : "/login"
+                  }
                   replace
                 />
               }
@@ -94,4 +119,3 @@ function App() {
 }
 
 export default App;
-

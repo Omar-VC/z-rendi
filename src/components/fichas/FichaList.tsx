@@ -1,5 +1,4 @@
 ﻿
-//Me gustaria que las fichas, se muestren en forma de tarjetas, con un diseño mas atractivo, y que al hacer click en una ficha, se muestre un modal con la informacion detallada de esa ficha.Para lograr esto, podemos utilizar un diseño de tarjetas para cada ficha y agregar un modal que se muestre al hacer clic en una ficha. Aquí te dejo una versión actualizada del componente `FichaList` con estas mejoras:
 
 import { useState } from "react";
 import Modal from "./modal";
@@ -56,11 +55,18 @@ const FichaList = ({ fichas, selectedId, onSelect }: Props) => {
       {isModalOpen && selectedFicha && (
         <Modal onClose={() => setIsModalOpen(false)}>
           <h2 className="text-xl font-bold mb-4">{selectedFicha.nombre} {selectedFicha.apellido}</h2>
-          <p><strong>Posición:</strong> {selectedFicha.posicion}</p>
+          <p><strong>Posición:</strong> {selectedFicha.puesto}</p>
           <p  ><strong>Edad:</strong> {selectedFicha.edad} años</p>
           <p><strong>Peso:</strong> {selectedFicha.peso} kg</p>
           <p><strong>Altura:</strong> {selectedFicha.altura} cm</p>
           {/* Agrega más detalles según sea necesario */}
+
+          {/* 👇 Botón para cerrar */}
+    <button onClick={() => setIsModalOpen(false)}
+      className="mt-4 bg-gray-500 text-white px-3 py-1 rounded"
+    >
+      Cerrar
+    </button>
         </Modal>
       )}
     </>

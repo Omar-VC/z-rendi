@@ -1,42 +1,41 @@
-﻿import type { Sesion, Ficha } from "../../types";
+﻿import type { Sesion } from "../../types";
 
 type Props = {
   sesiones: Sesion[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  clientes: Ficha[]; // 👈 lista de clientes pasada como prop
 };
 
-const SesionList = ({ sesiones, selectedId, onSelect, clientes }: Props) => (
-  <ul className="space-y-3">
-    {sesiones.map((sesion) => {
-      const isSelected = sesion.id === selectedId;
-      // 👇 ahora usamos sesion.atleta (que guarda el ID del cliente)
-      const cliente = clientes.find((c) => c.id === sesion.atleta);
+const SesionList = ({ sesiones, selectedId, onSelect }: Props) => {
+  if (sesiones.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-slate-300 p-4 text-slate-500">
+        No hay sesiones asignadas todavía.
+      </div>
+    );
+  }
 
-      return (
-        <li
+  return (
+    <div className="grid gap-2">
+      {sesiones.map((sesion) => (
+        <div
           key={sesion.id}
-          className={`rounded-lg border p-3 transition ${
-            isSelected ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white"
+          onClick={() => onSelect(sesion.id)}
+          className={`cursor-pointer rounded border p-2 ${
+            selectedId === sesion.id ? "bg-blue-100 border-blue-400" : "bg-white border-slate-200"
           }`}
         >
-          <button
-            className="w-full text-left"
-            type="button"
-            onClick={() => onSelect(sesion.id)}
-          >
-            <p className="font-semibold text-slate-900">
-              {cliente ? `${cliente.nombre} ${cliente.apellido}` : "Desconocido"}
-            </p>
-            <p className="text-sm capitalize text-slate-600">{sesion.tipo}</p>
-            <p className="text-sm text-slate-600">{sesion.fecha}</p>
-          </button>
-        </li>
-      );
-    })}
-  </ul>
-);
+          <p className="text-sm font-semibold text-slate-900">
+            Fecha: {sesion.fecha}
+          </p>
+          <p className="text-xs text-slate-600">
+            Duración estimada: {sesion.duracionEstimada}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default SesionList;
 

@@ -33,22 +33,6 @@ La aplicación ya está funcional y permite:
 
 ---
 
-## 🔧 Tareas pendientes
-
-- [ ] Implementar la función de **borrar clientes-usuarios** desde la interfaz de administrador.  
-- [ ] Probar exhaustivamente que cada usuario creado pueda visualizar su propia interfaz en modo **solo lectura** (ficha, cuotas, sesiones).  
-- [ ] Ajustar las páginas de **Sesiones** y **Cuotas** para que filtren correctamente por `clienteId`.  
-- [ ] Agregar un **botón para asignar cuotas** a los clientes registrados desde la vista de administrador.  
-- [ ] Rediseñar la interfaz utilizando la siguiente **paleta de colores**:  
-  - `#FF7F11`  
-  - `#ACBFA4`  
-  - `#E2E8CE`  
-  - `#262626`  
-- [ ] Actualizar el **navbar** para que los botones sean representados por **iconos** en lugar de texto, mejorando la usabilidad y estética.  
-- [ ] Documentar el flujo de roles y claims en la aplicación.  
-  
-
----
 
 ## 📌 Próximos pasos
 - Crear un módulo de administración que permita eliminar usuarios desde la app.  

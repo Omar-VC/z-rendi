@@ -1,109 +1,101 @@
-import { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  getDocs,
-} from "firebase/firestore";
-import type { Ficha, Sesion, Cuota } from "../types";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import FichaDetail from "../components/fichas/FichaDetail";
+import CuotaDetailCliente from "../components/cuotas/CuotaDetailCliente";
+import { useFichas } from "../hooks/useFichas";
+import { useCuotas } from "../hooks/useCuotas";
+import { useSesiones } from "../hooks/useSesiones";
+import NavbarCliente from "../components/NavbarCliente";
 
-const ClienteDashboard = () => {
-  const user = auth.currentUser;
-  const [ficha, setFicha] = useState<Ficha | null>(null);
-  const [sesiones, setSesiones] = useState<Sesion[]>([]);
-  const [cuotas, setCuotas] = useState<Cuota[]>([]);
-  const [loading, setLoading] = useState(true);
+const ClienteDashboard = ({ clienteId }: { clienteId: string }) => {
+  const { fichas } = useFichas(clienteId);
+  const { cuotas } = useCuotas(clienteId);
+  const { sesiones } = useSesiones(clienteId);
 
-  useEffect(() => {
-    if (!user) return;
+  const ficha = fichas[0];
+  const cuota = cuotas[0]; // suponemos una cuota activa
+  const sesionActual = sesiones[0]; // la más reciente
 
-    // Ficha única del cliente (busca por clienteId == uid)
-    const loadFicha = async () => {
-      const qFicha = query(collection(db, "fichas"), where("clienteId", "==", user.uid));
-      const fichaSnap = await getDocs(qFicha);
-      if (!fichaSnap.empty) {
-        const d = fichaSnap.docs[0];
-        setFicha({ id: d.id, ...(d.data() as Omit<Ficha, "id">) });
-      }
-    };
+  const [showFicha, setShowFicha] = useState(false);
+  const [showCuota, setShowCuota] = useState(false);
 
-    // Sesiones en tiempo real
-    const qSesiones = query(collection(db, "sesiones"), where("clienteId", "==", user.uid));
-    const unsubSesiones = onSnapshot(qSesiones, (snap) => {
-      setSesiones(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sesion, "id">) })));
-    });
-
-    // Cuotas en tiempo real
-    const qCuotas = query(collection(db, "cuotas"), where("clienteId", "==", user.uid));
-    const unsubCuotas = onSnapshot(qCuotas, (snap) => {
-      setCuotas(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Cuota, "id">) })));
-    });
-
-    loadFicha().finally(() => setLoading(false));
-
-    return () => {
-      unsubSesiones();
-      unsubCuotas();
-    };
-  }, [user]);
-
-  if (loading) return <p>Cargando datos...</p>;
+  const navigate = useNavigate();
 
   return (
-    <section className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-900">Mi Panel</h2>
+    <div className="space-y-6 pb-20"> {/* pb-20 para que no tape el navbar */}
+      {/* Navbar fijo abajo */}
+      <NavbarCliente />
 
-      {/* Ficha */}
-      <div className="rounded-lg border bg-white p-4">
-        <h3 className="text-lg font-semibold">Mi ficha</h3>
-        {ficha ? (
-          <ul className="text-sm text-slate-700">
-            <li>Nombre: {ficha.nombre} {ficha.apellido}</li>
-            <li>Edad: {ficha.edad}</li>
-            <li>Peso: {ficha.peso} kg</li>
-            <li>Altura: {ficha.altura} cm</li>
-            <li>Posición: {ficha.posicion}</li>
-            <li>Lesiones: {ficha.lesiones}</li>
-            <li>Evaluación inicial: {ficha.evaluacionInicial}</li>
-            <li>Evaluación actual: {ficha.evaluacionActual}</li>
-          </ul>
-        ) : (
-          <p>No hay ficha cargada.</p>
-        )}
+      {/* Tarjetas */}
+      <div className="grid gap-4 md:grid-cols-3 p-4">
+        <div
+          onClick={() => setShowFicha(true)}
+          className="cursor-pointer rounded-lg border p-4 shadow hover:bg-blue-50"
+        >
+          <h2 className="text-lg font-semibold">Mi ficha</h2>
+          <p className="text-sm text-slate-600">Ver mis datos personales</p>
+        </div>
+
+        <div
+          onClick={() => setShowCuota(true)}
+          className="cursor-pointer rounded-lg border p-4 shadow hover:bg-blue-50"
+        >
+          <h2 className="text-lg font-semibold">Mi cuota</h2>
+          <p className="text-sm text-slate-600">Ver estado de pago</p>
+        </div>
+
+        <div
+          onClick={() => navigate("/mis-sesiones")}
+          className="cursor-pointer rounded-lg border p-4 shadow hover:bg-blue-50"
+        >
+          <h2 className="text-lg font-semibold">Mis sesiones</h2>
+          <p className="text-sm text-slate-600">Ver sesión actual e historial</p>
+        </div>
       </div>
 
-      {/* Sesiones */}
-      <div className="rounded-lg border bg-white p-4">
-        <h3 className="text-lg font-semibold">Mis sesiones</h3>
-        {sesiones.length > 0 ? (
-          <ul className="list-disc pl-5 text-sm text-slate-700">
-            {sesiones.map((s) => (
-              <li key={s.id}>{s.fecha} - {s.tipo} • {s.observaciones}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No hay sesiones registradas.</p>
-        )}
-      </div>
+      {/* Modal ficha */}
+      {showFicha && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-96">
+            {ficha ? (
+              <FichaDetail ficha={ficha} onClose={() => setShowFicha(false)} />
+            ) : (
+              <div className="text-center">
+                <p className="text-slate-600">Todavía no tenés ficha asignada.</p>
+                <button
+                  onClick={() => setShowFicha(false)}
+                  className="mt-4 bg-gray-500 text-white px-3 py-1 rounded"
+                >
+                  Cerrar
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
-      {/* Cuotas */}
-      <div className="rounded-lg border bg-white p-4">
-        <h3 className="text-lg font-semibold">Mis cuotas</h3>
-        {cuotas.length > 0 ? (
-          <ul className="list-disc pl-5 text-sm text-slate-700">
-            {cuotas.map((c) => (
-              <li key={c.id}>
-                ${c.monto} - {c.estado} (vence: {c.fechaVencimiento})
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No hay cuotas registradas.</p>
-        )}
-      </div>
-    </section>
+      {/* Modal cuota */}
+{showCuota && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+    <div className="bg-white rounded-lg p-6 w-96">
+      {cuota ? (
+        <CuotaDetailCliente cuota={cuota} onClose={() => setShowCuota(false)} />
+      ) : (
+        <div className="text-center">
+          <p className="text-slate-600">Todavía no tenés cuota asignada.</p>
+          <button
+            onClick={() => setShowCuota(false)}
+            className="mt-4 bg-gray-500 text-white px-3 py-1 rounded"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+    </div>
   );
 };
 

@@ -4,36 +4,50 @@ type Props = {
   cuotas: Cuota[];
   selectedId: string | null;  
   onSelect: (id: string) => void;
-  onAsignarCuota: () => void; // Nueva función para asignar cuota
+  onAsignarCuota: () => void;
 };
 
 const CuotaList = ({ cuotas, selectedId, onSelect, onAsignarCuota }: Props) => (
   <div>
-    <button onClick={onAsignarCuota} className="mb-4 bg-green-600 text-white px-3 py-1 rounded">
-      Asignar Cuota
-    </button>
+    
     <ul className="space-y-3">
       {cuotas.map((cuota) => {
-        const isSelected = cuota.id === selectedId; // Verifica si la cuota actual es la seleccionada
-        const statusClasses = cuota.estado === "pagado" ? "text-emerald-700" : "text-amber-700"; // Define clases de estilo según el estado de la cuota 
+        const isSelected = cuota.id === selectedId;
+        const statusClasses =
+          cuota.estado === "pagado" ? "text-emerald-700" : "text-amber-700";
+
         return (
           <li
-            key={cuota.id}  
+            key={cuota.id}
             className={`rounded-lg border p-3 transition ${
-              isSelected ? "border-emerald-600 bg-emerald-50" : "border-slate-200 bg-white"
-            }`} 
+              isSelected
+                ? "border-emerald-600 bg-emerald-50"
+                : "border-slate-200 bg-white"
+            }`}
           >
-            <button className="w-full text-left" type="button" onClick={() => onSelect(cuota.id)}>
+            <button
+              className="w-full text-left"
+              type="button"
+              onClick={() => onSelect(cuota.id)}
+            >
               <p className="font-semibold text-slate-900">{cuota.atleta}</p>
-              <p className={`text-sm font-medium capitalize ${statusClasses}`}>{cuota.estado}</p>
-              <p className="text-sm text-slate-600">Vence: {cuota.fechaVencimiento}</p>
-              <p className="text-sm text-slate-600">Pago: {cuota.fechaPago ?? "No registrado"}</p>  
+              <p
+                className={`text-sm font-medium capitalize ${statusClasses}`}
+              >
+                {cuota.estado}
+              </p>
+              <p className="text-sm text-slate-600">
+                Vence: {cuota.fechaVencimiento}
+              </p>
+              <p className="text-sm text-slate-600">
+                Pago: {cuota.fechaPago ?? "No registrado"}
+              </p>
             </button>
           </li>
         );
       })}
     </ul>
   </div>
-);  
+);
 
 export default CuotaList;

@@ -16,13 +16,12 @@ export type SesionTipo = "fuerza" | "resistencia" | "tecnica" | "recuperacion";
 
 export type Sesion = {
   id: string;
-  tipo: SesionTipo;
-  fecha: string;
-  atleta: string;
-  ejercicios: string;
-  cargas: string;
-  observaciones: string;
+  clienteId: string;
+  fecha: string;            // 🔑 un solo campo para fecha
+  duracionEstimada: string; // 🔑 un solo campo para duración
+  bloques: string;          // 🔑 textarea con descripción rápida
 };
+
 
 export type CuotaEstado = "pagado" | "pendiente";
 
