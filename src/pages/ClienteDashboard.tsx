@@ -1,100 +1,77 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import FichaDetail from "../components/fichas/FichaDetail";
-import CuotaDetailCliente from "../components/cuotas/CuotaDetailCliente";
+import { auth } from "../firebase";
 import { useFichas } from "../hooks/useFichas";
 import { useCuotas } from "../hooks/useCuotas";
 import { useSesiones } from "../hooks/useSesiones";
 import NavbarCliente from "../components/NavbarCliente";
+import FichaDetail from "../components/fichas/FichaDetail";
+import CuotaDetailCliente from "../components/cuotas/CuotaDetailCliente";
+import SesionesCliente from "../components/sesiones/SesionesCliente";
 
-const ClienteDashboard = ({ clienteId }: { clienteId: string }) => {
+const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; clienteNombre: string }) => {
   const { fichas } = useFichas(clienteId);
   const { cuotas } = useCuotas(clienteId);
   const { sesiones } = useSesiones(clienteId);
 
   const ficha = fichas[0];
-  const cuota = cuotas[0]; // suponemos una cuota activa
-  const sesionActual = sesiones[0]; // la más reciente
+  const cuota = cuotas[0];
+  const sesionActual = sesiones[0];
 
-  const [showFicha, setShowFicha] = useState(false);
-  const [showCuota, setShowCuota] = useState(false);
-
-  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState("inicio");
 
   return (
-    <div className="space-y-6 pb-20"> {/* pb-20 para que no tape el navbar */}
-      {/* Navbar fijo abajo */}
-      <NavbarCliente />
+    <div className="flex flex-col min-h-screen bg-primary text-white">
+      {/* Header */}
+      <header className="flex justify-between items-center bg-secondary p-4">
+        <button onClick={() => auth.signOut()} className="btn btn-accent">
+          Salir
+        </button>
+        <span className="font-semibold">{clienteNombre}</span>
+      </header>
 
-      {/* Tarjetas */}
-      <div className="grid gap-4 md:grid-cols-3 p-4">
-        <div
-          onClick={() => setShowFicha(true)}
-          className="cursor-pointer rounded-lg border p-4 shadow hover:bg-blue-50"
-        >
-          <h2 className="text-lg font-semibold">Mi ficha</h2>
-          <p className="text-sm text-slate-600">Ver mis datos personales</p>
-        </div>
+      {/* Contenido central */}
+      <main className="flex-1 flex items-center justify-center p-6">
+        {activeSection === "inicio" && (
+          <div className="text-center">
+            {/* Logo Z-Rendi (cuando lo tengas lo reemplazás aquí) */}
+            <img src="/logo-zrendi.png" alt="Z-Rendi" className="mx-auto mb-6 w-40" />
+            <h1 className="text-2xl font-bold">Bienvenido a Z-Rendi</h1>
+          </div>
+        )}
 
-        <div
-          onClick={() => setShowCuota(true)}
-          className="cursor-pointer rounded-lg border p-4 shadow hover:bg-blue-50"
-        >
-          <h2 className="text-lg font-semibold">Mi cuota</h2>
-          <p className="text-sm text-slate-600">Ver estado de pago</p>
-        </div>
-
-        <div
-          onClick={() => navigate("/mis-sesiones")}
-          className="cursor-pointer rounded-lg border p-4 shadow hover:bg-blue-50"
-        >
-          <h2 className="text-lg font-semibold">Mis sesiones</h2>
-          <p className="text-sm text-slate-600">Ver sesión actual e historial</p>
-        </div>
-      </div>
-
-      {/* Modal ficha */}
-      {showFicha && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 w-96">
+        {activeSection === "ficha" && (
+          <div className="card w-full max-w-md">
             {ficha ? (
-              <FichaDetail ficha={ficha} onClose={() => setShowFicha(false)} />
+              <FichaDetail ficha={ficha} onClose={() => setActiveSection("inicio")} />
             ) : (
-              <div className="text-center">
-                <p className="text-slate-600">Todavía no tenés ficha asignada.</p>
-                <button
-                  onClick={() => setShowFicha(false)}
-                  className="mt-4 bg-gray-500 text-white px-3 py-1 rounded"
-                >
-                  Cerrar
-                </button>
-              </div>
+              <p className="text-gray-300">Todavía no tenés ficha asignada.</p>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Modal cuota */}
-{showCuota && (
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-    <div className="bg-white rounded-lg p-6 w-96">
-      {cuota ? (
-        <CuotaDetailCliente cuota={cuota} onClose={() => setShowCuota(false)} />
-      ) : (
-        <div className="text-center">
-          <p className="text-slate-600">Todavía no tenés cuota asignada.</p>
-          <button
-            onClick={() => setShowCuota(false)}
-            className="mt-4 bg-gray-500 text-white px-3 py-1 rounded"
-          >
-            Cerrar
-          </button>
-        </div>
-      )}
-    </div>
-  </div>
-)}
+        {activeSection === "cuotas" && (
+          <div className="card w-full max-w-md">
+            {cuota ? (
+              <CuotaDetailCliente cuota={cuota} onClose={() => setActiveSection("inicio")} />
+            ) : (
+              <p className="text-gray-300">Todavía no tenés cuota asignada.</p>
+            )}
+          </div>
+        )}
 
+        {activeSection === "sesiones" && (
+          <div className="card w-full max-w-md">
+            {sesionActual ? (
+              <SesionesCliente clienteId={clienteId} />
+            ) : (
+              <p className="text-gray-300">Todavía no tenés sesiones asignadas.</p>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* Navbar fijo abajo */}
+      <NavbarCliente onChangeSection={setActiveSection} />
     </div>
   );
 };

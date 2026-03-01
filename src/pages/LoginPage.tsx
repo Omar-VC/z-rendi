@@ -1,3 +1,4 @@
+// src/pages/LoginPage.tsx
 import { useState } from "react";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -15,49 +16,50 @@ const LoginPage = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/"); // redirige al flujo normal según rol
+      navigate("/");
     } catch (err: any) {
       setError("Error al iniciar sesión: " + err.message);
     }
   };
 
   return (
-    <section className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4">Iniciar sesión</h2>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded p-2"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded p-2"
-          required
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded font-medium"
-        >
-          Entrar
-        </button>
-      </form>
+    <section className="flex items-center justify-center min-h-screen bg-primary">
+      <div className="card w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-white text-center">
+          Iniciar sesión
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input"
+            required
+          />
+          <button type="submit" className="btn btn-primary w-full">
+            Entrar
+          </button>
+        </form>
 
-      {error && <p className="text-red-600 mt-2">{error}</p>}
+        {error && <p className="text-red-400 mt-3 text-sm">{error}</p>}
 
-      <div className="mt-4 text-center">
-        <p className="text-sm text-slate-600">
-          ¿No tienes cuenta?{" "}
-          <Link to="/registro-cliente" className="text-blue-600 font-medium">
-            Regístrate aquí
-          </Link>
-        </p>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-300">
+            ¿No tienes cuenta?{" "}
+            <Link to="/registro-cliente" className="text-highlight font-medium">
+              Regístrate aquí
+            </Link>
+          </p>
+        </div>
       </div>
     </section>
   );
