@@ -1,94 +1,66 @@
+// src/components/cuotas/CuotasCliente.tsx
 import { useState } from "react";
 import { useCuotas } from "../../hooks/useCuotas";
 import CuotaList from "./CuotaList";
 import CuotaDetail from "./CuotaDetail";
+import CuotaForm from "./CuotaForm";
+import HistorialCuotas from "./HistorialCuotas";
 
 const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
   const { cuotas, addCuota, updateCuota, deleteCuota } = useCuotas(clienteId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    monto: 0,
-    fechaVencimiento: "",
-    estado: "pendiente",
-  });
 
   const selectedCuota = cuotas.find((c) => c.id === selectedId);
 
-  const handleCreate = async () => {
-    await addCuota(formData);
+  const handleCreate = async (data: any) => {
+    await addCuota({ ...data });
     setIsModalOpen(false);
-    setFormData({ monto: 0, fechaVencimiento: "", estado: "pendiente" });
+  };
+
+  const cuotasPendientes = cuotas.filter((c) => c.estado === "pendiente");
+  const cuotasPagadas = cuotas.filter((c) => c.estado === "pagada");
+
+  const handleClearHistorial = async () => {
+    for (const cuota of cuotasPagadas) {
+      await deleteCuota(cuota.id);
+    }
   };
 
   return (
-    <div className="space-y-4">
-      {/* Botón para abrir formulario */}
+    <div className="space-y-6">
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-blue-600 text-white px-3 py-1 rounded"
+        className="btn btn-primary"
       >
         Asignar cuota
       </button>
 
-      {/* Formulario modal */}
       {isModalOpen && (
-        <div className="border p-4 bg-white rounded shadow">
-          <h3 className="font-semibold mb-2">Nueva cuota</h3>
-          <input
-            type="number"
-            placeholder="Monto"
-            value={formData.monto}
-            onChange={(e) =>
-              setFormData({ ...formData, monto: Number(e.target.value) })
-            }
-            className="border p-1 mb-2 w-full"
-          />
-          <input
-            type="date"
-            placeholder="Fecha de vencimiento"
-            value={formData.fechaVencimiento}
-            onChange={(e) =>
-              setFormData({ ...formData, fechaVencimiento: e.target.value })
-            }
-            className="border p-1 mb-2 w-full"
-          />
-          <select
-            value={formData.estado}
-            onChange={(e) =>
-              setFormData({ ...formData, estado: e.target.value })
-            }
-            className="border p-1 mb-2 w-full"
-          >
-            <option value="pendiente">Pendiente</option>
-            <option value="pagada">Pagada</option>
-          </select>
-
-          <button
-            onClick={handleCreate}
-            className="bg-green-600 text-white px-3 py-1 rounded mr-2"
-          >
-            Guardar
-          </button>
-          <button
-            onClick={() => setIsModalOpen(false)}
-            className="bg-gray-400 text-white px-3 py-1 rounded"
-          >
-            Cancelar
-          </button>
-        </div>
+        <CuotaForm
+          onSave={handleCreate}
+          onCancel={() => setIsModalOpen(false)}
+        />
       )}
 
-      <CuotaList
-        cuotas={cuotas}
-        selectedId={selectedId}
-        onSelect={(id) => setSelectedId(id)}
+      <div>
+        <h3 className="font-bold text-white mb-2">Cuotas pendientes</h3>
+        <CuotaList
+          cuotas={cuotasPendientes}
+          selectedId={selectedId}
+          onSelect={(id) => setSelectedId(id)}
+          onAsignarCuota={() => setIsModalOpen(true)}
+        />
+      </div>
+
+      <CuotaDetail
+        cuota={selectedCuota}
+        onDelete={deleteCuota}
+        onUpdate={updateCuota}
+        onClose={() => setSelectedId(null)}
       />
-      <CuotaDetail cuota={selectedCuota} 
-      onDelete={deleteCuota} 
-      onUpdate={updateCuota} 
-      onClose={() => setSelectedId(null)}
-      />
+
+      <HistorialCuotas historial={cuotasPagadas} onClear={handleClearHistorial} />
     </div>
   );
 };

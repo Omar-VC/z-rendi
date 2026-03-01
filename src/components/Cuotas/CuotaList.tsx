@@ -1,4 +1,5 @@
-﻿import type { Cuota } from "../../types";
+﻿// src/components/cuotas/CuotaList.tsx
+import type { Cuota } from "../../types";
 
 type Props = {
   cuotas: Cuota[];
@@ -7,46 +8,30 @@ type Props = {
   onAsignarCuota: () => void;
 };
 
-const CuotaList = ({ cuotas, selectedId, onSelect, onAsignarCuota }: Props) => (
-  <div>
-    
-    <ul className="space-y-3">
-      {cuotas.map((cuota) => {
-        const isSelected = cuota.id === selectedId;
-        const statusClasses =
-          cuota.estado === "pagado" ? "text-emerald-700" : "text-amber-700";
+const CuotaList = ({ cuotas, selectedId, onSelect }: Props) => (
+  <div className="space-y-3">
+    {cuotas.map((cuota) => {
+      const isSelected = cuota.id === selectedId;
+      const statusClasses =
+        cuota.estado === "pagada"
+          ? "text-green-400 font-semibold"
+          : "text-yellow-400 font-semibold";
 
-        return (
-          <li
-            key={cuota.id}
-            className={`rounded-lg border p-3 transition ${
-              isSelected
-                ? "border-emerald-600 bg-emerald-50"
-                : "border-slate-200 bg-white"
-            }`}
-          >
-            <button
-              className="w-full text-left"
-              type="button"
-              onClick={() => onSelect(cuota.id)}
-            >
-              <p className="font-semibold text-slate-900">{cuota.atleta}</p>
-              <p
-                className={`text-sm font-medium capitalize ${statusClasses}`}
-              >
-                {cuota.estado}
-              </p>
-              <p className="text-sm text-slate-600">
-                Vence: {cuota.fechaVencimiento}
-              </p>
-              <p className="text-sm text-slate-600">
-                Pago: {cuota.fechaPago ?? "No registrado"}
-              </p>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+      return (
+        <div
+          key={cuota.id}
+          className={`card cursor-pointer ${
+            isSelected ? "ring-2 ring-highlight scale-105" : ""
+          }`}
+          onClick={() => onSelect(cuota.id)}
+        >
+          <p className="text-lg font-bold">{cuota.mes}</p>
+          <p className={`text-sm capitalize ${statusClasses}`}>
+            {cuota.estado}
+          </p>
+        </div>
+      );
+    })}
   </div>
 );
 

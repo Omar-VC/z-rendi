@@ -1,4 +1,5 @@
-﻿import type { Cuota } from "../../types";
+﻿// src/components/cuotas/CuotaDetail.tsx
+import type { Cuota } from "../../types";
 import { useState } from "react";
 
 type Props = { 
@@ -14,7 +15,7 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
 
   if (!cuota) {
     return (
-      <div className="rounded-lg border border-dashed border-slate-300 p-4 text-slate-500">
+      <div className="card text-center text-sm text-gray-300">
         Seleccioná una cuota para ver su detalle.
       </div>
     );
@@ -27,35 +28,51 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
     setIsEditing(false);
   };
 
+  const handleMarkPaid = () => {
+    if (onUpdate) {
+      onUpdate(cuota.id, { estado: "pagada" });
+    }
+    setIsEditing(false);
+    if (onClose) onClose();
+  };
+
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <h3 className="text-lg font-semibold text-slate-900">Detalle de cuota</h3>
+    <div className="card">
+      <h3 className="text-lg font-bold mb-4">Detalle de cuota</h3>
 
       {!isEditing ? (
-        <div className="mt-3 space-y-2 text-sm text-slate-700">
+        <div className="space-y-2 text-sm">
+          <p><span className="font-semibold">Mes:</span> {cuota.mes}</p>
           <p><span className="font-semibold">Monto:</span> ${cuota.monto}</p>
-          <p><span className="font-semibold">Fecha de vencimiento:</span> {cuota.fechaVencimiento}</p>
+          <p><span className="font-semibold">Vencimiento:</span> {cuota.fechaVencimiento}</p>
           <p><span className="font-semibold">Estado:</span> {cuota.estado}</p>
         </div>
       ) : (
-        <div className="mt-3 space-y-2">
+        <div className="space-y-3">
+          <input
+            type="text"
+            placeholder="Mes"
+            defaultValue={cuota.mes}
+            onChange={(e) => setFormData({ ...formData, mes: e.target.value })}
+            className="input"
+          />
           <input
             type="number"
             placeholder="Monto"
             defaultValue={cuota.monto}
             onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
-            className="border p-1 mb-2 w-full"
+            className="input"
           />
           <input
             type="date"
             defaultValue={cuota.fechaVencimiento}
             onChange={(e) => setFormData({ ...formData, fechaVencimiento: e.target.value })}
-            className="border p-1 mb-2 w-full"
+            className="input"
           />
           <select
             defaultValue={cuota.estado}
             onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-            className="border p-1 mb-2 w-full"
+            className="input"
           >
             <option value="pendiente">Pendiente</option>
             <option value="pagada">Pagada</option>
@@ -64,36 +81,29 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
       )}
 
       {/* Botones de acción */}
-      <div className="mt-4 flex space-x-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-blue-600 text-white px-3 py-1 rounded"
-          >
+          <button onClick={() => setIsEditing(true)} className="btn btn-primary">
             Editar
           </button>
         )}
         {isEditing && (
-          <button
-            onClick={handleSave}
-            className="bg-green-600 text-white px-3 py-1 rounded"
-          >
+          <button onClick={handleSave} className="btn btn-success">
             Guardar cambios
           </button>
         )}
+        {cuota.estado === "pendiente" && (
+          <button onClick={handleMarkPaid} className="btn btn-success">
+            Marcar como pagada
+          </button>
+        )}
         {onDelete && (
-          <button
-            onClick={() => onDelete(cuota.id)}
-            className="bg-red-600 text-white px-3 py-1 rounded"
-          >
+          <button onClick={() => onDelete(cuota.id)} className="btn btn-danger">
             Eliminar cuota
           </button>
         )}
         {onClose && (
-          <button
-            onClick={onClose}
-            className="bg-gray-500 text-white px-3 py-1 rounded"
-          >
+          <button onClick={onClose} className="btn btn-secondary">
             Cerrar
           </button>
         )}
