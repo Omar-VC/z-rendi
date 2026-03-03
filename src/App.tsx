@@ -17,10 +17,14 @@ import ClienteDetail from "./pages/ClienteDetail";
 import ClienteDashboard from "./pages/ClienteDashboard";
 
 import AdminLayout from "./layouts/AdminLayout";
+import { useCliente } from "./hooks/useCliente"; // 👈 importamos el hook
 
 function App() {
   const [user, loading] = useAuthState(auth);
   const [role, setRole] = useState<string | null>(null);
+
+  // Hook para traer datos del cliente
+  const { cliente, loading: clienteLoading } = useCliente(user?.uid ?? "");
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -36,7 +40,7 @@ function App() {
     fetchUserRole();
   }, [user]);
 
-  if (loading) {
+  if (loading || clienteLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         Cargando...
@@ -67,7 +71,7 @@ function App() {
             element={
               <ClienteDashboard
                 clienteId={user.uid}
-                clienteNombre={user.displayName ?? "Cliente"}
+                clienteNombre={cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente"} // 👈 usamos el nombre de Firestore
               />
             }
           />
