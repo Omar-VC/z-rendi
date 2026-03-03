@@ -9,17 +9,14 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect, useState } from "react";
 import "./styles/global.css";
 
-
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegistroCliente from "./pages/RegistroCliente";
 import ClientesPage from "./pages/ClientesPage";
 import ClienteDetail from "./pages/ClienteDetail";
 import ClienteDashboard from "./pages/ClienteDashboard";
-import ClienteSesiones from "./pages/ClienteSesiones";
 
 import AdminLayout from "./layouts/AdminLayout";
-import NavbarCliente from "./components/NavbarCliente";
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -63,15 +60,17 @@ function App() {
           </Route>
         )}
 
-        {/* Cliente con NavbarCliente */}
+        {/* Cliente con ClienteDashboard */}
         {user && role === "cliente" && (
-          <>
-            <Route
-              path="/cliente-dashboard"
-              element={<ClienteDashboard clienteId={user.uid} />}
-            />
-            <Route path="/mis-sesiones" element={<ClienteSesiones />} />
-          </>
+          <Route
+            path="/cliente-dashboard"
+            element={
+              <ClienteDashboard
+                clienteId={user.uid}
+                clienteNombre={user.displayName ?? "Cliente"}
+              />
+            }
+          />
         )}
 
         {/* Redirecciones */}

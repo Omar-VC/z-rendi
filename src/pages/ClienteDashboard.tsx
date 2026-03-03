@@ -6,7 +6,7 @@ import { useSesiones } from "../hooks/useSesiones";
 import NavbarCliente from "../components/NavbarCliente";
 import FichaDetail from "../components/fichas/FichaDetail";
 import CuotaDetailCliente from "../components/cuotas/CuotaDetailCliente";
-import SesionesCliente from "../components/sesiones/SesionesCliente";
+import SesionesClienteView from "../components/sesiones/SesionesClienteView";
 
 const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; clienteNombre: string }) => {
   const { fichas } = useFichas(clienteId);
@@ -32,12 +32,21 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
       {/* Contenido central */}
       <main className="flex-1 flex items-center justify-center p-6">
         {activeSection === "inicio" && (
-          <div className="text-center">
-            {/* Logo Z-Rendi (cuando lo tengas lo reemplazás aquí) */}
-            <img src="/logo-zrendi.png" alt="Z-Rendi" className="mx-auto mb-6 w-40" />
-            <h1 className="text-2xl font-bold">Bienvenido a Z-Rendi</h1>
-          </div>
-        )}
+  <div className="text-center">
+    <img
+      src="/logo.jpeg"
+      alt="Logo"
+      className="mx-auto mb-6 w-40 drop-shadow-lg animate-zoomFadeIn"
+    />
+    <h1 className="text-2xl font-bold opacity-0 animate-fadeInDelay">
+      Bienvenido a Z-Rendi
+    </h1>
+  </div>
+)}
+
+
+
+
 
         {activeSection === "ficha" && (
           <div className="card w-full max-w-md">
@@ -62,7 +71,7 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
         {activeSection === "sesiones" && (
           <div className="card w-full max-w-md">
             {sesionActual ? (
-              <SesionesCliente clienteId={clienteId} />
+              <SesionesClienteView clienteId={clienteId} />
             ) : (
               <p className="text-gray-300">Todavía no tenés sesiones asignadas.</p>
             )}

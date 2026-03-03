@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { 
-  collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc 
+  collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc 
 } from "firebase/firestore";
 import type { Cuota } from "../types";
 
@@ -10,39 +10,34 @@ export function useCuotas(clienteId: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCuotas = async () => {
-      try {
-        const q = query(collection(db, "cuotas"), where("clienteId", "==", clienteId));
-        const snap = await getDocs(q);
-        setCuotas(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Cuota) })));
-      } catch (err) {
-        console.error("Error cargando cuotas:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    void fetchCuotas();
+    const q = query(collection(db, "cuotas"), where("clienteId", "==", clienteId));
+
+    // Suscripción en tiempo real
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setCuotas(snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as Cuota) })));
+      setLoading(false);
+    });
+
+    // Limpieza al desmontar
+    return () => unsubscribe();
   }, [clienteId]);
 
   const addCuota = async (nuevaCuota: Omit<Cuota, "id">) => {
-    const ref = await addDoc(collection(db, "cuotas"), { ...nuevaCuota, clienteId });
-    setCuotas((prev) => [...prev, { id: ref.id, ...nuevaCuota }]);
+    await addDoc(collection(db, "cuotas"), { ...nuevaCuota, clienteId });
+    // No hace falta actualizar manualmente el estado: onSnapshot lo hará
   };
 
   const updateCuota = async (cuotaId: string, data: Partial<Cuota>) => {
     const ref = doc(db, "cuotas", cuotaId);
     await updateDoc(ref, data);
-    setCuotas((prev) =>
-      prev.map((c) => (c.id === cuotaId ? { ...c, ...data } : c))
-    );
+    // Tampoco hace falta actualizar manualmente el estado
   };
 
   const deleteCuota = async (cuotaId: string) => {
     const ref = doc(db, "cuotas", cuotaId);
     await deleteDoc(ref);
-    setCuotas((prev) => prev.filter((c) => c.id !== cuotaId));
+    // El snapshot se encarga de reflejar el cambio
   };
 
   return { cuotas, loading, addCuota, updateCuota, deleteCuota };
-
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { auth } from "../firebase";
 import NavbarCliente from "../components/NavbarCliente";
+import SesionesClienteView from "../components/sesiones/SesionesClienteView";
 
 const ClienteLayout = ({ clienteNombre }: { clienteNombre: string }) => {
   const [activeSection, setActiveSection] = useState("inicio");
@@ -22,7 +23,6 @@ const ClienteLayout = ({ clienteNombre }: { clienteNombre: string }) => {
       <main className="flex-1 flex items-center justify-center p-6">
         {activeSection === "inicio" && (
           <div className="text-center">
-            {/* Aquí va el logo de Z-Rendi */}
             <img
               src="/logo-zrendi.png"
               alt="Z-Rendi"
@@ -49,7 +49,7 @@ const ClienteLayout = ({ clienteNombre }: { clienteNombre: string }) => {
         {activeSection === "sesiones" && (
           <div className="card w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Mis sesiones</h2>
-            {/* Aquí renderizamos SesionesCliente */}
+            <SesionesClienteView clienteId={auth.currentUser?.uid || ""} />
           </div>
         )}
       </main>
