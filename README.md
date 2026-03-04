@@ -58,3 +58,14 @@ Este proyecto está en evolución. Se recomienda mantener un archivo `NOTAS.md` 
 
 ----
 
+## ⚠️ Errores actuales en el build
+Durante la compilación con `npm run build` se detectan **39 errores de TypeScript**, principalmente relacionados con:
+
+- Uso de tipos incorrectos (`"pagada"` vs `"pagado"`, `string` vs `number`).  
+- Propiedades faltantes en los tipos (`mes` en `Cuota`, `estado` y `completadaAt` en `Sesion`, `deporte`, `puesto`, `telefono` en `Ficha`).  
+- Props sin tipar (`any`) en componentes como `CuotaDetailCliente`.  
+- Duplicación de `id` en los hooks (`useCliente`, `useCuotas`, `useFichas`, `useSesiones`).  
+- Inconsistencias de casing en imports (`Cuotas` vs `cuotas`, `Sesiones` vs `sesiones`).  
+- Formularios que envían strings donde el tipo espera números (`edad`, `peso`, etc.).  
+
+👉 La solución pasa por **alinear los tipos en `types.ts` con los componentes**, tipar correctamente las props y ajustar los hooks para evitar sobrescribir `id`. Con estas correcciones, la mayoría de los errores deberían resolverse.
