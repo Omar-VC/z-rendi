@@ -51,7 +51,7 @@ const ClienteDetail = () => {
         {activeTab === "fichas" && <FichasCliente clienteId={id} />}
         {activeTab === "cuotas" && <CuotasCliente clienteId={id} />}
         {activeTab === "sesiones" && (
-          <SesionesCliente clienteId={id} clientes={[]} />
+          <SesionesCliente clienteId={id} />
         )}
       </div>
     </div>

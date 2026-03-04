@@ -14,7 +14,7 @@ export function useSesiones(clienteId: string) {
 
     // Suscripción en tiempo real
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setSesiones(snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as Sesion) })));
+      setSesiones(snapshot.docs.map((d) => ({ ...(d.data() as Sesion), id: d.id })));
       setLoading(false);
     });
 
@@ -22,7 +22,7 @@ export function useSesiones(clienteId: string) {
     return () => unsubscribe();
   }, [clienteId]);
 
-  const addSesion = async (nuevaSesion: Omit<Sesion, "id">) => {
+  const addSesion = async (nuevaSesion: Omit<Sesion, "id" | "clienteId">) => {
     await addDoc(collection(db, "sesiones"), { ...nuevaSesion, clienteId });
     // No hace falta actualizar manualmente el estado: onSnapshot lo hará
   };

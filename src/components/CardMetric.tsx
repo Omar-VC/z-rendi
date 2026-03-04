@@ -18,7 +18,7 @@ const variantStyles: Record<string, string> = {
     "bg-secondary/40 backdrop-blur-md border border-white/20 shadow-lg text-white",
 };
 
-const iconMap: Record<string, JSX.Element> = {
+const iconMap: Record<string, React.ReactNode> = {
   "Fichas Activas": <FaUsers size={28} />,
   "Sesiones Programadas": <FaCalendarAlt size={28} />,
   "Cuotas Pendientes": <FaExclamationCircle size={28} />,

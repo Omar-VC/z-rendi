@@ -71,7 +71,7 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
           />
           <select
             defaultValue={cuota.estado}
-            onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, estado: e.target.value as Cuota["estado"] })}
             className="input"
           >
             <option value="pendiente">Pendiente</option>

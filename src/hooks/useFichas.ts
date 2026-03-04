@@ -12,7 +12,7 @@ export function useFichas(clienteId: string) {
       try {
         const q = query(collection(db, "fichas"), where("clienteId", "==", clienteId));
         const snap = await getDocs(q);
-        setFichas(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Ficha) })));
+        setFichas(snap.docs.map((d) => ({ ...(d.data() as Ficha), id: d.id })));
       } catch (err) {
         console.error("Error cargando fichas:", err);
       } finally {

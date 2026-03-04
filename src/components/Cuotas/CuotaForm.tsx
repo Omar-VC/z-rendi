@@ -8,12 +8,12 @@ type Props = {
 };
 
 const CuotaForm = ({ onSave, onCancel }: Props) => {
-  const [formData, setFormData] = useState({
-    mes: "",
-    fechaVencimiento: "",
-    monto: 0,
-    estado: "pendiente",
-  });
+  const [formData, setFormData] = useState<Omit<Cuota, "id" | "clienteId">>({
+  mes: "",
+  fechaVencimiento: "",
+  monto: 0,
+  estado: "pendiente",
+});
 
   const handleSubmit = () => {
     onSave(formData);
@@ -54,7 +54,7 @@ const CuotaForm = ({ onSave, onCancel }: Props) => {
       <select
         value={formData.estado}
         onChange={(e) =>
-          setFormData({ ...formData, estado: e.target.value })
+          setFormData({ ...formData, estado: e.target.value as Cuota["estado"] })
         }
         className="input mb-4"
       >

@@ -13,7 +13,7 @@ const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
 
   const selectedCuota = cuotas.find((c) => c.id === selectedId);
 
-  const handleCreate = async (data: any) => {
+  const handleCreate = async (data: Omit<import("../../types").Cuota, "id" | "clienteId">) => {
     await addCuota({ ...data });
     setIsModalOpen(false);
   };

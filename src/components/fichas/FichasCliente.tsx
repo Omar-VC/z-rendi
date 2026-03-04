@@ -4,7 +4,7 @@ import FichaDetail from "./FichaDetail";
 import { useState } from "react";
 
 const FichasCliente = ({ clienteId }: { clienteId: string }) => {
-  const { fichas, addFicha, updateFicha, deleteFicha } = useFichas(clienteId);
+  const { fichas, addFicha, deleteFicha } = useFichas(clienteId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,7 +22,12 @@ const FichasCliente = ({ clienteId }: { clienteId: string }) => {
   const selectedFicha = fichas.find((f) => f.id === selectedId);
 
   const handleCreate = async () => {
-    await addFicha(formData);
+    await addFicha({
+        ...formData,
+        edad: Number(formData.edad) || 0,
+        altura: Number(formData.altura) || 0,
+        peso: Number(formData.peso) || 0,
+      });
     setIsModalOpen(false);
     setFormData({
       nombre: "",
@@ -131,8 +136,8 @@ const FichasCliente = ({ clienteId }: { clienteId: string }) => {
       {/* Lista de fichas */}
       <FichaList
         fichas={fichas}
-        selectedId={selectedId ? parseInt(selectedId) : null}
-        onSelect={(id) => setSelectedId(id.toString())}
+        selectedId={selectedId}
+        onSelect={(id) => setSelectedId(id)}
       />
 
       {/* Detalle de ficha seleccionada */}

@@ -15,12 +15,20 @@ export function useCliente(clienteId: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!clienteId) return;
+    if (!clienteId) {
+      // 👇 cuando no hay clienteId, reseteás estados y marcás loading en false
+      setCliente(null);
+      setLoading(false);
+      return;
+    }
 
-    const ref = doc(db, "usuarios", clienteId); // 👈 ahora apunta a 'usuarios'
+    // 👇 cada vez que cambia clienteId válido, volvés a marcar loading en true
+    setLoading(true);
+
+    const ref = doc(db, "usuarios", clienteId);
     const unsubscribe = onSnapshot(ref, (snap) => {
       if (snap.exists()) {
-        setCliente({ id: snap.id, ...(snap.data() as Usuario) });
+        setCliente({ ...(snap.data() as Usuario), id: snap.id });
       } else {
         setCliente(null);
       }

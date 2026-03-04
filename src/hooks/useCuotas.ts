@@ -14,7 +14,7 @@ export function useCuotas(clienteId: string) {
 
     // Suscripción en tiempo real
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setCuotas(snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as Cuota) })));
+      setCuotas(snapshot.docs.map((d) => ({ ...(d.data() as Cuota), id: d.id })));
       setLoading(false);
     });
 
@@ -22,7 +22,7 @@ export function useCuotas(clienteId: string) {
     return () => unsubscribe();
   }, [clienteId]);
 
-  const addCuota = async (nuevaCuota: Omit<Cuota, "id">) => {
+  const addCuota = async (nuevaCuota: Omit<Cuota, "id" | "clienteId">) => {
     await addDoc(collection(db, "cuotas"), { ...nuevaCuota, clienteId });
     // No hace falta actualizar manualmente el estado: onSnapshot lo hará
   };

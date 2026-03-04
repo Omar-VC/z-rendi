@@ -5,9 +5,8 @@ import { useCuotas } from "../hooks/useCuotas";
 import { useSesiones } from "../hooks/useSesiones";
 import NavbarCliente from "../components/NavbarCliente";
 import FichaDetail from "../components/fichas/FichaDetail";
-import CuotaDetailCliente from "../components/cuotas/CuotaDetailCliente";
-import SesionesClienteView from "../components/sesiones/SesionesClienteView";
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import CuotaDetailCliente from "../components/Cuotas/CuotaDetailCliente";
+import SesionesClienteView from "../components/Sesiones/SesionesClienteView";
 
 const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; clienteNombre: string }) => {
   const { fichas } = useFichas(clienteId);

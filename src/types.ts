@@ -6,28 +6,33 @@
   edad: number;
   peso: number;
   altura: number;
-  posicion: string;
   lesiones: string;
-  evaluacionInicial: string;
-  evaluacionActual: string;
+  deporte?: string;
+  puesto?: string;
+  telefono?: string;
+  evaluacionInicial?: string;
+  evaluacionActual?: string;
 };
 
-export type SesionTipo = "fuerza" | "resistencia" | "tecnica" | "recuperacion";
+export type SesionEstado = "pendiente" | "completada";
 
 export type Sesion = {
   id: string;
   clienteId: string;
-  fecha: string;            // 🔑 un solo campo para fecha
-  duracionEstimada: string; // 🔑 un solo campo para duración
-  bloques: string;          // 🔑 textarea con descripción rápida
+  fecha: string;
+  duracionEstimada: string;
+  bloques: string;
+  estado?: SesionEstado;
+  completadaAt?: string;
 };
 
 
-export type CuotaEstado = "pagado" | "pendiente";
+export type CuotaEstado = "pagada" | "pendiente";
 
 export type Cuota = {
   id: string;
-  atleta: string;
+  clienteId: string;
+  mes: string;
   estado: CuotaEstado;
   fechaVencimiento: string;
   monto: number;
