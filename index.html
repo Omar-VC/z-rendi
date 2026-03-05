@@ -2,14 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+    <link rel="icon" type="image/png" href="/icon-192.png" />
     <title>z-rendi</title>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Pantalla de splash -->
+    <div id="splash" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+  <img src="/logo-500.png" alt="Z-Rendi Logo" width="200" />
+</div>
+
+
+    <!-- App React oculta hasta que cargue -->
+    <div id="root" style="display: none;"></div>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

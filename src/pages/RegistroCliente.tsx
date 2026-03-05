@@ -26,6 +26,7 @@ const RegistroCliente = () => {
         apellido,
         email,
         rol: "cliente",
+        estado: "pendiente",
         CreatedAt: new Date().toISOString(),
       });
       await setDoc(doc(db, "fichas", uid), {
@@ -35,6 +36,7 @@ const RegistroCliente = () => {
         evaluacionInicial: "",
         evaluacionActual: "",
       });
+
       setSuccess("Cliente registrado correctamente.");
       setEmail("");
       setPassword("");

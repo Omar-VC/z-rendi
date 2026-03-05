@@ -8,6 +8,7 @@ type Usuario = {
   apellido: string;
   email: string;
   rol: string;
+  estado?: string;
 };
 
 export function useCliente(clienteId: string) {
