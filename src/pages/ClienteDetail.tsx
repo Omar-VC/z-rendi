@@ -6,7 +6,9 @@ import SesionesCliente from "../components/Sesiones/SesionesCliente";
 
 const ClienteDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<"fichas" | "cuotas" | "sesiones">("fichas");
+  const [activeTab, setActiveTab] = useState<"fichas" | "cuotas" | "sesiones">(
+    "fichas",
+  );
 
   if (!id) return <div className="text-red-500">No se encontró el cliente</div>;
 
@@ -50,9 +52,7 @@ const ClienteDetail = () => {
       <div className="bg-secondary/40 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-6">
         {activeTab === "fichas" && <FichasCliente clienteId={id} />}
         {activeTab === "cuotas" && <CuotasCliente clienteId={id} />}
-        {activeTab === "sesiones" && (
-          <SesionesCliente clienteId={id} />
-        )}
+        {activeTab === "sesiones" && <SesionesCliente clienteId={id} />}
       </div>
     </div>
   );

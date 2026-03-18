@@ -20,13 +20,22 @@ const Home: React.FC = () => {
         ]);
 
         setFichas(
-          fichasSnap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Ficha, "id">) }))
+          fichasSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<Ficha, "id">),
+          })),
         );
         setSesiones(
-          sesionesSnap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Sesion, "id">) }))
+          sesionesSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<Sesion, "id">),
+          })),
         );
         setCuotas(
-          cuotasSnap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Cuota, "id">) }))
+          cuotasSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<Cuota, "id">),
+          })),
         );
       } catch (error) {
         console.error("Error cargando datos del home:", error);
@@ -41,7 +50,7 @@ const Home: React.FC = () => {
 
   const totalPendientes = useMemo(
     () => cuotas.filter((cuota) => cuota.estado === "pendiente").length,
-    [cuotas]
+    [cuotas],
   );
 
   const ingresosProyectados = useMemo(
@@ -50,7 +59,7 @@ const Home: React.FC = () => {
         style: "currency",
         currency: "ARS",
       }).format(cuotas.reduce((acc, cuota) => acc + cuota.monto, 0)),
-    [cuotas]
+    [cuotas],
   );
 
   return (
@@ -61,13 +70,27 @@ const Home: React.FC = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-  <CardMetric title="Fichas Activas" value={fichas.length} variant="info" />
-  <CardMetric title="Sesiones Programadas" value={sesiones.length} variant="info" />
-  <CardMetric title="Cuotas Pendientes" value={totalPendientes} variant="danger" />
-  <CardMetric title="Ingresos Proyectados" value={ingresosProyectados} variant="success" />
-</div>
-
-
+          <CardMetric
+            title="Fichas Activas"
+            value={fichas.length}
+            variant="info"
+          />
+          <CardMetric
+            title="Sesiones Programadas"
+            value={sesiones.length}
+            variant="info"
+          />
+          <CardMetric
+            title="Cuotas Pendientes"
+            value={totalPendientes}
+            variant="danger"
+          />
+          <CardMetric
+            title="Ingresos Proyectados"
+            value={ingresosProyectados}
+            variant="success"
+          />
+        </div>
       </section>
     </div>
   );

@@ -7,8 +7,15 @@ import NavbarCliente from "../components/NavbarCliente";
 import FichaDetail from "../components/fichas/FichaDetail";
 import CuotaDetailCliente from "../components/Cuotas/CuotaDetailCliente";
 import SesionesClienteView from "../components/Sesiones/SesionesClienteView";
+import GuiasPage from "../pages/GuiasPage"; // 🔹 Importa tu nueva página
 
-const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; clienteNombre: string }) => {
+const ClienteDashboard = ({
+  clienteId,
+  clienteNombre,
+}: {
+  clienteId: string;
+  clienteNombre: string;
+}) => {
   const { fichas } = useFichas(clienteId);
   const { cuotas } = useCuotas(clienteId);
   const { sesiones } = useSesiones(clienteId);
@@ -96,8 +103,12 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
                   <h3 className="font-bold">Instala la app en tu iPhone</h3>
                 </div>
                 <p className="text-sm">
-                  Abre el menú <span className="font-bold">Compartir</span> en Safari y
-                  selecciona <span className="font-bold">“Agregar a pantalla de inicio”</span>.
+                  Abre el menú <span className="font-bold">Compartir</span> en
+                  Safari y selecciona{" "}
+                  <span className="font-bold">
+                    “Agregar a pantalla de inicio”
+                  </span>
+                  .
                 </p>
               </>
             ) : (
@@ -111,12 +122,15 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
                     onClick={handleInstallClick}
                     className="bg-highlight hover:bg-highlight/80 px-4 py-2 rounded-md mt-3 text-sm flex items-center gap-2 mx-auto"
                   >
-                    <span className="material-icons text-base">install_mobile</span>
+                    <span className="material-icons text-base">
+                      install_mobile
+                    </span>
                     Instalar
                   </button>
                 ) : (
                   <p className="text-sm mt-2">
-                    Usa el menú del navegador y selecciona <span className="font-bold">“Instalar App”</span>.
+                    Usa el menú del navegador y selecciona{" "}
+                    <span className="font-bold">“Instalar App”</span>.
                   </p>
                 )}
               </>
@@ -140,7 +154,10 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
         {activeSection === "ficha" && (
           <div className="card w-full max-w-md">
             {ficha ? (
-              <FichaDetail ficha={ficha} onClose={() => setActiveSection("inicio")} />
+              <FichaDetail
+                ficha={ficha}
+                onClose={() => setActiveSection("inicio")}
+              />
             ) : (
               <p className="text-gray-300">Todavía no tenés ficha asignada.</p>
             )}
@@ -150,7 +167,10 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
         {activeSection === "cuotas" && (
           <div className="card w-full max-w-md">
             {cuota ? (
-              <CuotaDetailCliente cuota={cuota} onClose={() => setActiveSection("inicio")} />
+              <CuotaDetailCliente
+                cuota={cuota}
+                onClose={() => setActiveSection("inicio")}
+              />
             ) : (
               <p className="text-gray-300">Todavía no tenés cuota asignada.</p>
             )}
@@ -162,8 +182,17 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
             {sesionActual ? (
               <SesionesClienteView clienteId={clienteId} />
             ) : (
-              <p className="text-gray-300">Todavía no tenés sesiones asignadas.</p>
+              <p className="text-gray-300">
+                Todavía no tenés sesiones asignadas.
+              </p>
             )}
+          </div>
+        )}
+
+        {/* 🔹 Nueva sección Guías */}
+        {activeSection === "guias" && (
+          <div className="card w-full max-w-3xl">
+            <GuiasPage />
           </div>
         )}
       </main>

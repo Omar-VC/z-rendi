@@ -9,12 +9,13 @@ import RegistroCliente from "./pages/RegistroCliente";
 import ClientesPage from "./pages/ClientesPage";
 import ClienteDetail from "./pages/ClienteDetail";
 import ClienteDashboard from "./pages/ClienteDashboard";
+import GuiasPage from "./pages/GuiasPage"; // 🔹 nueva página
 
 import AdminLayout from "./layouts/AdminLayout";
 import { useCliente } from "./hooks/useCliente";
 
 function App() {
-  const navigate = useNavigate(); // 👈 ahora sí funciona
+  const navigate = useNavigate();
 
   const [user, loading] = useAuthState(auth);
   const [role, setRole] = useState<string | null>(null);
@@ -55,22 +56,28 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/clientes" element={<ClientesPage />} />
           <Route path="/clientes/:id" element={<ClienteDetail />} />
+          {/* 🔹 Nueva ruta Guías */}
+          <Route path="/guias" element={<GuiasPage />} />
         </Route>
       )}
 
       {/* Cliente con ClienteDashboard */}
       {user && role === "cliente" && cliente?.estado === "aprobado" && (
-        <Route
-          path="/cliente-dashboard"
-          element={
-            <ClienteDashboard
-              clienteId={user.uid}
-              clienteNombre={
-                cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente"
-              }
-            />
-          }
-        />
+        <>
+          <Route
+            path="/cliente-dashboard"
+            element={
+              <ClienteDashboard
+                clienteId={user.uid}
+                clienteNombre={
+                  cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente"
+                }
+              />
+            }
+          />
+          {/* 🔹 Nueva ruta Guías */}
+          <Route path="/guias" element={<GuiasPage />} />
+        </>
       )}
 
       {/* Si está pendiente */}

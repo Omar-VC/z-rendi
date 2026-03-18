@@ -78,6 +78,17 @@ const NavbarCliente = ({ onChangeSection }: NavbarClienteProps) => {
             </svg>
             <span className="text-xs">Sesiones</span>
           </button>
+
+          {/* Nuevo botón Guías */}
+          <button
+            onClick={() => handleSectionChange("guias")}
+            className="flex flex-col items-center text-white hover:text-blue-400 transition"
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20h9M12 4h9M4 8h16M4 16h16" />
+            </svg>
+            <span className="text-xs">Guías</span>
+          </button>
         </div>
       </div>
     </div>
@@ -85,4 +96,3 @@ const NavbarCliente = ({ onChangeSection }: NavbarClienteProps) => {
 };
 
 export default NavbarCliente;
-
