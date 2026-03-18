@@ -23,6 +23,7 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
   const [isIos, setIsIos] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -77,16 +78,24 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
 
       {/* Contenido central */}
       <main className="flex-1 flex flex-col items-center justify-center p-6">
-        {/* Banner instalación */}
-        {!isStandalone && (
-          <div className="bg-accent text-white p-4 rounded-lg shadow-md text-center mb-6 max-w-md">
+        {/* Banner instalación con botón cerrar */}
+        {!isStandalone && showBanner && (
+          <div className="bg-accent text-white p-4 rounded-lg shadow-md text-center mb-6 max-w-md relative">
+            {/* Botón cerrar */}
+            <button
+              onClick={() => setShowBanner(false)}
+              className="absolute top-2 right-2 text-white hover:text-gray-200"
+            >
+              <span className="material-icons text-sm">close</span>
+            </button>
+
             {isIos ? (
               <>
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <span className="material-icons">ios_share</span>
                   <h3 className="font-bold">Instala la app en tu iPhone</h3>
                 </div>
-                <p>
+                <p className="text-sm">
                   Abre el menú <span className="font-bold">Compartir</span> en Safari y
                   selecciona <span className="font-bold">“Agregar a pantalla de inicio”</span>.
                 </p>
@@ -100,13 +109,13 @@ const ClienteDashboard = ({ clienteId, clienteNombre }: { clienteId: string; cli
                 {deferredPrompt ? (
                   <button
                     onClick={handleInstallClick}
-                    className="btn bg-highlight hover:bg-highlight/80 px-6 py-2 rounded-lg mt-3 flex items-center gap-2"
+                    className="bg-highlight hover:bg-highlight/80 px-4 py-2 rounded-md mt-3 text-sm flex items-center gap-2 mx-auto"
                   >
-                    <span className="material-icons">install_mobile</span>
-                    Instalar App
+                    <span className="material-icons text-base">install_mobile</span>
+                    Instalar
                   </button>
                 ) : (
-                  <p>
+                  <p className="text-sm mt-2">
                     Usa el menú del navegador y selecciona <span className="font-bold">“Instalar App”</span>.
                   </p>
                 )}

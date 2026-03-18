@@ -32,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
         <nav className="flex-1 p-2 space-y-2">
           <Link
             to="/home"
+            onClick={() => setIsOpen(false)} // 🔹 Cierra el sidebar al seleccionar
             className="flex items-center px-3 py-2 rounded hover:bg-highlight/40 transition-colors duration-300"
           >
             <span className="mr-2">🏠</span>
@@ -39,6 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
           </Link>
           <Link
             to="/clientes"
+            onClick={() => setIsOpen(false)} // 🔹 Cierra el sidebar al seleccionar
             className="flex items-center px-3 py-2 rounded hover:bg-highlight/40 transition-colors duration-300"
           >
             <span className="mr-2">👥</span>
@@ -49,7 +51,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
         {/* Botón salir siempre visible */}
         <div className="p-4 border-t border-white/20 mt-auto">
           <button
-            onClick={onLogout}
+            onClick={() => {
+              setIsOpen(false); // 🔹 También cierra el sidebar al salir
+              onLogout?.();
+            }}
             className="w-full bg-accent/70 px-3 py-2 rounded-lg hover:bg-highlight/60 text-white font-semibold transition duration-300 flex items-center justify-center shadow-md"
           >
             Salir
