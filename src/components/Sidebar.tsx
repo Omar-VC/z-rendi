@@ -63,6 +63,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
             <span className="mr-2">📖</span>
             <span className="inline">Guías</span>
           </Link>
+          <Link
+            to="/seguimiento"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center px-3 py-2 rounded hover:bg-highlight/40 transition-colors duration-300"
+          >
+            <span className="mr-2">📊</span>
+            <span className="inline">Seguimiento</span>
+          </Link>
         </nav>
 
         {/* Botón salir */}

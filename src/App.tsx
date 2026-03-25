@@ -9,7 +9,8 @@ import RegistroCliente from "./pages/RegistroCliente";
 import ClientesPage from "./pages/ClientesPage";
 import ClienteDetail from "./pages/ClienteDetail";
 import ClienteDashboard from "./pages/ClienteDashboard";
-import GuiasPage from "./pages/GuiasPage"; // 🔹 nueva página
+import GuiasPage from "./pages/GuiasPage";
+import SeguimientoPage from "./pages/SeguimientoPage"; // 🔹 nueva página
 
 import AdminLayout from "./layouts/AdminLayout";
 import { useCliente } from "./hooks/useCliente";
@@ -56,8 +57,9 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/clientes" element={<ClientesPage />} />
           <Route path="/clientes/:id" element={<ClienteDetail />} />
-          {/* 🔹 Nueva ruta Guías */}
           <Route path="/guias" element={<GuiasPage />} />
+          {/* 🔹 Nueva ruta Seguimiento */}
+          <Route path="/seguimiento" element={<SeguimientoPage />} />
         </Route>
       )}
 
@@ -75,7 +77,6 @@ function App() {
               />
             }
           />
-          {/* 🔹 Nueva ruta Guías */}
           <Route path="/guias" element={<GuiasPage />} />
         </>
       )}
