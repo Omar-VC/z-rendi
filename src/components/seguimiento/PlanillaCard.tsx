@@ -1,4 +1,6 @@
+// src/components/seguimiento/PlanillaCard.tsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import RegistroForm from "./RegistroForm";
 import RendimientoTable from "./RendimientoTable";
 import { db } from "../../firebase";
@@ -9,12 +11,14 @@ import {
   doc,
   deleteDoc,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 
 interface BroncoTest {
   id: string;
   fecha?: string;
   tiempo?: string;
+  tiempoSegundos?: number;
 }
 
 interface Registro {
@@ -41,19 +45,19 @@ interface PlanillaCardProps {
 }
 
 const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDeletePlanilla }) => {
+  const navigate = useNavigate();
   const [registros, setRegistros] = useState<Registro[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingRegistro, setEditingRegistro] = useState<Registro | null>(null);
 
-  // Escuchar registros en tiempo real
   useEffect(() => {
     const unsub = onSnapshot(
       collection(db, "planillas", planillaId, "registros"),
       (snapshot) => {
         setRegistros(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
+          snapshot.docs.map((d) => ({
+            id: d.id,
+            ...(d.data() as any),
           })) as Registro[]
         );
       }
@@ -61,16 +65,19 @@ const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDelet
     return () => unsub();
   }, [planillaId]);
 
-  // Guardar nuevo registro
   const agregarRegistro = async (data: any) => {
-    await addDoc(collection(db, "planillas", planillaId, "registros"), {
-      ...data,
-      fechaRegistro: new Date(),
-    });
-    setShowForm(false);
+    try {
+      await addDoc(collection(db, "planillas", planillaId, "registros"), {
+        ...data,
+        fechaRegistro: new Date(),
+      });
+      setShowForm(false);
+    } catch (err) {
+      console.error("Error creando registro:", err);
+      alert("Ocurrió un error al crear el registro.");
+    }
   };
 
-  // Actualizar registro existente
   const actualizarRegistro = async (data: any, registroId: string) => {
     try {
       const registroRef = doc(db, "planillas", planillaId, "registros", registroId);
@@ -86,7 +93,6 @@ const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDelet
     }
   };
 
-  // Eliminar registro
   const eliminarRegistro = async (registroId: string) => {
     const confirm = window.confirm("¿Eliminar este registro?");
     if (!confirm) return;
@@ -98,13 +104,29 @@ const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDelet
     }
   };
 
-  // Abrir formulario en modo edición
+  const actualizarBroncoTest = async (registroId: string, broncoId: string, nuevo: BroncoTest) => {
+    try {
+      const registroRef = doc(db, "planillas", planillaId, "registros", registroId);
+      const snapshot = await getDoc(registroRef);
+      if (!snapshot.exists()) {
+        alert("Registro no encontrado.");
+        return;
+      }
+      const data = snapshot.data() as any;
+      const broncoTests: BroncoTest[] = Array.isArray(data.broncoTests) ? data.broncoTests : [];
+      const nuevoArray = broncoTests.map((b) => (b.id === broncoId ? { ...b, ...nuevo } : b));
+      await updateDoc(registroRef, { broncoTests: nuevoArray, fechaActualizacion: new Date() });
+    } catch (err) {
+      console.error("Error actualizando Bronco Test:", err);
+      alert("Ocurrió un error al actualizar el Bronco Test.");
+    }
+  };
+
   const handleEdit = (registro: Registro) => {
     setEditingRegistro(registro);
     setShowForm(true);
   };
 
-  // Callback que recibe RegistroForm: decide crear o actualizar
   const handleSaveFromForm = (data: any, registroId?: string) => {
     if (registroId) {
       return actualizarRegistro(data, registroId);
@@ -113,7 +135,6 @@ const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDelet
     }
   };
 
-  // Cancelar edición/creación
   const handleCancelForm = () => {
     setEditingRegistro(null);
     setShowForm(false);
@@ -123,12 +144,17 @@ const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDelet
     <div className="card space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">{nombre}</h2>
-        <button
-          onClick={() => onDeletePlanilla(planillaId)}
-          className="btn btn-danger"
-        >
-          Eliminar planilla
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => navigate(`/planillas/${planillaId}`)} className="btn btn-primary">
+            Ver planilla
+          </button>
+          <button
+            onClick={() => onDeletePlanilla(planillaId)}
+            className="btn btn-danger"
+          >
+            Eliminar planilla
+          </button>
+        </div>
       </div>
 
       {!showForm && (
@@ -149,9 +175,11 @@ const PlanillaCard: React.FC<PlanillaCardProps> = ({ planillaId, nombre, onDelet
         registros={registros}
         onDelete={eliminarRegistro}
         onEdit={handleEdit}
+        onUpdateBronco={actualizarBroncoTest}
       />
     </div>
   );
 };
 
 export default PlanillaCard;
+

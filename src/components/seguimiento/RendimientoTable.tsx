@@ -1,9 +1,11 @@
-import React from "react";
+// src/components/seguimiento/RendimientoTable.tsx
+import React, { useState } from "react";
 
 interface BroncoTest {
   id: string;
   fecha?: string;
   tiempo?: string;
+  tiempoSegundos?: number;
 }
 
 interface Registro {
@@ -27,12 +29,56 @@ interface RendimientoTableProps {
   registros: Registro[];
   onDelete: (id: string) => void;
   onEdit: (registro: Registro) => void;
+  onUpdateBronco: (registroId: string, broncoId: string, nuevo: BroncoTest) => Promise<void>;
 }
 
-const RendimientoTable: React.FC<RendimientoTableProps> = ({ registros, onDelete, onEdit }) => {
+const parseTimeToSeconds = (input: string): number | null => {
+  if (!input) return null;
+  const trimmed = input.trim();
+  const mmss = /^(\d{1,2}):([0-5]?\d(?:\.\d+)?)$/;
+  const secondsOnly = /^(\d+(?:\.\d+)?)$/;
+  if (mmss.test(trimmed)) {
+    const [, mm, ss] = trimmed.match(mmss)!;
+    return Number(mm) * 60 + Number(ss);
+  } else if (secondsOnly.test(trimmed)) {
+    return Number(trimmed);
+  }
+  return null;
+};
+
+const RendimientoTable: React.FC<RendimientoTableProps> = ({ registros, onDelete, onEdit, onUpdateBronco }) => {
+  const [editingBronco, setEditingBronco] = useState<{ registroId: string; broncoId: string } | null>(null);
+  const [editFecha, setEditFecha] = useState("");
+  const [editTiempo, setEditTiempo] = useState("");
+
   if (registros.length === 0) {
     return <p className="text-slate-300">Todavía no hay registros en esta planilla.</p>;
   }
+
+  const startEditBronco = (registroId: string, b: BroncoTest) => {
+    setEditingBronco({ registroId, broncoId: b.id });
+    setEditFecha(b.fecha ?? "");
+    setEditTiempo(b.tiempo ?? "");
+  };
+
+  const saveEditBronco = async () => {
+    if (!editingBronco) return;
+    const tiempoSeg = parseTimeToSeconds(editTiempo);
+    if (tiempoSeg === null) {
+      alert("Formato de tiempo inválido. Usá mm:ss o segundos (ej. 85 o 1:25).");
+      return;
+    }
+    const nuevo: BroncoTest = { id: editingBronco.broncoId, fecha: editFecha, tiempo: editTiempo, tiempoSegundos: tiempoSeg };
+    try {
+      await onUpdateBronco(editingBronco.registroId, editingBronco.broncoId, nuevo);
+      setEditingBronco(null);
+      setEditFecha("");
+      setEditTiempo("");
+    } catch (err) {
+      console.error("Error guardando Bronco Test:", err);
+      alert("No se pudo guardar el Bronco Test. Revisa la consola.");
+    }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -70,8 +116,23 @@ const RendimientoTable: React.FC<RendimientoTableProps> = ({ registros, onDelete
                 {r.broncoTests && r.broncoTests.length > 0 ? (
                   <ul className="list-none p-0 m-0">
                     {r.broncoTests.map((b) => (
-                      <li key={b.id} className="text-sm">
-                        {b.fecha} — {b.tiempo}
+                      <li key={b.id} className="text-sm mb-1">
+                        {editingBronco && editingBronco.registroId === r.id && editingBronco.broncoId === b.id ? (
+                          <div className="flex gap-2 items-end">
+                            <input type="date" value={editFecha} onChange={(e) => setEditFecha(e.target.value)} className="input" />
+                            <input type="text" value={editTiempo} onChange={(e) => setEditTiempo(e.target.value)} className="input" />
+                            <button onClick={saveEditBronco} className="btn btn-primary">Guardar</button>
+                            <button onClick={() => setEditingBronco(null)} className="btn btn-secondary">Cancelar</button>
+                          </div>
+                        ) : (
+                          <div className="flex justify-between items-center">
+                            <span>{b.fecha} — {b.tiempo} {b.tiempoSegundos ? `(${b.tiempoSegundos}s)` : ""}</span>
+                            <div className="flex gap-2">
+                              <button onClick={() => onEdit(r)} className="btn btn-secondary">Editar registro</button>
+                              <button onClick={() => startEditBronco(r.id!, b)} className="btn btn-secondary">Editar Bronco</button>
+                            </div>
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -80,19 +141,9 @@ const RendimientoTable: React.FC<RendimientoTableProps> = ({ registros, onDelete
                 )}
               </td>
               <td className="px-4 py-2 flex gap-2">
-                <button
-                  onClick={() => onEdit(r)}
-                  className="btn btn-secondary"
-                >
-                  Editar
-                </button>
+                <button onClick={() => onEdit(r)} className="btn btn-secondary">Editar</button>
                 {r.id && (
-                  <button
-                    onClick={() => onDelete(r.id!)}
-                    className="btn btn-danger"
-                  >
-                    Eliminar
-                  </button>
+                  <button onClick={() => onDelete(r.id!)} className="btn btn-danger">Eliminar</button>
                 )}
               </td>
             </tr>
@@ -104,4 +155,3 @@ const RendimientoTable: React.FC<RendimientoTableProps> = ({ registros, onDelete
 };
 
 export default RendimientoTable;
-

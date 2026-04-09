@@ -1,4 +1,5 @@
-﻿import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+﻿// src/App.tsx
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect, useState } from "react";
@@ -10,7 +11,8 @@ import ClientesPage from "./pages/ClientesPage";
 import ClienteDetail from "./pages/ClienteDetail";
 import ClienteDashboard from "./pages/ClienteDashboard";
 import GuiasPage from "./pages/GuiasPage";
-import SeguimientoPage from "./pages/SeguimientoPage"; // 🔹 nueva página
+import SeguimientoPage from "./pages/SeguimientoPage";
+import PlanillaDetailPage from "./pages/PlanillaDetailPage";
 
 import AdminLayout from "./layouts/AdminLayout";
 import { useCliente } from "./hooks/useCliente";
@@ -58,8 +60,8 @@ function App() {
           <Route path="/clientes" element={<ClientesPage />} />
           <Route path="/clientes/:id" element={<ClienteDetail />} />
           <Route path="/guias" element={<GuiasPage />} />
-          {/* 🔹 Nueva ruta Seguimiento */}
           <Route path="/seguimiento" element={<SeguimientoPage />} />
+          <Route path="/planillas/:id" element={<PlanillaDetailPage />} />
         </Route>
       )}
 

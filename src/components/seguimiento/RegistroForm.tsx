@@ -1,3 +1,4 @@
+// src/components/seguimiento/RegistroForm.tsx
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -5,13 +6,28 @@ interface BroncoTest {
   id: string;
   fecha: string;
   tiempo: string;
+  tiempoSegundos?: number;
 }
 
 interface RegistroFormProps {
   onSave: (data: any, id?: string) => void;
   onCancel: () => void;
-  initialData?: any; // si viene, estamos editando
+  initialData?: any;
 }
+
+const parseTimeToSeconds = (input: string): number | null => {
+  if (!input) return null;
+  const trimmed = input.trim();
+  const mmss = /^(\d{1,2}):([0-5]?\d(?:\.\d+)?)$/;
+  const secondsOnly = /^(\d+(?:\.\d+)?)$/;
+  if (mmss.test(trimmed)) {
+    const [, mm, ss] = trimmed.match(mmss)!;
+    return Number(mm) * 60 + Number(ss);
+  } else if (secondsOnly.test(trimmed)) {
+    return Number(trimmed);
+  }
+  return null;
+};
 
 const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialData }) => {
   const [formData, setFormData] = useState({
@@ -31,8 +47,10 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
   const [broncoFecha, setBroncoFecha] = useState("");
   const [broncoTiempo, setBroncoTiempo] = useState("");
   const [broncoTests, setBroncoTests] = useState<BroncoTest[]>([]);
+  const [editingBroncoId, setEditingBroncoId] = useState<string | null>(null);
+  const [editingBroncoFecha, setEditingBroncoFecha] = useState("");
+  const [editingBroncoTiempo, setEditingBroncoTiempo] = useState("");
 
-  // Si initialData existe, precargar el formulario
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -51,11 +69,15 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
 
       setBroncoTests(
         Array.isArray(initialData.broncoTests)
-          ? initialData.broncoTests.map((b: any) => ({ id: b.id ?? uuidv4(), fecha: b.fecha, tiempo: b.tiempo }))
+          ? initialData.broncoTests.map((b: any) => ({
+              id: b.id ?? uuidv4(),
+              fecha: b.fecha,
+              tiempo: b.tiempo,
+              tiempoSegundos: b.tiempoSegundos ?? (b.tiempo ? parseTimeToSeconds(b.tiempo) : undefined),
+            }))
           : []
       );
     } else {
-      // limpiar si es nuevo
       setFormData({
         nombre: "",
         apellido: "",
@@ -85,10 +107,16 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
       alert("Completa fecha y tiempo del Bronco Test antes de agregar.");
       return;
     }
+    const tiempoSeg = parseTimeToSeconds(broncoTiempo);
+    if (tiempoSeg === null) {
+      alert("Formato de tiempo inválido. Usá mm:ss o segundos (ej. 85 o 1:25).");
+      return;
+    }
     const nuevo: BroncoTest = {
       id: uuidv4(),
       fecha: broncoFecha,
       tiempo: broncoTiempo,
+      tiempoSegundos: tiempoSeg,
     };
     setBroncoTests([...broncoTests, nuevo]);
     setBroncoFecha("");
@@ -99,10 +127,32 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
     setBroncoTests(broncoTests.filter((b) => b.id !== id));
   };
 
+  const startEditBroncoLocal = (b: BroncoTest) => {
+    setEditingBroncoId(b.id);
+    setEditingBroncoFecha(b.fecha);
+    setEditingBroncoTiempo(b.tiempo);
+  };
+
+  const saveEditBroncoLocal = () => {
+    if (!editingBroncoId) return;
+    const tiempoSeg = parseTimeToSeconds(editingBroncoTiempo);
+    if (tiempoSeg === null) {
+      alert("Formato de tiempo inválido. Usá mm:ss o segundos (ej. 85 o 1:25).");
+      return;
+    }
+    setBroncoTests(
+      broncoTests.map((b) =>
+        b.id === editingBroncoId ? { ...b, fecha: editingBroncoFecha, tiempo: editingBroncoTiempo, tiempoSegundos: tiempoSeg } : b
+      )
+    );
+    setEditingBroncoId(null);
+    setEditingBroncoFecha("");
+    setEditingBroncoTiempo("");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Convertir a tipos numéricos donde corresponda
     const payload = {
       nombre: formData.nombre.trim(),
       apellido: formData.apellido.trim(),
@@ -118,7 +168,6 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
       broncoTests: broncoTests.length ? broncoTests : [],
     };
 
-    // Si initialData tiene id, lo pasamos para actualizar; si no, crear
     if (initialData && initialData.id) {
       onSave(payload, initialData.id);
     } else {
@@ -130,7 +179,6 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
     <form onSubmit={handleSubmit} className="card space-y-4">
       <h2 className="text-lg font-semibold">{initialData ? "Editar registro" : "Nuevo registro"}</h2>
 
-      {/* Datos personales */}
       <div className="grid grid-cols-2 gap-4">
         <input name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} className="input" />
         <input name="apellido" placeholder="Apellido" value={formData.apellido} onChange={handleChange} className="input" />
@@ -139,28 +187,24 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
         <input name="peso" type="number" placeholder="Peso (kg)" value={formData.peso} onChange={handleChange} className="input" />
       </div>
 
-      {/* Fuerza */}
       <h3 className="font-semibold">Fuerza</h3>
       <div className="grid grid-cols-2 gap-4">
         <input name="fuerzaPress" type="number" placeholder="Press plano pecho (kg)" value={formData.fuerzaPress} onChange={handleChange} className="input" />
         <input name="fuerzaSentadillas" type="number" placeholder="Sentadillas (kg)" value={formData.fuerzaSentadillas} onChange={handleChange} className="input" />
       </div>
 
-      {/* Velocidad */}
       <h3 className="font-semibold">Velocidad</h3>
       <div className="grid grid-cols-2 gap-4">
         <input name="velocidadDistancia" type="number" placeholder="Distancia (m)" value={formData.velocidadDistancia} onChange={handleChange} className="input" />
         <input name="velocidadTiempo" type="number" step="0.01" placeholder="Tiempo (s)" value={formData.velocidadTiempo} onChange={handleChange} className="input" />
       </div>
 
-      {/* Resistencia */}
       <h3 className="font-semibold">Resistencia</h3>
       <div className="grid grid-cols-2 gap-4">
         <input name="resistenciaAerobica" type="text" placeholder="Aeróbica base (km o mts)" value={formData.resistenciaAerobica} onChange={handleChange} className="input" />
         <input name="resistenciaAnaerobica" type="text" placeholder="Anaeróbica (ej: 10x15m en 3min)" value={formData.resistenciaAnaerobica} onChange={handleChange} className="input" />
       </div>
 
-      {/* Bronco Test */}
       <h3 className="font-semibold">Bronco Test</h3>
       <div className="grid grid-cols-3 gap-2 items-end">
         <input
@@ -186,18 +230,29 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onSave, onCancel, initialDa
           <h4 className="font-medium">Bronco Tests agregados</h4>
           <ul className="list-disc pl-5">
             {broncoTests.map((b) => (
-              <li key={b.id} className="flex items-center justify-between">
-                <span>{b.fecha} — {b.tiempo}</span>
-                <button type="button" onClick={() => eliminarBroncoLocal(b.id)} className="text-sm text-red-400 hover:underline">
-                  Eliminar
-                </button>
+              <li key={b.id} className="flex items-center justify-between gap-4">
+                {editingBroncoId === b.id ? (
+                  <div className="flex gap-2 items-end">
+                    <input type="date" value={editingBroncoFecha} onChange={(e) => setEditingBroncoFecha(e.target.value)} className="input" />
+                    <input type="text" value={editingBroncoTiempo} onChange={(e) => setEditingBroncoTiempo(e.target.value)} className="input" />
+                    <button type="button" onClick={saveEditBroncoLocal} className="btn btn-primary">Guardar</button>
+                    <button type="button" onClick={() => setEditingBroncoId(null)} className="btn btn-secondary">Cancelar</button>
+                  </div>
+                ) : (
+                  <>
+                    <span>{b.fecha} — {b.tiempo} {b.tiempoSegundos ? `(${b.tiempoSegundos}s)` : ""}</span>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => startEditBroncoLocal(b)} className="text-sm text-blue-300 hover:underline">Editar</button>
+                      <button type="button" onClick={() => eliminarBroncoLocal(b.id)} className="text-sm text-red-400 hover:underline">Eliminar</button>
+                    </div>
+                  </>
+                )}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Botones */}
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel} className="btn btn-secondary">Cancelar</button>
         <button type="submit" className="btn btn-primary">{initialData ? "Actualizar" : "Guardar"}</button>
