@@ -1,89 +1,20 @@
 // src/pages/SeguimientoPage.tsx
-import React, { useState, useEffect } from "react";
-import { db } from "../firebase";
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-  doc,
-  getDocs,
-} from "firebase/firestore";
-import PlanillaCard from "../components/seguimiento/PlanillaCard";
-
-interface Planilla {
-  id: string;
-  nombre: string;
-  fechaCreacion?: any;
-}
+import React, { useState } from "react";
+import { useSeguimiento } from "../hooks/useSeguimiento";
+import PlanillaCard from "../components/seguimiento/ui/PlanillaCard";
 
 const SeguimientoPage = () => {
-  const [planillas, setPlanillas] = useState<Planilla[]>([]);
+  const { planillas, crearPlanilla, eliminarPlanilla, loading } = useSeguimiento();
   const [nombreNueva, setNombreNueva] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const colRef = collection(db, "planillas");
-    const unsub = onSnapshot(colRef, (snapshot) => {
-      setPlanillas(
-        snapshot.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as any),
-        })) as Planilla[]
-      );
-    }, (err) => {
-      console.error("onSnapshot error planillas:", err);
-    });
-    return () => unsub();
-  }, []);
-
-  const crearPlanilla = async () => {
+  const handleCrear = () => {
     if (!nombreNueva.trim()) {
       alert("Ingresá un nombre para la planilla");
       return;
     }
 
-    setLoading(true);
-    try {
-      console.log("Intentando crear planilla:", nombreNueva);
-      const ref = await addDoc(collection(db, "planillas"), {
-        nombre: nombreNueva.trim(),
-        fechaCreacion: new Date(),
-      });
-      console.log("Planilla creada con id:", ref.id);
-      setNombreNueva("");
-    } catch (err) {
-      console.error("Error creando planilla:", err);
-      alert("Error al crear planilla. Revisa la consola para más detalles.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const eliminarPlanilla = async (planillaId: string) => {
-    const confirmDelete = window.confirm(
-      "¿Eliminar planilla y todos sus registros y atletas? Esta acción no se puede deshacer."
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const registrosSnap = await getDocs(collection(db, "planillas", planillaId, "registros"));
-      const deletePromises: Promise<void>[] = [];
-      registrosSnap.forEach((r) => {
-        deletePromises.push(deleteDoc(doc(db, "planillas", planillaId, "registros", r.id)));
-      });
-
-      const atletasSnap = await getDocs(collection(db, "planillas", planillaId, "atletas"));
-      atletasSnap.forEach((a) => {
-        deletePromises.push(deleteDoc(doc(db, "planillas", planillaId, "atletas", a.id)));
-      });
-
-      await Promise.all(deletePromises);
-      await deleteDoc(doc(db, "planillas", planillaId));
-    } catch (err) {
-      console.error("Error eliminando planilla:", err);
-      alert("Ocurrió un error al eliminar la planilla. Revisa la consola.");
-    }
+    crearPlanilla(nombreNueva);
+    setNombreNueva("");
   };
 
   return (
@@ -97,10 +28,11 @@ const SeguimientoPage = () => {
           value={nombreNueva}
           onChange={(e) => setNombreNueva(e.target.value)}
           className="input"
+          disabled={loading}
         />
         <button
           type="button"
-          onClick={crearPlanilla}
+          onClick={handleCrear}
           className="btn btn-primary"
           disabled={loading}
         >
