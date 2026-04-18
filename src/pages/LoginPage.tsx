@@ -1,4 +1,3 @@
-// src/pages/LoginPage.tsx
 import { useState } from "react";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -23,11 +22,12 @@ const LoginPage = () => {
   };
 
   return (
-    <section className="flex items-center justify-center min-h-screen bg-primary">
+    <section className="flex items-center justify-center min-h-screen">
       <div className="card w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-white text-center">
           Iniciar sesión
         </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -37,6 +37,7 @@ const LoginPage = () => {
             className="input"
             required
           />
+
           <input
             type="password"
             placeholder="Contraseña"
@@ -45,17 +46,18 @@ const LoginPage = () => {
             className="input"
             required
           />
+
           <button type="submit" className="btn btn-primary w-full">
             Entrar
           </button>
         </form>
 
-        {error && <p className="text-red-400 mt-3 text-sm">{error}</p>}
+        {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-muted">
             ¿No tienes cuenta?{" "}
-            <Link to="/registro-cliente" className="text-highlight font-medium">
+            <Link to="/registro-cliente" className="link-accent">
               Regístrate aquí
             </Link>
           </p>

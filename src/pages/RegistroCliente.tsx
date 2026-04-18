@@ -1,4 +1,3 @@
-// src/pages/RegistroCliente.tsx
 import { useState } from "react";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -18,17 +17,25 @@ const RegistroCliente = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
       const uid = userCredential.user.uid;
+
       await setDoc(doc(db, "usuarios", uid), {
         nombre,
         apellido,
         email,
         rol: "cliente",
         estado: "pendiente",
-        CreatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
       });
+
       await setDoc(doc(db, "fichas", uid), {
         nombre,
         apellido,
@@ -38,10 +45,12 @@ const RegistroCliente = () => {
       });
 
       setSuccess("Cliente registrado correctamente.");
+
       setEmail("");
       setPassword("");
       setNombre("");
       setApellido("");
+
       navigate("/login");
     } catch (err: any) {
       setError("Error al registrar cliente: " + err.message);
@@ -49,11 +58,12 @@ const RegistroCliente = () => {
   };
 
   return (
-    <section className="flex items-center justify-center min-h-screen bg-primary">
+    <section className="flex items-center justify-center min-h-screen">
       <div className="card w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-white text-center">
           Registro de Cliente
         </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -63,6 +73,7 @@ const RegistroCliente = () => {
             className="input"
             required
           />
+
           <input
             type="text"
             placeholder="Apellido"
@@ -71,6 +82,7 @@ const RegistroCliente = () => {
             className="input"
             required
           />
+
           <input
             type="email"
             placeholder="Correo electrónico"
@@ -79,6 +91,7 @@ const RegistroCliente = () => {
             className="input"
             required
           />
+
           <input
             type="password"
             placeholder="Contraseña"
@@ -87,17 +100,27 @@ const RegistroCliente = () => {
             className="input"
             required
           />
+
           <button type="submit" className="btn btn-primary w-full">
             Registrar
           </button>
         </form>
 
-        {error && <p className="text-red-400 mt-3 text-sm">{error}</p>}
-        {success && <p className="text-green-400 mt-3 text-sm">{success}</p>}
+        {error && (
+          <p className="mt-3 text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
-        <p className="mt-6 text-sm text-gray-300 text-center">
+        {success && (
+          <p className="mt-3 text-sm text-green-400">
+            {success}
+          </p>
+        )}
+
+        <p className="mt-6 text-sm text-muted text-center">
           ¿Ya tienes una cuenta?{" "}
-          <Link to="/login" className="text-highlight font-medium">
+          <Link to="/login" className="link-accent">
             Inicia sesión
           </Link>
         </p>
@@ -107,5 +130,3 @@ const RegistroCliente = () => {
 };
 
 export default RegistroCliente;
-
-

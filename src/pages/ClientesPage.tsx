@@ -39,28 +39,26 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   const handleApproveCliente = async (id: string) => {
-    try {
-      await updateDoc(doc(db, "usuarios", id), { estado: "aprobado" });
-      setClientes(
-        clientes.map((c) => (c.id === id ? { ...c, estado: "aprobado" } : c)),
-      );
-    } catch (error) {
-      console.error("Error aprobando cliente:", error);
-    }
+    await updateDoc(doc(db, "usuarios", id), { estado: "aprobado" });
+    setClientes((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, estado: "aprobado" } : c)),
+    );
   };
 
   const handleDeleteCliente = async (id: string) => {
-    try {
-      await deleteDoc(doc(db, "usuarios", id));
-      setClientes(clientes.filter((cliente) => cliente.id !== id));
-    } catch (error) {
-      console.error("Error eliminando cliente:", error);
-    }
+    await deleteDoc(doc(db, "usuarios", id));
+    setClientes((prev) => prev.filter((c) => c.id !== id));
   };
 
   return (
-    <div className="min-h-screen bg-primary/90 backdrop-blur-sm p-6 text-white">
-      <h2 className="text-3xl font-bold mb-8 border-b border-white/20 pb-2">
+    <div
+      className="min-h-screen p-6"
+      style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
+    >
+      <h2
+        className="text-3xl font-bold mb-8 border-b pb-2"
+        style={{ borderColor: "var(--border)" }}
+      >
         Clientes Registrados
       </h2>
 
@@ -69,12 +67,14 @@ const ClientesPage: React.FC = () => {
           <div
             key={cliente.id}
             onClick={() => navigate(`/clientes/${cliente.id}`)}
-            className="cursor-pointer bg-secondary/40 backdrop-blur-md border border-white/20 shadow-lg rounded-xl p-6 hover:shadow-xl hover:bg-secondary/60 transition"
+            className="cursor-pointer rounded-xl p-6 border backdrop-blur-md shadow-lg transition hover:shadow-xl hover:scale-[1.02]"
+            style={{ backgroundColor: "var(--surface)", borderColor: "var(--border)" }}
           >
             <h3 className="text-xl font-semibold mb-2">
               {cliente.nombre} {cliente.apellido}
             </h3>
-            <p className="text-sm mb-2">
+
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
               Estado: {cliente.estado || "pendiente"}
             </p>
 
@@ -84,7 +84,7 @@ const ClientesPage: React.FC = () => {
                   e.stopPropagation();
                   handleDeleteCliente(cliente.id);
                 }}
-                className="btn bg-accent/80 hover:bg-highlight/70 w-full"
+                className="btn btn-danger w-full"
               >
                 Eliminar
               </button>
@@ -95,7 +95,7 @@ const ClientesPage: React.FC = () => {
                     e.stopPropagation();
                     handleApproveCliente(cliente.id);
                   }}
-                  className="btn bg-green-600 hover:bg-green-500 w-full"
+                  className="btn btn-primary w-full"
                 >
                   Aceptar
                 </button>

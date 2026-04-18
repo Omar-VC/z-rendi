@@ -1,8 +1,40 @@
-/* Estilos globales */
-body {
-  @apply bg-primary text-white font-sans;
+:root {
+  --bg: #0f0f10; /* menos azul, más neutro oscuro */
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.08);
+
+  --border: rgba(255, 255, 255, 0.10);
+
+  --text: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.6);
+
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+
+  --focus: #ef4444;
+
+  --accent-green: #39ff88;
+--accent-green-hover: #2ee676;
 }
 
+
+
+
+
+
+
+
+/* Estilos globales */
+
+* {
+  transition-property: background-color, border-color, box-shadow, transform;
+}
+
+body {
+  @apply font-sans;
+  background-color: var(--bg);
+  color: var(--text);
+}
 /* Encabezados */
 h1, h2, h3 {
   @apply font-bold tracking-wide;
@@ -10,52 +42,86 @@ h1, h2, h3 {
 
 /* Botón base */
 .btn {
-  @apply px-4 py-2 rounded-lg font-semibold transition duration-300;
-  @apply flex items-center justify-center;
+  @apply px-4 py-2 rounded-lg font-semibold;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Variantes */
 .btn-primary {
-  @apply bg-red-700 text-white shadow-md;
+  background-color: var(--primary);
+  color: white;
 }
 
 .btn-primary:hover {
-  @apply bg-red-600;
-}
-
-.btn-success {
-  @apply bg-green-600 text-white hover:bg-green-700 shadow-md;
+  background-color: var(--primary-hover);
 }
 
 .btn-danger {
-  @apply bg-red-600 text-white shadow-md;
+  background-color: var(--primary);
 }
 
 .btn-danger:hover {
-  @apply bg-red-500;
+  background-color: #b91c1c;
 }
 
 .btn-secondary {
-  @apply bg-gray-500 text-white hover:bg-gray-600 shadow-md;
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255,255,255,0.15);
 }
 
 /* Tarjetas */
 .card {
-  @apply rounded-xl p-5 shadow-md transition duration-200 bg-secondary/30 border border-white/10 text-white;
+  @apply rounded-xl p-6 border;
+  background-color: var(--surface);
+  border-color: var(--border);
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  @apply shadow-lg;
+  background-color: var(--surface-2);
 }
 
 /* Inputs */
 .input {
-  @apply w-full px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500;
+  @apply w-full px-3 py-2 rounded-lg;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+select {
+  @apply w-full px-3 py-2 rounded-lg;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 select option {
   background-color: #111827;
   color: white;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
 
@@ -91,3 +157,23 @@ select option {
 }
 
 
+table {
+  border-color: var(--border);
+}
+
+tr {
+  transition: background-color 0.15s ease;
+}
+
+tr:hover {
+  background-color: rgba(255,255,255,0.04);
+}
+
+.link-accent {
+  color: var(--accent-green);
+  transition: opacity 0.2s ease;
+}
+
+.link-accent:hover {
+  color: var(--accent-green-hover);
+}
