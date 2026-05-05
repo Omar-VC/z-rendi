@@ -1,17 +1,28 @@
-﻿// src/components/cuotas/CuotaDetail.tsx
-import type { Cuota } from "../../types";
-import { useState } from "react";
+﻿import { useState, useEffect } from "react";
+import type { Cuota } from "../types";
 
-type Props = { 
-  cuota: Cuota | undefined; 
-  onDelete?: (id: string) => void; 
-  onClose?: () => void; 
+type Props = {
+  cuota: Cuota | undefined;
+  onDelete?: (id: string) => void;
+  onClose?: () => void;
   onUpdate?: (id: string, data: Partial<Cuota>) => void;
 };
 
 const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Cuota>>({});
+
+  // sincroniza datos al seleccionar otra cuota
+  useEffect(() => {
+    if (cuota) {
+      setFormData({
+        mes: cuota.mes,
+        monto: cuota.monto,
+        fechaVencimiento: cuota.fechaVencimiento,
+        estado: cuota.estado,
+      });
+    }
+  }, [cuota]);
 
   if (!cuota) {
     return (
@@ -33,7 +44,7 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
       onUpdate(cuota.id, { estado: "pagada" });
     }
     setIsEditing(false);
-    if (onClose) onClose();
+    onClose?.();
   };
 
   return (
@@ -51,27 +62,37 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
         <div className="space-y-3">
           <input
             type="text"
-            placeholder="Mes"
-            defaultValue={cuota.mes}
+            value={formData.mes || ""}
             onChange={(e) => setFormData({ ...formData, mes: e.target.value })}
             className="input"
           />
           <input
             type="number"
-            placeholder="Monto"
-            defaultValue={cuota.monto}
-            onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
+            value={formData.monto || 0}
+            onChange={(e) =>
+              setFormData({ ...formData, monto: Number(e.target.value) })
+            }
             className="input"
           />
           <input
             type="date"
-            defaultValue={cuota.fechaVencimiento}
-            onChange={(e) => setFormData({ ...formData, fechaVencimiento: e.target.value })}
+            value={formData.fechaVencimiento || ""}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                fechaVencimiento: e.target.value,
+              })
+            }
             className="input"
           />
           <select
-            defaultValue={cuota.estado}
-            onChange={(e) => setFormData({ ...formData, estado: e.target.value as Cuota["estado"] })}
+            value={formData.estado || "pendiente"}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                estado: e.target.value as Cuota["estado"],
+              })
+            }
             className="input"
           >
             <option value="pendiente">Pendiente</option>
@@ -80,28 +101,34 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
         </div>
       )}
 
-      {/* Botones de acción */}
       <div className="mt-4 flex flex-wrap gap-2">
         {!isEditing && (
           <button onClick={() => setIsEditing(true)} className="btn btn-primary">
             Editar
           </button>
         )}
+
         {isEditing && (
           <button onClick={handleSave} className="btn btn-success">
             Guardar cambios
           </button>
         )}
+
         {cuota.estado === "pendiente" && (
           <button onClick={handleMarkPaid} className="btn btn-success">
             Marcar como pagada
           </button>
         )}
+
         {onDelete && (
-          <button onClick={() => onDelete(cuota.id)} className="btn btn-danger">
+          <button
+            onClick={() => onDelete(cuota.id)}
+            className="btn btn-danger"
+          >
             Eliminar cuota
           </button>
         )}
+
         {onClose && (
           <button onClick={onClose} className="btn btn-secondary">
             Cerrar

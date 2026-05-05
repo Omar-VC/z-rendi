@@ -1,23 +1,28 @@
-// src/components/cuotas/CuotaForm.tsx
 import { useState } from "react";
-import type { Cuota } from "../../types";
+import type { Cuota } from "../types";
 
 type Props = {
   onSave: (data: Omit<Cuota, "id" | "clienteId">) => void;
   onCancel: () => void;
 };
 
-const CuotaForm = ({ onSave, onCancel }: Props) => {
-  const [formData, setFormData] = useState<Omit<Cuota, "id" | "clienteId">>({
+const initialState: Omit<Cuota, "id" | "clienteId"> = {
   mes: "",
   fechaVencimiento: "",
   monto: 0,
   estado: "pendiente",
-});
+};
+
+const CuotaForm = ({ onSave, onCancel }: Props) => {
+  const [formData, setFormData] = useState(initialState);
 
   const handleSubmit = () => {
+    if (!formData.mes || !formData.fechaVencimiento || formData.monto <= 0) {
+      return;
+    }
+
     onSave(formData);
-    setFormData({ mes: "", fechaVencimiento: "", monto: 0, estado: "pendiente" });
+    setFormData(initialState);
   };
 
   return (
@@ -54,7 +59,10 @@ const CuotaForm = ({ onSave, onCancel }: Props) => {
       <select
         value={formData.estado}
         onChange={(e) =>
-          setFormData({ ...formData, estado: e.target.value as Cuota["estado"] })
+          setFormData({
+            ...formData,
+            estado: e.target.value as Cuota["estado"],
+          })
         }
         className="input mb-4"
       >

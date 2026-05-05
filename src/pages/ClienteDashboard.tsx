@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import { useFichas } from "../hooks/useFichas";
-import { useCuotas } from "../hooks/useCuotas";
+import { useCuotas } from "../features/cuotas/hooks/useCuotas";
 import { useSesiones } from "../hooks/useSesiones";
 import NavbarCliente from "../components/NavbarCliente";
 import FichaDetail from "../components/fichas/FichaDetail";
-import CuotaDetailCliente from "../components/Cuotas/CuotaDetailCliente";
+import CuotaDetail from "../features/cuotas/components/CuotaDetail";
 import SesionesClienteView from "../components/Sesiones/SesionesClienteView";
 import GuiasPage from "../pages/GuiasPage"; // 🔹 Importa tu nueva página
 
@@ -167,7 +167,7 @@ const ClienteDashboard = ({
         {activeSection === "cuotas" && (
           <div className="card w-full max-w-md">
             {cuota ? (
-              <CuotaDetailCliente
+              <CuotaDetail
                 cuota={cuota}
                 onClose={() => setActiveSection("inicio")}
               />

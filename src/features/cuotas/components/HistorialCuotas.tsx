@@ -1,5 +1,4 @@
-// src/components/cuotas/HistorialCuotas.tsx
-import type { Cuota } from "../../types";
+import type { Cuota } from "../types";
 
 type Props = {
   historial: Cuota[];

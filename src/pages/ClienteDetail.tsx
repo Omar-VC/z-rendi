@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import FichasCliente from "../components/fichas/FichasCliente";
-import CuotasCliente from "../components/Cuotas/CuotasCliente";
+import CuotasCliente from "../features/cuotas/components/CuotasCliente";
 import SesionesCliente from "../components/Sesiones/SesionesCliente";
 
 const ClienteDetail = () => {

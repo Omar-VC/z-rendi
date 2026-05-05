@@ -1,6 +1,7 @@
-// src/components/cuotas/CuotasCliente.tsx
 import { useState } from "react";
-import { useCuotas } from "../../hooks/useCuotas";
+import { useCuotas } from "../hooks/useCuotas";
+import type { Cuota } from "../types";
+
 import CuotaList from "./CuotaList";
 import CuotaDetail from "./CuotaDetail";
 import CuotaForm from "./CuotaForm";
@@ -8,13 +9,14 @@ import HistorialCuotas from "./HistorialCuotas";
 
 const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
   const { cuotas, addCuota, updateCuota, deleteCuota } = useCuotas(clienteId);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const selectedCuota = cuotas.find((c) => c.id === selectedId);
 
-  const handleCreate = async (data: Omit<import("../../types").Cuota, "id" | "clienteId">) => {
-    await addCuota({ ...data });
+  const handleCreate = async (data: Omit<Cuota, "id" | "clienteId">) => {
+    await addCuota(data);
     setIsModalOpen(false);
   };
 
@@ -22,9 +24,7 @@ const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
   const cuotasPagadas = cuotas.filter((c) => c.estado === "pagada");
 
   const handleClearHistorial = async () => {
-    for (const cuota of cuotasPagadas) {
-      await deleteCuota(cuota.id);
-    }
+    await Promise.all(cuotasPagadas.map((c) => deleteCuota(c.id)));
   };
 
   return (
@@ -48,8 +48,7 @@ const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
         <CuotaList
           cuotas={cuotasPendientes}
           selectedId={selectedId}
-          onSelect={(id) => setSelectedId(id)}
-          onAsignarCuota={() => setIsModalOpen(true)}
+          onSelect={setSelectedId}
         />
       </div>
 
@@ -60,7 +59,10 @@ const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
         onClose={() => setSelectedId(null)}
       />
 
-      <HistorialCuotas historial={cuotasPagadas} onClear={handleClearHistorial} />
+      <HistorialCuotas
+        historial={cuotasPagadas}
+        onClear={handleClearHistorial}
+      />
     </div>
   );
 };

@@ -1,11 +1,9 @@
-﻿// src/components/cuotas/CuotaList.tsx
-import type { Cuota } from "../../types";
+﻿import type { Cuota } from "../types";
 
 type Props = {
   cuotas: Cuota[];
-  selectedId: string | null;  
+  selectedId: string | null;
   onSelect: (id: string) => void;
-  onAsignarCuota: () => void;
 };
 
 const CuotaList = ({ cuotas, selectedId, onSelect }: Props) => (
