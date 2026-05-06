@@ -1,12 +1,14 @@
-import { useFichas } from "../../hooks/useFichas";
+import { useState } from "react";
+import { useFichas } from "../hooks/useFichas";
 import FichaList from "./FichaList";
 import FichaDetail from "./FichaDetail";
-import { useState } from "react";
 
 const FichasCliente = ({ clienteId }: { clienteId: string }) => {
   const { fichas, addFicha, deleteFicha } = useFichas(clienteId);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -23,12 +25,14 @@ const FichasCliente = ({ clienteId }: { clienteId: string }) => {
 
   const handleCreate = async () => {
     await addFicha({
-        ...formData,
-        edad: Number(formData.edad) || 0,
-        altura: Number(formData.altura) || 0,
-        peso: Number(formData.peso) || 0,
-      });
+      ...formData,
+      edad: Number(formData.edad) || 0,
+      altura: Number(formData.altura) || 0,
+      peso: Number(formData.peso) || 0,
+    });
+
     setIsModalOpen(false);
+
     setFormData({
       nombre: "",
       apellido: "",
@@ -44,7 +48,6 @@ const FichasCliente = ({ clienteId }: { clienteId: string }) => {
 
   return (
     <div className="space-y-6">
-      {/* Botón para abrir formulario */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="btn btn-primary"
@@ -52,7 +55,6 @@ const FichasCliente = ({ clienteId }: { clienteId: string }) => {
         Nueva Ficha
       </button>
 
-      {/* Formulario modal */}
       {isModalOpen && (
         <div className="border border-white/20 bg-secondary/40 backdrop-blur-md rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-white mb-4">
@@ -133,14 +135,12 @@ const FichasCliente = ({ clienteId }: { clienteId: string }) => {
         </div>
       )}
 
-      {/* Lista de fichas */}
       <FichaList
         fichas={fichas}
         selectedId={selectedId}
-        onSelect={(id) => setSelectedId(id)}
+        onSelect={setSelectedId}
       />
 
-      {/* Detalle de ficha seleccionada */}
       <FichaDetail
         ficha={selectedFicha}
         onDelete={deleteFicha}

@@ -1,4 +1,4 @@
-﻿import type { Ficha } from "../../types";
+﻿import type { Ficha } from "../types";
 
 type Props = { 
   ficha: Ficha | undefined; 
@@ -20,6 +20,7 @@ const FichaDetail = ({ ficha, onDelete, onClose }: Props) => {
       <h3 className="text-xl font-semibold text-white mb-4 tracking-tight">
         Detalle de atleta
       </h3>
+
       <div className="space-y-2 text-sm text-gray-200">
         <p><span className="font-semibold">Nombre:</span> {ficha.nombre} {ficha.apellido}</p>
         <p><span className="font-semibold">Edad:</span> {ficha.edad}</p>
@@ -31,27 +32,23 @@ const FichaDetail = ({ ficha, onDelete, onClose }: Props) => {
       </div>
 
       <div className="mt-6 flex space-x-3">
-  {onDelete && (
-    <button
-      onClick={() => onDelete(ficha.id)}
-      className="btn btn-danger"
-    >
-      Eliminar Ficha
-    </button>
-  )}
-  {onClose && (
-    <button onClick={onClose} className="btn btn-secondary">
-      Cerrar
-    </button>
-  )}
-</div>
+        {onDelete && (
+          <button
+            onClick={() => onDelete(ficha.id)}
+            className="btn btn-danger"
+          >
+            Eliminar Ficha
+          </button>
+        )}
 
-
-
-
+        {onClose && (
+          <button onClick={onClose} className="btn btn-secondary">
+            Cerrar
+          </button>
+        )}
+      </div>
     </div>
   );
 };
-
 
 export default FichaDetail;
