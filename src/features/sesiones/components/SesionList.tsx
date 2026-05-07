@@ -1,5 +1,4 @@
-﻿// src/components/sesiones/SesionList.tsx
-import type { Sesion } from "../../types";
+import type { Sesion } from "../types";
 
 type Props = {
   sesiones: Sesion[];
@@ -32,6 +31,7 @@ const SesionList = ({ sesiones, selectedId, onSelect }: Props) => {
             <p className="text-lg font-bold text-white">
               📅 {sesion.fecha}
             </p>
+
             <p className="text-sm text-gray-200">
               ⏱ Duración estimada: {sesion.duracionEstimada}
             </p>
@@ -43,5 +43,3 @@ const SesionList = ({ sesiones, selectedId, onSelect }: Props) => {
 };
 
 export default SesionList;
-
-

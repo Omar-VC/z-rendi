@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import { useFichas } from "../features/fichas/hooks/useFichas";
 import { useCuotas } from "../features/cuotas/hooks/useCuotas";
-import { useSesiones } from "../hooks/useSesiones";
+import { useSesiones } from "../features/sesiones/hooks/useSesiones";
 import NavbarCliente from "../components/NavbarCliente";
 import FichaDetail from "../features/fichas/components/FichaDetail"; 
 import CuotaDetail from "../features/cuotas/components/CuotaDetail";
-import SesionesClienteView from "../components/Sesiones/SesionesClienteView";
+import SesionesClienteView from "../features/sesiones/components/SesionesClienteView";
 import GuiasPage from "../pages/GuiasPage"; // 🔹 Importa tu nueva página
 
 const ClienteDashboard = ({
