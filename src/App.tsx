@@ -15,7 +15,7 @@ import SeguimientoPage from "./pages/SeguimientoPage";
 import PlanillaDetailPage from "./pages/PlanillaDetailPage";
 
 import AdminLayout from "./layouts/AdminLayout";
-import { useCliente } from "./hooks/useCliente";
+import { useCliente } from "./features/users/hooks/useCliente";
 
 function App() {
   const navigate = useNavigate();
