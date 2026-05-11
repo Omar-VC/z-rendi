@@ -20,17 +20,13 @@ const Home: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [
-          fichasSnap,
-          sesionesSnap,
-          cuotasSnap,
-          clientesSnap,
-        ] = await Promise.all([
-          getDocs(collection(db, "fichas")),
-          getDocs(collection(db, "sesiones")),
-          getDocs(collection(db, "cuotas")),
-          getDocs(collection(db, "usuarios")),
-        ]);
+        const [fichasSnap, sesionesSnap, cuotasSnap, clientesSnap] =
+          await Promise.all([
+            getDocs(collection(db, "fichas")),
+            getDocs(collection(db, "sesiones")),
+            getDocs(collection(db, "cuotas")),
+            getDocs(collection(db, "usuarios")),
+          ]);
 
         setFichas(
           fichasSnap.docs.map((doc) => ({
@@ -67,29 +63,23 @@ const Home: React.FC = () => {
     void loadData();
   }, []);
 
-  // 📅 Mes actual
   const fechaActual = new Date();
   const mesActual = fechaActual.toLocaleString("es-AR", { month: "long" });
   const mesActualCapitalizado =
     mesActual.charAt(0).toUpperCase() + mesActual.slice(1);
 
-  // 📊 Cuotas del mes actual
   const cuotasMes = useMemo(
     () => cuotas.filter((c) => c.mes === mesActualCapitalizado),
     [cuotas, mesActualCapitalizado]
   );
 
-  // 📊 Clientes con cuota este mes
   const clientesConCuota = useMemo(
     () => new Set(cuotasMes.map((c) => c.clienteId)),
     [cuotasMes]
   );
 
-  // 📊 Métricas
   const clientesTotales = clientes.length;
-
   const clientesAlDia = cuotasMes.filter((c) => c.estado === "pagada").length;
-
   const clientesAtrasados = cuotasMes.filter(
     (c) => c.estado !== "pagada"
   ).length;
@@ -121,28 +111,30 @@ const Home: React.FC = () => {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: "var(--bg)" }}
     >
-      <section className="p-6 space-y-6 flex-1">
+      <section className="p-4 md:p-6 space-y-4 md:space-y-6 flex-1">
         <h2
-          className="text-3xl font-bold border-b pb-2"
+          className="text-2xl md:text-3xl font-bold border-b pb-2"
           style={{ color: "var(--text)", borderColor: "var(--border)" }}
         >
           Dashboard
         </h2>
 
-        {/* 🔹 TARJETA RESUMEN */}
+        {/* resumen */}
         <div
-          className="rounded-xl p-6 border shadow-lg space-y-4"
+          className="rounded-xl p-4 md:p-6 border shadow-lg space-y-3 md:space-y-4"
           style={{
             backgroundColor: "var(--surface)",
             borderColor: "var(--border)",
           }}
         >
-          <div className="text-lg font-semibold">Resumen del negocio</div>
+          <div className="text-base md:text-lg font-semibold">
+            Resumen del negocio
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 text-sm">
             <div>Clientes: {clientesTotales}</div>
             <div>
-              Ingreso total esperado: {formatMoney(ingresoMensualEsperado)}
+              Ingreso esperado: {formatMoney(ingresoMensualEsperado)}
             </div>
 
             <div className="text-green-400">
@@ -154,17 +146,17 @@ const Home: React.FC = () => {
             </div>
 
             <div className="text-yellow-400">
-              ⛔ Sin cuota del mes: {clientesSinCuota}
+              ⛔ Sin cuota: {clientesSinCuota}
             </div>
 
             <div className="font-bold text-blue-400">
-              💰 Ingreso del mes: {formatMoney(ingresoMesActual)}
+              💰 Ingreso mes: {formatMoney(ingresoMesActual)}
             </div>
           </div>
         </div>
 
-        {/* 🔹 MÉTRICAS SECUNDARIAS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* métricas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           <CardMetric title="Fichas Activas" value={fichas.length} />
           <CardMetric title="Sesiones Programadas" value={sesiones.length} />
           <CardMetric

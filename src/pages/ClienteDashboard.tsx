@@ -155,7 +155,7 @@ const ClienteDashboard = ({
       </header>
 
       {/* CONTENIDO */}
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto px-4 py-6 pt-4 sm:pt-6">
         {/* BANNER APP */}
         {!isStandalone && showBanner && (
           <div

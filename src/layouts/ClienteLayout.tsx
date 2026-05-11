@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { auth } from "../firebase";
 import NavbarCliente from "../components/NavbarCliente";
-import SesionesClienteView from "../components/Sesiones/SesionesClienteView";
+import SesionesClienteView from "../features/sesiones/components/SesionesClienteView";
 
 const ClienteLayout = ({ clienteNombre }: { clienteNombre: string }) => {
   const [activeSection, setActiveSection] = useState("inicio");

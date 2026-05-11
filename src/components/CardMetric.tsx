@@ -1,5 +1,10 @@
 import React from "react";
-import { FaUsers, FaCalendarAlt, FaExclamationCircle, FaMoneyBillWave } from "react-icons/fa";
+import {
+  FaUsers,
+  FaCalendarAlt,
+  FaExclamationCircle,
+  FaMoneyBillWave,
+} from "react-icons/fa";
 
 interface CardMetricProps {
   title: string;
@@ -8,10 +13,10 @@ interface CardMetricProps {
 }
 
 const variantStyles: Record<string, string> = {
-  success: "text-white border-green-500/30",
-  warning: "text-white border-yellow-500/30",
-  danger: "text-white border-red-500/30",
-  info: "text-white border-white/10",
+  success: "border-green-500/30",
+  warning: "border-yellow-500/30",
+  danger: "border-red-500/30",
+  info: "border-white/10",
 };
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -21,15 +26,18 @@ const iconMap: Record<string, React.ReactNode> = {
   "Ingresos Proyectados": <FaMoneyBillWave size={28} />,
 };
 
-const CardMetric: React.FC<CardMetricProps> = ({ title, value, variant = "info" }) => {
-  const border = variantStyles[variant];
+const CardMetric: React.FC<CardMetricProps> = ({
+  title,
+  value,
+  variant = "info",
+}) => {
   const icon = iconMap[title] ?? null;
 
   return (
     <div
       className={`rounded-xl p-6 flex flex-col items-center justify-center text-center 
       border backdrop-blur-md shadow-lg transition duration-300 
-      hover:scale-105 hover:shadow-2xl`}
+      hover:scale-105 hover:shadow-2xl ${variantStyles[variant]}`}
       style={{ backgroundColor: "var(--surface)" }}
     >
       {/* Icono */}

@@ -1,5 +1,5 @@
 // src/pages/SeguimientoPage.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSeguimiento } from "../features/seguimiento/hooks/useSeguimiento";
 import PlanillaCard from "../features/seguimiento/components/PlanillaCard";
 
