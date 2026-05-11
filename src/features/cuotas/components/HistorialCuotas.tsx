@@ -3,9 +3,10 @@ import type { Cuota } from "../types";
 type Props = {
   historial: Cuota[];
   onClear: () => void;
+  showActions?: boolean;
 };
 
-const HistorialCuotas = ({ historial, onClear }: Props) => {
+const HistorialCuotas = ({ historial, onClear, showActions = true }: Props) => {
   if (historial.length === 0) {
     return (
       <div className="text-gray-300 text-sm italic">
@@ -18,9 +19,11 @@ const HistorialCuotas = ({ historial, onClear }: Props) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold">Historial de cuotas</h3>
-        <button onClick={onClear} className="btn btn-danger text-sm">
-          Limpiar historial
-        </button>
+        {showActions && (
+          <button onClick={onClear} className="btn btn-danger text-sm">
+            Limpiar historial
+          </button>
+        )}
       </div>
 
       <div className="space-y-3">

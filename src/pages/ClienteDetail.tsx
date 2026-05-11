@@ -7,19 +7,19 @@ import SesionesCliente from "../features/sesiones/components/SesionesCliente";
 const ClienteDetail = () => {
   const { id } = useParams<{ id: string }>();
 
-  const [activeTab, setActiveTab] = useState<
-    "fichas" | "cuotas" | "sesiones"
-  >("fichas");
+  const [activeTab, setActiveTab] = useState<"fichas" | "cuotas" | "sesiones">(
+    "fichas",
+  );
 
   if (!id)
     return (
-      <div style={{ color: "var(--primary)" }}>
-        No se encontró el cliente
-      </div>
+      <div style={{ color: "var(--primary)" }}>No se encontró el cliente</div>
     );
 
   const tabClass = (tab: string) =>
-    `px-4 py-2 rounded-t-lg transition-colors duration-200`;
+    `px-4 py-2 rounded-t-lg transition-colors duration-200 ${
+      activeTab === tab ? "bg-white/10 text-white" : "text-gray-400"
+    }`;
 
   return (
     <div
@@ -34,14 +34,6 @@ const ClienteDetail = () => {
         <button
           className={tabClass("fichas")}
           onClick={() => setActiveTab("fichas")}
-          style={{
-            backgroundColor:
-              activeTab === "fichas" ? "var(--surface)" : "transparent",
-            color:
-              activeTab === "fichas"
-                ? "var(--text)"
-                : "var(--text-muted)",
-          }}
         >
           Fichas
         </button>
@@ -49,14 +41,6 @@ const ClienteDetail = () => {
         <button
           className={tabClass("cuotas")}
           onClick={() => setActiveTab("cuotas")}
-          style={{
-            backgroundColor:
-              activeTab === "cuotas" ? "var(--surface)" : "transparent",
-            color:
-              activeTab === "cuotas"
-                ? "var(--text)"
-                : "var(--text-muted)",
-          }}
         >
           Cuotas
         </button>
@@ -64,14 +48,6 @@ const ClienteDetail = () => {
         <button
           className={tabClass("sesiones")}
           onClick={() => setActiveTab("sesiones")}
-          style={{
-            backgroundColor:
-              activeTab === "sesiones" ? "var(--surface)" : "transparent",
-            color:
-              activeTab === "sesiones"
-                ? "var(--text)"
-                : "var(--text-muted)",
-          }}
         >
           Sesiones
         </button>
@@ -86,7 +62,9 @@ const ClienteDetail = () => {
         }}
       >
         {activeTab === "fichas" && <FichasCliente clienteId={id} />}
-        {activeTab === "cuotas" && <CuotasCliente clienteId={id} />}
+        {activeTab === "cuotas" && (
+          <CuotasCliente clienteId={id} adminMode={true} />
+        )}
         {activeTab === "sesiones" && <SesionesCliente clienteId={id} />}
       </div>
     </div>

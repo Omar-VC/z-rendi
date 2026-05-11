@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { auth } from "../firebase";
+
 import { useFichas } from "../features/fichas/hooks/useFichas";
 import { useCuotas } from "../features/cuotas/hooks/useCuotas";
 import { useSesiones } from "../features/sesiones/hooks/useSesiones";
+
 import NavbarCliente from "../components/NavbarCliente";
-import FichaDetail from "../features/fichas/components/FichaDetail"; 
-import CuotaDetail from "../features/cuotas/components/CuotaDetail";
+
+import FichaDetail from "../features/fichas/components/FichaDetail";
 import SesionesClienteView from "../features/sesiones/components/SesionesClienteView";
-import GuiasPage from "../pages/GuiasPage"; // 🔹 Importa tu nueva página
+import CuotasCliente from "../features/cuotas/components/CuotasCliente";
+
+import GuiasPage from "../pages/GuiasPage";
 
 const ClienteDashboard = ({
   clienteId,
@@ -26,7 +30,7 @@ const ClienteDashboard = ({
 
   const [activeSection, setActiveSection] = useState("inicio");
 
-  // --- Banner instalación PWA ---
+  // ---------------- PWA ----------------
   const [isIos, setIsIos] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -34,12 +38,14 @@ const ClienteDashboard = ({
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
+
     const ios = /iphone|ipad|ipod/.test(userAgent);
+
     const standalone = window.matchMedia("(display-mode: standalone)").matches;
+
     setIsIos(ios);
     setIsStandalone(standalone);
 
-    // Capturar evento en Android
     window.addEventListener("beforeinstallprompt", (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -47,157 +53,343 @@ const ClienteDashboard = ({
   }, []);
 
   const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-      if (choiceResult.outcome === "accepted") {
-        console.log("Usuario aceptó instalar la app");
-      } else {
-        console.log("Usuario canceló la instalación");
-      }
-      setDeferredPrompt(null);
-    }
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+
+    await deferredPrompt.userChoice;
+
+    setDeferredPrompt(null);
   };
 
-  return (
-    <div className="flex flex-col min-h-screen bg-primary text-white">
-      {/* Header */}
-      <header className="flex flex-wrap justify-between items-center bg-secondary p-4 shadow-md">
-        {/* Botón salir */}
-        <button
-          onClick={() => auth.signOut()}
-          className="flex items-center gap-2 px-3 py-2 rounded-md bg-accent hover:bg-accent/80 transition text-sm md:text-base"
-        >
-          <span className="material-icons">logout</span>
-          <span className="hidden sm:inline">Salir</span>
-        </button>
+  // ---------------- HOME CARDS ----------------
+  const homeCards = [
+    {
+      id: "ficha",
+      title: "Mi ficha",
+      subtitle: ficha
+        ? "Ver información física y deportiva"
+        : "Sin ficha asignada",
+      icon: "badge",
+    },
+    {
+      id: "sesiones",
+      title: "Sesiones",
+      subtitle: sesionActual
+        ? "Ver entrenamientos asignados"
+        : "Sin sesiones asignadas",
+      icon: "fitness_center",
+    },
+    {
+      id: "cuotas",
+      title: "Cuotas",
+      subtitle: cuota ? "Consultar estado de pagos" : "Sin cuotas asignadas",
+      icon: "payments",
+    },
+    {
+      id: "guias",
+      title: "Guías",
+      subtitle: "Material y contenido de apoyo",
+      icon: "menu_book",
+    },
+  ];
 
-        {/* Nombre del cliente con avatar */}
-        <div className="flex items-center gap-3 mt-2 sm:mt-0">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-highlight flex items-center justify-center text-white font-bold">
-            {clienteNombre.charAt(0).toUpperCase()}
+  return (
+    <div
+      className="min-h-screen text-white pb-24"
+      style={{ backgroundColor: "var(--bg)" }}
+    >
+      {/* HEADER */}
+      <header
+        className="
+          sticky top-0 z-40
+          backdrop-blur-xl
+          border-b
+        "
+        style={{
+          backgroundColor: "rgba(15,15,16,0.85)",
+          borderColor: "var(--border)",
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          {/* IZQUIERDA */}
+          <div className="flex items-center gap-3">
+            <div
+              className="
+                w-11 h-11 rounded-2xl
+                flex items-center justify-center
+                font-bold text-lg
+              "
+              style={{
+                backgroundColor: "var(--primary)",
+              }}
+            >
+              {clienteNombre.charAt(0).toUpperCase()}
+            </div>
+
+            <div>
+              <p className="text-sm text-gray-400">Bienvenido</p>
+
+              <h2 className="font-semibold text-base sm:text-lg">
+                {clienteNombre}
+              </h2>
+            </div>
           </div>
-          <span className="font-semibold text-base sm:text-lg truncate max-w-[150px]">
-            {clienteNombre}
-          </span>
+
+          {/* DERECHA */}
+          <button
+            onClick={() => auth.signOut()}
+            className="
+              flex items-center gap-2
+              px-4 py-2 rounded-xl
+              border border-white/10
+              hover:bg-white/5
+              transition
+            "
+          >
+            <span className="material-icons text-[20px]">logout</span>
+
+            <span className="hidden sm:inline">Salir</span>
+          </button>
         </div>
       </header>
 
-      {/* Contenido central */}
-      <main className="flex-1 flex flex-col items-center justify-center p-6">
-        {/* Banner instalación con botón cerrar */}
+      {/* CONTENIDO */}
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        {/* BANNER APP */}
         {!isStandalone && showBanner && (
-          <div className="bg-accent text-white p-4 rounded-lg shadow-md text-center mb-6 max-w-md relative">
-            {/* Botón cerrar */}
+          <div
+            className="
+              relative overflow-hidden
+              rounded-2xl p-5 mb-6
+              border
+            "
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(220,38,38,0.25), rgba(255,255,255,0.03))",
+              borderColor: "rgba(220,38,38,0.3)",
+            }}
+          >
             <button
               onClick={() => setShowBanner(false)}
-              className="absolute top-2 right-2 text-white hover:text-gray-200"
+              className="absolute top-3 right-3 text-gray-300 hover:text-white"
             >
-              <span className="material-icons text-sm">close</span>
+              <span className="material-icons text-[18px]">close</span>
             </button>
 
-            {isIos ? (
-              <>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="material-icons">ios_share</span>
-                  <h3 className="font-bold">Instala la app en tu iPhone</h3>
-                </div>
-                <p className="text-sm">
-                  Abre el menú <span className="font-bold">Compartir</span> en
-                  Safari y selecciona{" "}
-                  <span className="font-bold">
-                    “Agregar a pantalla de inicio”
-                  </span>
-                  .
+            <div className="flex items-start gap-4">
+              <div
+                className="
+                  min-w-[52px] h-[52px]
+                  rounded-2xl
+                  flex items-center justify-center
+                "
+                style={{
+                  backgroundColor: "rgba(220,38,38,0.2)",
+                }}
+              >
+                <span className="material-icons text-3xl">install_mobile</span>
+              </div>
+
+              <div className="flex-1">
+                <h3 className="font-bold text-lg mb-1">Instala Z-Rendi</h3>
+
+                <p className="text-sm text-gray-300 mb-4">
+                  Accede más rápido desde tu pantalla principal.
                 </p>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="material-icons">download</span>
-                  <h3 className="font-bold">Instala la app en tu Android</h3>
-                </div>
-                {deferredPrompt ? (
+
+                {isIos ? (
+                  <p className="text-sm text-gray-300">
+                    En Safari presiona <strong>Compartir</strong> y luego{" "}
+                    <strong>“Agregar a pantalla de inicio”</strong>.
+                  </p>
+                ) : deferredPrompt ? (
                   <button
                     onClick={handleInstallClick}
-                    className="bg-highlight hover:bg-highlight/80 px-4 py-2 rounded-md mt-3 text-sm flex items-center gap-2 mx-auto"
+                    className="btn btn-primary"
                   >
-                    <span className="material-icons text-base">
-                      install_mobile
-                    </span>
-                    Instalar
+                    Instalar aplicación
                   </button>
                 ) : (
-                  <p className="text-sm mt-2">
+                  <p className="text-sm text-gray-300">
                     Usa el menú del navegador y selecciona{" "}
-                    <span className="font-bold">“Instalar App”</span>.
+                    <strong>“Instalar app”</strong>.
                   </p>
                 )}
-              </>
-            )}
+              </div>
+            </div>
           </div>
         )}
 
+        {/* INICIO */}
         {activeSection === "inicio" && (
-          <div className="text-center">
-            <img
-              src="/logo.jpeg"
-              alt="Logo"
-              className="mx-auto mb-6 w-40 drop-shadow-lg animate-zoomFadeIn"
-            />
-            <h1 className="text-2xl font-bold opacity-0 animate-fadeInDelay">
-              Bienvenido a Z-Rendi
-            </h1>
+          <div className="space-y-8">
+            {/* HERO */}
+            <section
+              className="
+                rounded-3xl p-8
+                border overflow-hidden relative
+              "
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(220,38,38,0.18), rgba(255,255,255,0.02))",
+                borderColor: "var(--border)",
+              }}
+            >
+              <div className="relative z-10">
+                <img
+                  src="/logo.jpeg"
+                  alt="Logo"
+                  className="
+                    w-24 sm:w-32
+                    mb-6
+                    drop-shadow-2xl
+                    animate-zoomFadeIn
+                  "
+                />
+
+                <h1 className="text-3xl sm:text-4xl font-bold mb-3">Z-Rendi</h1>
+
+                <p className="text-gray-300 max-w-xl leading-relaxed">
+                  Tu espacio personal para seguimiento, entrenamientos, fichas y
+                  rendimiento.
+                </p>
+              </div>
+
+              <div
+                className="
+                  absolute -right-20 -top-20
+                  w-72 h-72 rounded-full blur-3xl
+                "
+                style={{
+                  backgroundColor: "rgba(220,38,38,0.15)",
+                }}
+              />
+            </section>
+
+            {/* ACCESOS */}
+            <section>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {homeCards.map((card) => (
+                  <button
+                    key={card.id}
+                    onClick={() => setActiveSection(card.id)}
+                    className="
+                      text-left
+                      rounded-2xl p-5
+                      border
+                      hover:scale-[1.01]
+                      hover:bg-white/[0.03]
+                      transition-all
+                    "
+                    style={{
+                      backgroundColor: "var(--surface)",
+                      borderColor: "var(--border)",
+                    }}
+                  >
+                    <div className="flex items-start justify-between mb-5">
+                      <div
+                        className="
+                          w-14 h-14 rounded-2xl
+                          flex items-center justify-center
+                        "
+                        style={{
+                          backgroundColor: "rgba(220,38,38,0.15)",
+                        }}
+                      >
+                        <span className="material-icons text-3xl">
+                          {card.icon}
+                        </span>
+                      </div>
+
+                      <span className="material-icons text-gray-500">
+                        arrow_forward_ios
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-semibold mb-1">{card.title}</h3>
+
+                    <p className="text-sm text-gray-400">{card.subtitle}</p>
+                  </button>
+                ))}
+              </div>
+            </section>
           </div>
         )}
 
+        {/* FICHA */}
         {activeSection === "ficha" && (
-          <div className="card w-full max-w-md">
-            {ficha ? (
-              <FichaDetail
-                ficha={ficha}
-                onClose={() => setActiveSection("inicio")}
-              />
-            ) : (
-              <p className="text-gray-300">Todavía no tenés ficha asignada.</p>
-            )}
+          <div className="space-y-4">
+            <button
+              onClick={() => setActiveSection("inicio")}
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              ← Volver
+            </button>
+
+            <div className="card">
+              {ficha ? (
+                <FichaDetail
+                  ficha={ficha}
+                  onClose={() => setActiveSection("inicio")}
+                />
+              ) : (
+                <p className="text-gray-400">
+                  Todavía no tenés ficha asignada.
+                </p>
+              )}
+            </div>
           </div>
         )}
 
+        {/* CUOTAS */}
         {activeSection === "cuotas" && (
-          <div className="card w-full max-w-md">
-            {cuota ? (
-              <CuotaDetail
-                cuota={cuota}
-                onClose={() => setActiveSection("inicio")}
-              />
-            ) : (
-              <p className="text-gray-300">Todavía no tenés cuota asignada.</p>
-            )}
+          <div className="w-full max-w-3xl">
+            <CuotasCliente clienteId={clienteId} adminMode={false} />
           </div>
         )}
 
+
+        {/* SESIONES */}
         {activeSection === "sesiones" && (
-          <div className="card w-full max-w-md">
-            {sesionActual ? (
-              <SesionesClienteView clienteId={clienteId} />
-            ) : (
-              <p className="text-gray-300">
-                Todavía no tenés sesiones asignadas.
-              </p>
-            )}
+          <div className="space-y-4">
+            <button
+              onClick={() => setActiveSection("inicio")}
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              ← Volver
+            </button>
+
+            <div className="card">
+              {sesionActual ? (
+                <SesionesClienteView clienteId={clienteId} />
+              ) : (
+                <p className="text-gray-400">
+                  Todavía no tenés sesiones asignadas.
+                </p>
+              )}
+            </div>
           </div>
         )}
 
-        {/* 🔹 Nueva sección Guías */}
+        {/* GUIAS */}
         {activeSection === "guias" && (
-          <div className="card w-full max-w-3xl">
-            <GuiasPage />
+          <div className="space-y-4">
+            <button
+              onClick={() => setActiveSection("inicio")}
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              ← Volver
+            </button>
+
+            <div className="card">
+              <GuiasPage />
+            </div>
           </div>
         )}
       </main>
 
-      {/* Navbar fijo abajo */}
+      {/* NAVBAR */}
       <NavbarCliente onChangeSection={setActiveSection} />
     </div>
   );

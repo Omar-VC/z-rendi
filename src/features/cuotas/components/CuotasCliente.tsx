@@ -7,7 +7,13 @@ import CuotaDetail from "./CuotaDetail";
 import CuotaForm from "./CuotaForm";
 import HistorialCuotas from "./HistorialCuotas";
 
-const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
+const CuotasCliente = ({
+  clienteId,
+  adminMode = false,
+}: {
+  clienteId: string;
+  adminMode?: boolean;
+}) => {
   const { cuotas, addCuota, updateCuota, deleteCuota } = useCuotas(clienteId);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -29,12 +35,14 @@ const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
 
   return (
     <div className="space-y-6">
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="btn btn-primary"
-      >
-        Asignar cuota
-      </button>
+      {adminMode && (
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="btn btn-primary"
+        >
+          Asignar cuota
+        </button>
+      )}  
 
       {isModalOpen && (
         <CuotaForm
@@ -57,11 +65,13 @@ const CuotasCliente = ({ clienteId }: { clienteId: string }) => {
         onDelete={deleteCuota}
         onUpdate={updateCuota}
         onClose={() => setSelectedId(null)}
+        showActions={adminMode}
       />
 
       <HistorialCuotas
         historial={cuotasPagadas}
         onClear={handleClearHistorial}
+        showActions={adminMode}
       />
     </div>
   );

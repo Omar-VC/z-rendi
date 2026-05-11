@@ -6,9 +6,16 @@ type Props = {
   onDelete?: (id: string) => void;
   onClose?: () => void;
   onUpdate?: (id: string, data: Partial<Cuota>) => void;
+  showActions?: boolean;
 };
 
-const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
+const CuotaDetail = ({
+  cuota,
+  onDelete,
+  onClose,
+  onUpdate,
+  showActions = true,
+}: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Cuota>>({});
 
@@ -53,10 +60,19 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
 
       {!isEditing ? (
         <div className="space-y-2 text-sm">
-          <p><span className="font-semibold">Mes:</span> {cuota.mes}</p>
-          <p><span className="font-semibold">Monto:</span> ${cuota.monto}</p>
-          <p><span className="font-semibold">Vencimiento:</span> {cuota.fechaVencimiento}</p>
-          <p><span className="font-semibold">Estado:</span> {cuota.estado}</p>
+          <p>
+            <span className="font-semibold">Mes:</span> {cuota.mes}
+          </p>
+          <p>
+            <span className="font-semibold">Monto:</span> ${cuota.monto}
+          </p>
+          <p>
+            <span className="font-semibold">Vencimiento:</span>{" "}
+            {cuota.fechaVencimiento}
+          </p>
+          <p>
+            <span className="font-semibold">Estado:</span> {cuota.estado}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -102,29 +118,29 @@ const CuotaDetail = ({ cuota, onDelete, onClose, onUpdate }: Props) => {
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {!isEditing && (
-          <button onClick={() => setIsEditing(true)} className="btn btn-primary">
+        {showActions && !isEditing && (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="btn btn-primary"
+          >
             Editar
           </button>
         )}
 
-        {isEditing && (
+        {showActions && isEditing && (
           <button onClick={handleSave} className="btn btn-success">
             Guardar cambios
           </button>
         )}
 
-        {cuota.estado === "pendiente" && (
+        {showActions && cuota.estado === "pendiente" && (
           <button onClick={handleMarkPaid} className="btn btn-success">
             Marcar como pagada
           </button>
         )}
 
-        {onDelete && (
-          <button
-            onClick={() => onDelete(cuota.id)}
-            className="btn btn-danger"
-          >
+        {showActions && onDelete && (
+          <button onClick={() => onDelete(cuota.id)} className="btn btn-danger">
             Eliminar cuota
           </button>
         )}
