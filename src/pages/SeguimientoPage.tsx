@@ -1,7 +1,7 @@
 // src/pages/SeguimientoPage.tsx
 import React, { useState } from "react";
-import { useSeguimiento } from "../hooks/useSeguimiento";
-import PlanillaCard from "../components/seguimiento/ui/PlanillaCard";
+import { useSeguimiento } from "../features/seguimiento/hooks/useSeguimiento";
+import PlanillaCard from "../features/seguimiento/components/PlanillaCard";
 
 const SeguimientoPage = () => {
   const { planillas, crearPlanilla, eliminarPlanilla, loading } = useSeguimiento();

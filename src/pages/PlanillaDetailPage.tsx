@@ -1,10 +1,14 @@
 // src/pages/PlanillaDetailPage.tsx
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePlanilla } from "../hooks/usePlanilla";
-import AtletaForm from "../components/seguimiento/forms/AtletaForm";
-import RegistroForm from "../components/seguimiento/forms/RegistroForm";
-import type { Atleta, Registro } from "../types/seguimiento";
+import { usePlanilla } from "../features/seguimiento/hooks/usePlanilla";
+import AtletaForm from "../features/seguimiento/components/AtletaForm";
+import RegistroForm from "../features/seguimiento/components/RegistroForm";
+
+import type {
+  Atleta,
+  Registro,
+} from "../features/seguimiento/types";
 
 const PlanillaDetailPage = () => {
   const { id } = useParams<{ id: string }>();

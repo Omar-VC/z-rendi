@@ -1,8 +1,8 @@
 // src/components/seguimiento/RegistroForm.tsx
 import React, { useEffect, useState } from "react";
 
-import type { Registro, Atleta } from "../../types";
-import { formatDateInput } from "../../../../shared/utils/date";
+import type { Registro, Atleta } from "../types";
+import { formatDateInput } from "../../../utils/date";
 interface RegistroFormProps {
   atletas?: Atleta[];
   onSave: (data: Registro, id?: string) => void;
