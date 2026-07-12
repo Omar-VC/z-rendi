@@ -1,132 +1,93 @@
-﻿// src/App.tsx
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { auth } from "./firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useEffect, useState } from "react";
-import "./styles/global.css";
-import Home from "./pages/Home";
-import LoginPage from "./pages/LoginPage";
-import RegistroCliente from "./pages/RegistroCliente";
-import ClientesPage from "./pages/ClientesPage";
-import ClienteDetail from "./pages/ClienteDetail";
-import ClienteDashboard from "./pages/ClienteDashboard";
-import GuiasPage from "./pages/GuiasPage";
-import SeguimientoPage from "./pages/SeguimientoPage";
-import PlanillaDetailPage from "./pages/PlanillaDetailPage";
+﻿import { Routes, Route, Navigate } from "react-router-dom";
+
+import { useAuth } from "./auth/useAuth";
+
+import LoginPage from "./auth/pages/LoginPage";
 
 import AdminLayout from "./layouts/AdminLayout";
-import { useCliente } from "./features/users/hooks/useCliente";
+import ClienteLayoutV2 from "./layouts/ClienteLayoutV2";
+
+import ClientesPageV2 from "./features/admin/clientes/pages/ClientesPageV2";
+import ClienteDetailV2 from "./features/admin/clientes/pages/ClienteDetailV2";
+
 
 function App() {
-  const navigate = useNavigate();
 
-  const [user, loading] = useAuthState(auth);
-  const [role, setRole] = useState<string | null>(null);
+  const { user, usuario, loading } = useAuth();
 
-  const { cliente, loading: clienteLoading } = useCliente(user?.uid ?? "");
 
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (user) {
-        const idTokenResult = await user.getIdTokenResult(true);
-        const userRole = idTokenResult.claims.role as string | undefined;
-        setRole(userRole ?? "cliente");
-        console.log("Claims:", idTokenResult.claims);
-      } else {
-        setRole(null);
-      }
-    };
-    fetchUserRole();
-  }, [user]);
-
-  if (loading || clienteLoading) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="min-h-screen flex items-center justify-center">
         Cargando...
       </div>
     );
   }
 
+
   return (
     <Routes>
-      {/* Login y registro */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/registro-cliente" element={<RegistroCliente />} />
 
-      {/* Admin con AdminLayout */}
-      {user && role === "admin" && (
-        <Route element={<AdminLayout />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/clientes" element={<ClientesPage />} />
-          <Route path="/clientes/:id" element={<ClienteDetail />} />
-          <Route path="/guias" element={<GuiasPage />} />
-          <Route path="/seguimiento" element={<SeguimientoPage />} />
-          <Route path="/planillas/:id" element={<PlanillaDetailPage />} />
-        </Route>
-      )}
+      <Route 
+        path="/login" 
+        element={<LoginPage />} 
+      />
 
-      {/* Cliente con ClienteDashboard */}
-      {user && role === "cliente" && cliente?.estado === "aprobado" && (
-        <>
+
+      {
+        user && usuario?.rol === "admin" && (
+          <Route element={<AdminLayout />}>
+
+            <Route
+              path="/clientes"
+              element={<ClientesPageV2 />}
+            />
+
+            <Route
+              path="/clientes/:id"
+              element={<ClienteDetailV2 />}
+            />
+
+          </Route>
+        )
+      }
+
+
+
+      {
+        user && usuario?.rol === "cliente" && (
           <Route
-            path="/cliente-dashboard"
+            path="/cliente"
             element={
-              <ClienteDashboard
-                clienteId={user.uid}
-                clienteNombre={
-                  cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente"
-                }
+              <ClienteLayoutV2
+                clienteNombre={`${usuario.nombre} ${usuario.apellido}`}
               />
             }
           />
-          <Route path="/guias" element={<GuiasPage />} />
-        </>
-      )}
+        )
+      }
 
-      {/* Si está pendiente */}
-      {user && role === "cliente" && cliente?.estado === "pendiente" && (
-        <Route
-          path="/cliente-dashboard"
-          element={
-            <div className="flex items-center justify-center h-screen bg-primary text-white">
-              <div className="bg-secondary/40 backdrop-blur-md border border-white/20 rounded-xl p-8 text-center shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">
-                  Cuenta pendiente de aprobación
-                </h2>
-                <p className="mb-6">
-                  Tu registro fue exitoso, pero aún está pendiente de
-                  aprobación por el administrador.
-                </p>
-                <button
-                  onClick={() => navigate("/login")}
-                  className="btn bg-accent hover:bg-highlight px-6 py-2 rounded-lg"
-                >
-                  Volver al Login
-                </button>
-              </div>
-            </div>
-          }
-        />
-      )}
 
-      {/* Redirecciones */}
+
       <Route
         path="*"
         element={
           <Navigate
             to={
               user
-                ? role === "admin"
-                  ? "/home"
-                  : "/cliente-dashboard"
+                ? usuario?.rol === "admin"
+                  ? "/clientes"
+                  : "/cliente"
                 : "/login"
             }
             replace
           />
         }
       />
+
     </Routes>
   );
 }
+
 
 export default App;

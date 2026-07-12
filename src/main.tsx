@@ -6,6 +6,7 @@ import "./index.css";
 import "./styles/global.css";
 
 import App from "./App.tsx";
+import { AuthProvider } from "./auth/AuthContext";
 
 const rootElement = document.getElementById("root")!;
 const splashElement = document.getElementById("splash");
@@ -13,7 +14,9 @@ const splashElement = document.getElementById("splash");
 createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>
 );
