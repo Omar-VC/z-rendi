@@ -7,5 +7,7 @@ export interface Cliente {
   email: string;
   estado: EstadoCliente;
   rol: "cliente";
-  CreatedAt: string;
+  createdAt: string;
+
+  frecuenciaSemanal?: number;
 }

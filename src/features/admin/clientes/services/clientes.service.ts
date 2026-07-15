@@ -26,15 +26,14 @@ export async function getClientes(): Promise<Cliente[]> {
         email: data.email,
         estado: data.estado,
         rol: data.rol,
-        CreatedAt: data.CreatedAt,
+        createdAt: data.CreatedAt,
+        frecuenciaSemanal: data.frecuenciaSemanal,
       } as Cliente;
     })
     .filter((usuario) => usuario.rol === "cliente");
 }
 
-export async function getClienteById(
-  id: string
-): Promise<Cliente | null> {
+export async function getClienteById(id: string): Promise<Cliente | null> {
   const clienteRef = doc(db, USUARIOS_COLLECTION, id);
   const snapshot = await getDoc(clienteRef);
 
@@ -51,7 +50,8 @@ export async function getClienteById(
     email: data.email,
     estado: data.estado,
     rol: data.rol,
-    CreatedAt: data.CreatedAt,
+    createdAt: data.CreatedAt,
+    frecuenciaSemanal: data.frecuenciaSemanal,
   } as Cliente;
 }
 
@@ -67,4 +67,16 @@ export async function rechazarCliente(id: string): Promise<void> {
   const clienteRef = doc(db, USUARIOS_COLLECTION, id);
 
   await deleteDoc(clienteRef);
+}
+
+//Frecuncia semanal
+export async function actualizarFrecuenciaSemanal(
+  id: string,
+  frecuenciaSemanal: number,
+): Promise<void> {
+  const clienteRef = doc(db, USUARIOS_COLLECTION, id);
+
+  await updateDoc(clienteRef, {
+    frecuenciaSemanal,
+  });
 }

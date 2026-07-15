@@ -3,6 +3,7 @@ import { useClientes } from "../hooks/useClientes";
 import ClienteCard from "../components/ClienteCard";
 import ClienteRequestCard from "../components/ClienteRequestCard";
 
+
 function ClientesPageV2() {
   const { pendientes, aprobados, loading, error, aceptar, rechazar } =
     useClientes();

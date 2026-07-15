@@ -12,9 +12,7 @@ import ClienteDetailV2 from "./features/admin/clientes/pages/ClienteDetailV2";
 
 
 function App() {
-
   const { user, usuario, loading } = useAuth();
-
 
   if (loading) {
     return (
@@ -24,50 +22,28 @@ function App() {
     );
   }
 
-
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
 
-      <Route 
-        path="/login" 
-        element={<LoginPage />} 
-      />
+      {user && usuario?.rol === "admin" && (
+        <Route element={<AdminLayout />}>
+          <Route path="/clientes" element={<ClientesPageV2 />} />
 
+          <Route path="/clientes/:id" element={<ClienteDetailV2 />} />
+        </Route>
+      )}
 
-      {
-        user && usuario?.rol === "admin" && (
-          <Route element={<AdminLayout />}>
-
-            <Route
-              path="/clientes"
-              element={<ClientesPageV2 />}
+      {user && usuario?.rol === "cliente" && (
+        <Route
+          path="/cliente"
+          element={
+            <ClienteLayoutV2
+              clienteNombre={`${usuario.nombre} ${usuario.apellido}`}
             />
-
-            <Route
-              path="/clientes/:id"
-              element={<ClienteDetailV2 />}
-            />
-
-          </Route>
-        )
-      }
-
-
-
-      {
-        user && usuario?.rol === "cliente" && (
-          <Route
-            path="/cliente"
-            element={
-              <ClienteLayoutV2
-                clienteNombre={`${usuario.nombre} ${usuario.apellido}`}
-              />
-            }
-          />
-        )
-      }
-
-
+          }
+        />
+      )}
 
       <Route
         path="*"
@@ -84,10 +60,8 @@ function App() {
           />
         }
       />
-
     </Routes>
   );
 }
-
 
 export default App;

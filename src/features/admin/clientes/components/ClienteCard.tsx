@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import type { Cliente } from "../types";
+import { useState } from "react";
+import RegistrarAsistenciaButton from "../../asistencia/components/RegistrarAsistenciaButton";
+import RegistrarAsistenciaModal from "../../asistencia/components/RegistrarAsistenciaModal";
+import { useCuotasCliente } from "../../cuotas/hooks/useCuotasCliente";
+import { useAsistencia } from "../../asistencia/hooks/useAsistencia";
 
 interface ClienteCardProps {
   cliente: Cliente;
@@ -7,56 +12,69 @@ interface ClienteCardProps {
 
 function ClienteCard({ cliente }: ClienteCardProps) {
   const navigate = useNavigate();
+  const { cuotas } = useCuotasCliente(cliente.id);
+
+  const { porcentaje, cargando: cargandoAsistencia } = useAsistencia(
+    cliente.id,
+    cliente.frecuenciaSemanal,
+  );
+
+  const ultimaCuota = cuotas[0];
+  const [mostrandoAsistencia, setMostrandoAsistencia] = useState(false);
 
   return (
     <div className="p-5 rounded-xl border border-white/10">
       <div className="flex justify-between items-start gap-4">
-
         <div>
           <h3 className="text-lg font-semibold">
             {cliente.nombre} {cliente.apellido}
           </h3>
 
-          <p className="mt-2 text-sm">
-            🟢 Activo
-          </p>
+          <p className="mt-2 text-sm">🟢 Activo</p>
         </div>
 
-        <button
-          onClick={() => navigate(`/clientes/${cliente.id}`)}
-          className="px-4 py-2 rounded-lg"
-        >
-          Ver
-        </button>
+        <div className="flex gap-2">
+          <RegistrarAsistenciaButton
+            onClick={() => setMostrandoAsistencia(true)}
+          />
 
+          <button
+            onClick={() => navigate(`/clientes/${cliente.id}`)}
+            className="px-4 py-2 rounded-lg"
+          >
+            Ver
+          </button>
+        </div>
       </div>
-
+      {mostrandoAsistencia && (
+        <RegistrarAsistenciaModal
+          cliente={cliente}
+          onCerrar={() => setMostrandoAsistencia(false)}
+        />
+      )}
 
       <div className="mt-5 space-y-2 text-sm">
-
         <p>
           Cuota:
           <span className="ml-2 opacity-70">
-            Sin información
+            {ultimaCuota
+              ? `${ultimaCuota.mes} ${ultimaCuota.estado}`
+              : "Sin cuota"}
           </span>
         </p>
 
         <p>
           Asistencia:
           <span className="ml-2 opacity-70">
-            Sin información
+            {cargandoAsistencia ? "Cargando..." : `${porcentaje}%`}
           </span>
         </p>
 
         <p>
           Seguimiento:
-          <span className="ml-2 opacity-70">
-            Sin información
-          </span>
+          <span className="ml-2 opacity-70">Sin información</span>
         </p>
-
       </div>
-
     </div>
   );
 }
