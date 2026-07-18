@@ -9,6 +9,7 @@ import {
 
 import { db } from "../../../../firebase/firebase";
 import type { Cliente } from "../types";
+import { getAuth } from "firebase/auth";
 
 const USUARIOS_COLLECTION = "usuarios";
 
@@ -56,10 +57,18 @@ export async function getClienteById(id: string): Promise<Cliente | null> {
 }
 
 export async function aprobarCliente(id: string): Promise<void> {
+  const auth = getAuth();
+  const preparador = auth.currentUser;
+
+  if (!preparador) {
+    throw new Error("No hay usuario autenticado.");
+  }
+
   const clienteRef = doc(db, USUARIOS_COLLECTION, id);
 
   await updateDoc(clienteRef, {
     estado: "aprobado",
+    preparadorId: preparador.uid,
   });
 }
 

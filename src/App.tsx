@@ -9,6 +9,7 @@ import ClienteLayoutV2 from "./layouts/ClienteLayoutV2";
 
 import ClientesPageV2 from "./features/admin/clientes/pages/ClientesPageV2";
 import ClienteDetailV2 from "./features/admin/clientes/pages/ClienteDetailV2";
+import BibliotecaPageV2 from "./features/admin/biblioteca/pages/BibliotecaPageV2";
 
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
           <Route path="/clientes" element={<ClientesPageV2 />} />
 
           <Route path="/clientes/:id" element={<ClienteDetailV2 />} />
+
+          <Route path="/biblioteca" element={<BibliotecaPageV2 />} />
         </Route>
       )}
 

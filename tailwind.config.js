@@ -11,6 +11,8 @@ export default {
         secondary: "#740A03",
         accent: "#C3110C",
         highlight: "#E6501B",
+        grisSemiOscuro: "#242424",
+        botonAlt1: "#A4E31B", 
       },
     },
   },

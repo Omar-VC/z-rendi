@@ -20,25 +20,14 @@ import ClienteTrainingConfig from "../components/ClienteTrainingConfig";
 import { useAsistencia } from "../../asistencia/hooks/useAsistencia";
 import ResumenAsistencia from "../../asistencia/components/ResumenAsistencia";
 import HistorialAsistencia from "../../asistencia/components/HistorialAsistencia";
+import SeguimientoPanel from "../../seguimiento/components/SeguimientoPanel";
 
 function ClienteDetailV2() {
   const { id } = useParams();
   const { ficha, recargar: recargarFicha } = useFichaCliente(id);
   const { cuotas, recargar: recargarCuotas } = useCuotasCliente(id);
   const ultimaCuota = cuotas[0];
-  const fecha = new Date();
-
-  const mesActual = fecha.toLocaleString("es-AR", {
-    month: "long",
-  });
-
-  const anioActual = fecha.getFullYear();
-
-  const cuotaActual = cuotas.find(
-    (cuota) =>
-      cuota.mes.toLowerCase() === mesActual.toLowerCase() &&
-      cuota.anio === anioActual,
-  );
+  
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const {
     asistencias,
@@ -179,7 +168,7 @@ function ClienteDetailV2() {
         <section className="p-6 rounded-xl border border-white/10">
           <h2 className="text-xl font-bold">Seguimiento</h2>
 
-          <p className="mt-2 opacity-70">Próximamente evolución del cliente.</p>
+          <SeguimientoPanel clienteId={id!} />
         </section>
 
         {editandoFicha && id ? (
