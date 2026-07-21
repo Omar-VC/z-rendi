@@ -5,6 +5,7 @@ import { useSeguimiento } from "../hooks/useSeguimiento";
 import NuevaSesionModal from "./NuevaSesionModal";
 import UltimaSesionCard from "./UltimaSesionCard";
 import RegistroSesiones from "./RegistroSesiones";
+import BarrerasPanel from "./BarrerasPanel";
 
 type Props = {
   clienteId: string;
@@ -13,42 +14,26 @@ type Props = {
 export default function SeguimientoPanel({ clienteId }: Props) {
   const [mostrarModal, setMostrarModal] = useState(false);
 
-  const {
-    sesiones,
-    loading,
-    recargar,
-  } = useSeguimiento(clienteId);
+  const { sesiones, loading, recargar } = useSeguimiento(clienteId);
 
   return (
     <div className="space-y-6">
-
-      <h3 className="text-lg font-semibold">
-        Seguimiento deportivo
-      </h3>
-
+      <h3 className="text-lg font-semibold">Seguimiento deportivo</h3>
 
       {loading ? (
-
         <p>Cargando sesiones...</p>
-
       ) : (
-
         <>
-
-          <UltimaSesionCard
-            sesion={sesiones[0]}
-          />
-
+          <UltimaSesionCard sesion={sesiones[0]} />
 
           <RegistroSesiones
             sesiones={sesiones}
             onNuevaSesion={() => setMostrarModal(true)}
           />
 
+          <BarrerasPanel clienteId={clienteId} />
         </>
-
       )}
-
 
       {mostrarModal && (
         <NuevaSesionModal
@@ -60,7 +45,6 @@ export default function SeguimientoPanel({ clienteId }: Props) {
           }}
         />
       )}
-
     </div>
   );
 }
