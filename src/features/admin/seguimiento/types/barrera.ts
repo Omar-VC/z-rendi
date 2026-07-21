@@ -17,6 +17,8 @@ export interface Barrera {
 
   categoria?: string;
 
+  subcategoria?: string;
+
   unidad?: string;
 
   objetivo: string;

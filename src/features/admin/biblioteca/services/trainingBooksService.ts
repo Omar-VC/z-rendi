@@ -47,3 +47,28 @@ export async function crearLibro(
     updatedAt: Timestamp.now(),
   });
 }
+
+export async function eliminarLibro(
+  id: string
+): Promise<void> {
+
+  await deleteDoc(
+    doc(db, COLLECTION, id)
+  );
+
+}
+
+export async function actualizarLibro(
+  id: string,
+  cambios: Partial<TrainingBook>
+): Promise<void> {
+
+  await updateDoc(
+    doc(db, COLLECTION, id),
+    {
+      ...cambios,
+      updatedAt: Timestamp.now(),
+    }
+  );
+
+}

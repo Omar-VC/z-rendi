@@ -8,29 +8,20 @@ import PruebaCard from "./PruebaCard";
 import NuevaPruebaModal from "./NuevaPruebaModal";
 
 export default function BibliotecaPruebas() {
-
   const { user } = useAuth();
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
   if (!user) return null;
 
-  const {
-    pruebas,
-    loading,
-    recargar,
-  } = usePhysicalTests({
+  const { pruebas, loading, recargar } = usePhysicalTests({
     preparadorId: user.uid,
   });
 
   return (
     <div className="space-y-4">
-
       <div className="flex items-center justify-between">
-
-        <h2 className="text-lg font-semibold">
-          Pruebas físicas
-        </h2>
+        <h2 className="text-lg font-semibold">Pruebas físicas</h2>
 
         <button
           onClick={() => setMostrarModal(true)}
@@ -38,38 +29,25 @@ export default function BibliotecaPruebas() {
         >
           Nueva prueba
         </button>
-
       </div>
 
       {loading ? (
-
         <p>Cargando pruebas...</p>
-
       ) : pruebas.length === 0 ? (
-
-        <p className="text-gray-500">
-          No hay pruebas registradas.
-        </p>
-
+        <p className="text-gray-500">No hay pruebas registradas.</p>
       ) : (
-
         <div className="space-y-3">
-
           {pruebas.map((prueba) => (
-
             <PruebaCard
               key={prueba.id}
               prueba={prueba}
+              onActualizado={recargar}
             />
-
           ))}
-
         </div>
-
       )}
 
       {mostrarModal && (
-
         <NuevaPruebaModal
           onClose={() => setMostrarModal(false)}
           onGuardado={() => {
@@ -77,9 +55,7 @@ export default function BibliotecaPruebas() {
             setMostrarModal(false);
           }}
         />
-
       )}
-
     </div>
   );
 }

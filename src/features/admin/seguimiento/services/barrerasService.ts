@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  getDoc,
   getDocs,
   deleteDoc,
   query,
@@ -84,17 +85,53 @@ export async function actualizarBarrera(
 
 export async function guardarNuevoObjetivo(
   id: string,
-  objetivo: string
+  objetivoNuevo: string
 ): Promise<void> {
 
   const ref = doc(db, COLLECTION, id);
 
+  const snapshot = await getDoc(ref);
+
+  if (!snapshot.exists()) {
+    throw new Error("La barrera no existe");
+  }
+
+  const barrera = snapshot.data();
+
+
+  const historialActual = barrera.historial || [];
+
+
+  const nuevoRegistro = {
+
+    fecha: new Date(),
+
+    objetivo: barrera.objetivo,
+
+    resultado: barrera.resultado || "",
+
+    observaciones: barrera.observaciones || "",
+
+  };
+
+
   await updateDoc(ref, {
-    objetivo,
+
+    objetivo: objetivoNuevo,
+
     resultado: "",
+
     observaciones: "",
+
     estado: "pendiente",
+
+    historial: [
+      ...historialActual,
+      nuevoRegistro,
+    ],
+
     updatedAt: serverTimestamp(),
+
   });
 
 }

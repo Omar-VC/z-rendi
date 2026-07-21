@@ -54,6 +54,8 @@ export default function NuevaBarreraModal({
 
       categoria: pruebaSeleccionada.categoria,
 
+      subcategoria: pruebaSeleccionada.subcategoria,
+
       unidad: pruebaSeleccionada.unidad,
 
       objetivo,

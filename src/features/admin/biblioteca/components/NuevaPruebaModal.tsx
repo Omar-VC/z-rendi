@@ -4,7 +4,10 @@ import { useAuth } from "../../../../auth/useAuth";
 
 import { crearPrueba } from "../services/physicalTestsService";
 
-import type { CategoriaPrueba } from "../types/physicalTest";
+import type {
+  CategoriaPrueba,
+  SubcategoriaPrueba,
+} from "../types/physicalTest";
 
 type Props = {
   onClose: () => void;
@@ -26,6 +29,9 @@ export default function NuevaPruebaModal({ onClose, onGuardado }: Props) {
 
   const [categoria, setCategoria] = useState<CategoriaPrueba>("Fuerza");
 
+  const [subcategoria, setSubcategoria] =
+    useState<SubcategoriaPrueba>("General");
+
   const [unidad, setUnidad] = useState("");
 
   async function guardar() {
@@ -36,6 +42,7 @@ export default function NuevaPruebaModal({ onClose, onGuardado }: Props) {
       preparadorId: user.uid,
       nombre: nombre.trim(),
       categoria,
+      subcategoria,
       unidad: unidad.trim(),
     });
 
@@ -83,6 +90,22 @@ export default function NuevaPruebaModal({ onClose, onGuardado }: Props) {
             className="w-full border rounded px-3 py-2"
             placeholder="Ej: kg, cm, seg"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1">Subcategoría</label>
+
+          <select
+            value={subcategoria}
+            onChange={(e) =>
+              setSubcategoria(e.target.value as SubcategoriaPrueba)
+            }
+            className="w-full border rounded px-3 py-2"
+          >
+            <option value="General">General</option>
+            <option value="Superior">Superior</option>
+            <option value="Inferior">Inferior</option>
+          </select>
         </div>
 
         <div className="flex justify-end gap-2">

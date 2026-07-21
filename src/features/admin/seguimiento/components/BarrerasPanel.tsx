@@ -12,6 +12,8 @@ import NuevoObjetivoModal from "./NuevoObjetivoModal";
 
 import { eliminarBarrera } from "../services/barrerasService";
 
+import HistorialBarrera from "./HistorialBarrera";
+
 type Props = {
   clienteId: string;
 };
@@ -66,7 +68,7 @@ export default function BarrerasPanel({ clienteId }: Props) {
         {barreras.map((barrera) => (
           <div key={barrera.id} className="border rounded p-3">
             <div className="font-medium">{barrera.nombre}</div>
-
+            
             {barrera.categoria && (
               <div className="text-sm text-gray-500">{barrera.categoria}</div>
             )}
@@ -74,6 +76,8 @@ export default function BarrerasPanel({ clienteId }: Props) {
             <div className="text-sm">Objetivo: {barrera.objetivo}</div>
 
             <div className="text-sm">Estado: {barrera.estado}</div>
+            
+            <HistorialBarrera historial={barrera.historial} />
 
             <div className="mt-3 flex justify-between">
               {barrera.estado === "pendiente" ? (

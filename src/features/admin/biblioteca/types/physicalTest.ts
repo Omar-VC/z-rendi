@@ -5,19 +5,24 @@ export type CategoriaPrueba =
   | "Resistencia"
   | "Movilidad";
 
+export type SubcategoriaPrueba =
+  | "Superior"
+  | "Inferior"
+  | "General";
+
 export interface PhysicalTest {
+  id: string;
 
-  id:string;
+  preparadorId: string;
 
-  preparadorId:string;
+  nombre: string;
 
-  nombre:string;
+  categoria: CategoriaPrueba;
 
-  categoria:CategoriaPrueba;
+  subcategoria: SubcategoriaPrueba;
 
-  unidad?:string;
+  unidad: string;
 
-  createdAt?:any;
-
-  updatedAt?:any;
+  createdAt?: any;
+  updatedAt?: any;
 }
