@@ -1,0 +1,302 @@
+:root {
+  --bg: #0f0f10;
+
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.08);
+
+  --border: rgba(255, 255, 255, 0.10);
+
+  --text: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.6);
+
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+
+  --focus: #ef4444;
+
+  --accent-green: #39ff88;
+  --accent-green-hover: #2ee676;
+}
+
+/* =========================
+   BASE
+========================= */
+
+* {
+  transition-property:
+    background-color,
+    border-color,
+    box-shadow,
+    transform,
+    opacity;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-sans;
+
+  background-color: var(--bg);
+  color: var(--text);
+
+  margin: 0;
+  min-height: 100vh;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-bold tracking-wide;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.page-container {
+  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn {
+  @apply px-4 py-2 rounded-xl font-semibold;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  min-height: 44px;
+
+  border: 1px solid transparent;
+
+  backdrop-filter: blur(10px);
+
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: white;
+
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.btn-danger {
+  background-color: #b91c1c;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #991b1b;
+}
+
+.btn-success {
+  background-color: var(--accent-green);
+  color: #0f0f10;
+}
+
+.btn-success:hover {
+  background-color: var(--accent-green-hover);
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  @apply rounded-2xl p-6 border;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border-color: rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.25);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.07);
+
+  border-color: rgba(255, 255, 255, 0.14);
+
+  transform: translateY(-2px);
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input {
+  @apply w-full px-4 rounded-xl;
+
+  min-height: 48px;
+
+  background-color: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid var(--border);
+
+  color: var(--text);
+
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  outline: none;
+
+  border-color: var(--focus);
+
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* =========================
+   SELECTS
+========================= */
+
+select {
+  @apply w-full px-4 rounded-xl;
+
+  min-height: 48px;
+
+  background-color: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid var(--border);
+
+  color: var(--text);
+
+  transition: all 0.2s ease;
+}
+
+select option {
+  background-color: #111827;
+  color: white;
+}
+
+select:focus {
+  outline: none;
+
+  border-color: var(--focus);
+
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* =========================
+   TABLES
+========================= */
+
+table {
+  width: 100%;
+  border-color: var(--border);
+  border-collapse: collapse;
+}
+
+tr {
+  transition: background-color 0.15s ease;
+}
+
+tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.link-accent {
+  color: var(--accent-green);
+  transition: opacity 0.2s ease;
+}
+
+.link-accent:hover {
+  color: var(--accent-green-hover);
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes zoomFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-zoomFadeIn {
+  animation: zoomFadeIn 1s ease-out forwards;
+}
+
+.animate-fadeInDelay {
+  animation: fadeIn 1s ease-out forwards;
+  animation-delay: 1s;
+}

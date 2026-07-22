@@ -8,18 +8,43 @@ const SidebarV2 = ({ onLogout }: Props) => {
   const navigate = useNavigate();
 
   return (
-    <div className="p-4 space-y-4">
+    <div
+      className="
+        h-full
+        flex
+        flex-col
+        p-6
+        bg-primary
+        text-white
+      "
+    >
 
-      <h2 className="font-bold text-xl">
-        Z-Rendi
-      </h2>
+      {/* Marca */}
+      <div className="mb-10">
+        <h2 className="text-2xl font-bold">
+          Z-Rendi
+        </h2>
+
+        <p className="text-sm text-white/60 mt-1">
+          Preparación física
+        </p>
+      </div>
 
 
-      <nav className="space-y-2">
+      {/* Navegación */}
+      <nav className="flex-1 space-y-2">
 
         <button
           onClick={() => navigate("/clientes")}
-          className="block"
+          className="
+            w-full
+            text-left
+            px-4
+            py-3
+            rounded-xl
+            hover:bg-white/10
+            transition
+          "
         >
           Clientes
         </button>
@@ -27,18 +52,34 @@ const SidebarV2 = ({ onLogout }: Props) => {
 
         <button
           onClick={() => navigate("/biblioteca")}
-          className="block"
+          className="
+            w-full
+            text-left
+            px-4
+            py-3
+            rounded-xl
+            hover:bg-white/10
+            transition
+          "
         >
           Biblioteca
         </button>
 
-
       </nav>
 
 
+      {/* Logout */}
       <button
         onClick={onLogout}
-        className="mt-4"
+        className="
+          w-full
+          px-4
+          py-3
+          rounded-xl
+          bg-white/10
+          hover:bg-accent
+          transition
+        "
       >
         Salir
       </button>

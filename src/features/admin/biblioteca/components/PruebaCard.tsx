@@ -1,16 +1,32 @@
-import type { PhysicalTest } from "../types/physicalTest";
-import { eliminarPrueba } from "../services/physicalTestsService";
 import { useState } from "react";
+
+import type { PhysicalTest } from "../types/physicalTest";
+
+import { eliminarPrueba } from "../services/physicalTestsService";
+
 import EditarPruebaModal from "./EditarPruebaModal";
+
+import { Card, Button } from "../../../../shared/ui";
+
 
 type Props = {
   prueba: PhysicalTest;
   onActualizado: () => void;
 };
 
-export default function PruebaCard({ prueba, onActualizado }: Props) {
+
+export default function PruebaCard({
+  prueba,
+  onActualizado,
+}: Props) {
+
+  const [mostrarEditar, setMostrarEditar] = useState(false);
+
+
   async function borrarPrueba() {
-    const confirmar = window.confirm("¿Eliminar esta prueba física?");
+    const confirmar = window.confirm(
+      "¿Eliminar esta prueba física?"
+    );
 
     if (!confirmar) return;
 
@@ -19,35 +35,73 @@ export default function PruebaCard({ prueba, onActualizado }: Props) {
     onActualizado();
   }
 
-  const [mostrarEditar, setMostrarEditar] = useState(false);
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 flex items-center justify-between">
-      <div>
-        <h3 className="font-semibold">{prueba.nombre}</h3>
+    <Card>
 
-        <p className="text-sm text-gray-500">
-          {prueba.categoria}
+      <div className="
+        flex
+        items-center
+        justify-between
+        gap-4
+      ">
 
-          {prueba.subcategoria !== "General" && ` • ${prueba.subcategoria}`}
-        </p>
+
+        {/* Información */}
+        <div>
+
+          <h3 className="
+            font-bold
+            text-primary
+          ">
+            {prueba.nombre}
+          </h3>
+
+
+          <p className="
+            text-sm
+            text-slate-500
+            mt-1
+          ">
+            {prueba.categoria}
+
+            {prueba.subcategoria !== "General" &&
+              ` • ${prueba.subcategoria}`
+            }
+          </p>
+
+        </div>
+
+
+
+        {/* Acciones */}
+        <div className="
+          flex
+          gap-2
+        ">
+
+          <Button
+            variant="secondary"
+            onClick={() => setMostrarEditar(true)}
+          >
+            Editar
+          </Button>
+
+
+          <Button
+            variant="danger"
+            onClick={borrarPrueba}
+          >
+            Eliminar
+          </Button>
+
+
+        </div>
+
+
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => setMostrarEditar(true)}
-          className="px-3 py-1 rounded border hover:bg-gray-100"
-        >
-          Editar
-        </button>
 
-        <button
-          onClick={borrarPrueba}
-          className="px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50"
-        >
-          Eliminar
-        </button>
-      </div>
 
       {mostrarEditar && (
         <EditarPruebaModal
@@ -59,7 +113,8 @@ export default function PruebaCard({ prueba, onActualizado }: Props) {
           }}
         />
       )}
-      
-    </div>
+
+
+    </Card>
   );
 }
