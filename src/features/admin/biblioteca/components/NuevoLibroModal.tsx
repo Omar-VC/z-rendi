@@ -1,5 +1,15 @@
 import { useState } from "react";
+
 import type { TrainingBook } from "../types/trainingBook";
+
+import {
+  Modal,
+  Input,
+  Select,
+  Textarea,
+  Button,
+} from "../../../../shared/ui";
+
 
 interface Props {
   abierto: boolean;
@@ -10,6 +20,7 @@ interface Props {
   preparadorId: string;
 }
 
+
 export default function NuevoLibroModal({
   abierto,
   cerrar,
@@ -18,17 +29,22 @@ export default function NuevoLibroModal({
 }: Props) {
 
   const [nombre, setNombre] = useState("");
+
   const [categoria, setCategoria] =
     useState<TrainingBook["categoria"]>("Fuerza");
 
   const [ejercicio, setEjercicio] = useState("");
-  const [ejercicios, setEjercicios] = useState<string[]>([]);
+
+  const [ejercicios, setEjercicios] =
+    useState<string[]>([]);
 
   const [observaciones, setObservaciones] =
     useState("");
 
 
+
   if (!abierto) return null;
+
 
 
   async function guardar() {
@@ -51,6 +67,7 @@ export default function NuevoLibroModal({
   }
 
 
+
   function agregarEjercicio() {
 
     if (!ejercicio.trim()) return;
@@ -64,26 +81,29 @@ export default function NuevoLibroModal({
   }
 
 
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
 
-      <div className="bg-grisSemiOscuro text-white rounded-lg p-6 w-full max-w-md space-y-4">
-
-        <h2 className="text-xl font-bold">
-          Nuevo libro
-        </h2>
+    <Modal
+      title="Nuevo libro"
+      onClose={cerrar}
+    >
 
 
-        <input
-          className="border p-2 w-full rounded bg-white text-black placeholder-gray-400"
+      <div className="space-y-4">
+
+
+        <Input
           placeholder="Nombre del libro"
           value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
+          onChange={(e) =>
+            setNombre(e.target.value)
+          }
         />
 
-    
-        <select
-          className="border p-2 w-full rounded bg-white text-black"
+
+
+        <Select
           value={categoria}
           onChange={(e) =>
             setCategoria(
@@ -91,19 +111,21 @@ export default function NuevoLibroModal({
             )
           }
         >
+
           <option>Fuerza</option>
           <option>Potencia</option>
           <option>Velocidad</option>
           <option>Resistencia</option>
           <option>Prevención</option>
 
-        </select>
+        </Select>
+
+
 
 
         <div className="flex gap-2">
 
-          <input
-            className="border p-2 flex-1 rounded bg-white text-black placeholder-gray-400"
+          <Input
             placeholder="Ejercicio"
             value={ejercicio}
             onChange={(e) =>
@@ -111,27 +133,46 @@ export default function NuevoLibroModal({
             }
           />
 
-          <button
-            className="bg-botonAlt1 px-3 rounded"
+
+          <Button
+            variant="accent"
             onClick={agregarEjercicio}
           >
             +
-          </button>
+          </Button>
 
         </div>
 
 
-        <ul className="text-sm space-y-1">
-          {ejercicios.map((e, index) => (
-            <li key={index}>
-              • {e}
-            </li>
-          ))}
-        </ul>
 
 
-        <textarea
-          className="border p-2 w-full rounded bg-white text-black placeholder-gray-400"
+        <div className="
+          rounded-xl
+          bg-slate-50
+          p-3
+        ">
+
+          <ul className="
+            text-sm
+            text-slate-600
+            space-y-1
+          ">
+
+            {ejercicios.map((e, index) => (
+              <li key={index}>
+                • {e}
+              </li>
+            ))}
+
+          </ul>
+
+        </div>
+
+
+
+
+
+        <Textarea
           placeholder="Observaciones"
           value={observaciones}
           onChange={(e) =>
@@ -140,27 +181,38 @@ export default function NuevoLibroModal({
         />
 
 
-        <div className="flex justify-end gap-2">
 
-          <button
-            className="px-4 py-2"
+
+        <div className="
+          flex
+          justify-end
+          gap-3
+          pt-3
+        ">
+
+          <Button
+            variant="secondary"
             onClick={cerrar}
           >
             Cancelar
-          </button>
+          </Button>
 
 
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+          <Button
+            variant="accent"
             onClick={guardar}
           >
             Guardar
-          </button>
+          </Button>
+
 
         </div>
 
+
       </div>
 
-    </div>
+
+    </Modal>
+
   );
 }

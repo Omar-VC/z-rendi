@@ -9,10 +9,19 @@ import type {
   SubcategoriaPrueba,
 } from "../types/physicalTest";
 
+import {
+  Modal,
+  Input,
+  Select,
+  Button,
+} from "../../../../shared/ui";
+
+
 type Props = {
   onClose: () => void;
   onGuardado: () => void;
 };
+
 
 const categorias: CategoriaPrueba[] = [
   "Fuerza",
@@ -22,105 +31,240 @@ const categorias: CategoriaPrueba[] = [
   "Movilidad",
 ];
 
-export default function NuevaPruebaModal({ onClose, onGuardado }: Props) {
+
+export default function NuevaPruebaModal({
+  onClose,
+  onGuardado,
+}: Props) {
+
   const { user } = useAuth();
 
-  const [nombre, setNombre] = useState("");
 
-  const [categoria, setCategoria] = useState<CategoriaPrueba>("Fuerza");
+  const [nombre, setNombre] =
+    useState("");
+
+
+  const [categoria, setCategoria] =
+    useState<CategoriaPrueba>("Fuerza");
+
 
   const [subcategoria, setSubcategoria] =
     useState<SubcategoriaPrueba>("General");
 
-  const [unidad, setUnidad] = useState("");
+
+  const [unidad, setUnidad] =
+    useState("");
+
+
 
   async function guardar() {
+
     if (!user) return;
+
     if (!nombre.trim()) return;
 
+
     await crearPrueba({
+
       preparadorId: user.uid,
+
       nombre: nombre.trim(),
+
       categoria,
+
       subcategoria,
+
       unidad: unidad.trim(),
+
     });
 
+
     onGuardado();
+
   }
 
+
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-grisSemiOscuro rounded-lg p-6 w-full max-w-md space-y-4">
-        <h2 className="text-lg font-semibold">Nueva prueba física</h2>
+
+    <Modal
+      title="Nueva prueba física"
+      onClose={onClose}
+    >
+
+
+      <div className="space-y-4">
+
 
         <div>
-          <label className="block text-sm mb-1">Nombre</label>
 
-          <input
+          <label className="
+            block
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+          ">
+            Nombre
+          </label>
+
+
+          <Input
             value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className="bg-grisSemiOscuro w-full border rounded px-3 py-2"
+            onChange={(e) =>
+              setNombre(e.target.value)
+            }
             placeholder="Ej: Sprint 20 m"
           />
+
         </div>
 
-        <div>
-          <label className="block text-sm mb-1">Categoría</label>
 
-          <select
+
+
+
+        <div>
+
+          <label className="
+            block
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+          ">
+            Categoría
+          </label>
+
+
+          <Select
             value={categoria}
-            onChange={(e) => setCategoria(e.target.value as CategoriaPrueba)}
-            className="w-full border rounded px-3 py-2"
+            onChange={(e) =>
+              setCategoria(
+                e.target.value as CategoriaPrueba
+              )
+            }
           >
+
             {categorias.map((cat) => (
-              <option key={cat} value={cat}>
+
+              <option
+                key={cat}
+                value={cat}
+              >
                 {cat}
               </option>
+
             ))}
-          </select>
+
+
+          </Select>
+
         </div>
 
-        <div>
-          <label className="block text-sm mb-1">Unidad</label>
 
-          <input
+
+
+
+        <div>
+
+          <label className="
+            block
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+          ">
+            Unidad
+          </label>
+
+
+          <Input
             value={unidad}
-            onChange={(e) => setUnidad(e.target.value)}
-            className="w-full border rounded px-3 py-2"
+            onChange={(e) =>
+              setUnidad(e.target.value)
+            }
             placeholder="Ej: kg, cm, seg"
           />
+
         </div>
+
+
+
+
 
         <div>
-          <label className="block text-sm mb-1">Subcategoría</label>
 
-          <select
+          <label className="
+            block
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+          ">
+            Subcategoría
+          </label>
+
+
+          <Select
             value={subcategoria}
             onChange={(e) =>
-              setSubcategoria(e.target.value as SubcategoriaPrueba)
+              setSubcategoria(
+                e.target.value as SubcategoriaPrueba
+              )
             }
-            className="w-full border rounded px-3 py-2"
           >
-            <option value="General">General</option>
-            <option value="Superior">Superior</option>
-            <option value="Inferior">Inferior</option>
-          </select>
+
+            <option value="General">
+              General
+            </option>
+
+            <option value="Superior">
+              Superior
+            </option>
+
+            <option value="Inferior">
+              Inferior
+            </option>
+
+          </Select>
+
         </div>
 
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 border rounded">
-            Cancelar
-          </button>
 
-          <button
+
+
+
+        <div className="
+          flex
+          justify-end
+          gap-3
+          pt-3
+        ">
+
+
+          <Button
+            variant="secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
+
+
+          <Button
+            variant="accent"
             onClick={guardar}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Guardar
-          </button>
+          </Button>
+
+
         </div>
+
+
       </div>
-    </div>
+
+
+    </Modal>
+
   );
 }

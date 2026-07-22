@@ -4,11 +4,21 @@ import type { TrainingBook } from "../types/trainingBook";
 
 import { actualizarLibro } from "../services/trainingBooksService";
 
+import {
+  Modal,
+  Input,
+  Select,
+  Textarea,
+  Button,
+} from "../../../../shared/ui";
+
+
 type Props = {
   libro: TrainingBook;
   onClose: () => void;
   onGuardado: () => void;
 };
+
 
 export default function EditarLibroModal({
   libro,
@@ -16,16 +26,28 @@ export default function EditarLibroModal({
   onGuardado,
 }: Props) {
 
-  const [nombre, setNombre] = useState(libro.nombre);
+
+  const [nombre, setNombre] =
+    useState(libro.nombre);
+
 
   const [categoria, setCategoria] =
-    useState<TrainingBook["categoria"]>(libro.categoria);
+    useState<TrainingBook["categoria"]>(
+      libro.categoria
+    );
+
 
   const [ejercicios, setEjercicios] =
-    useState(libro.ejercicios.join("\n"));
+    useState(
+      libro.ejercicios.join("\n")
+    );
+
 
   const [observaciones, setObservaciones] =
-    useState(libro.observaciones || "");
+    useState(
+      libro.observaciones || ""
+    );
+
 
 
   async function guardar() {
@@ -51,43 +73,65 @@ export default function EditarLibroModal({
   }
 
 
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-      <div className="bg-white rounded-lg p-6 w-full max-w-md space-y-4">
+    <Modal
+      title="Editar libro"
+      onClose={onClose}
+    >
 
-        <h2 className="text-lg font-semibold">
-          Editar libro
-        </h2>
+
+      <div className="space-y-4">
+
 
 
         <div>
 
-          <label className="text-sm">
+          <label className="
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+            block
+          ">
             Nombre
           </label>
 
-          <input
+
+          <Input
             value={nombre}
-            onChange={(e)=>setNombre(e.target.value)}
-            className="w-full border rounded px-3 py-2"
+            onChange={(e) =>
+              setNombre(e.target.value)
+            }
           />
 
         </div>
 
 
+
+
+
         <div>
 
-          <label className="text-sm">
+          <label className="
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+            block
+          ">
             Categoría
           </label>
 
-          <select
+
+          <Select
             value={categoria}
-            onChange={(e)=>setCategoria(
-              e.target.value as TrainingBook["categoria"]
-            )}
-            className="w-full border rounded px-3 py-2"
+            onChange={(e) =>
+              setCategoria(
+                e.target.value as TrainingBook["categoria"]
+              )
+            }
           >
 
             <option value="Fuerza">
@@ -110,64 +154,99 @@ export default function EditarLibroModal({
               Prevención
             </option>
 
-          </select>
+          </Select>
 
         </div>
 
 
+
+
+
         <div>
 
-          <label className="text-sm">
+          <label className="
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+            block
+          ">
             Ejercicios (uno por línea)
           </label>
 
-          <textarea
+
+          <Textarea
             value={ejercicios}
-            onChange={(e)=>setEjercicios(e.target.value)}
-            className="w-full border rounded px-3 py-2"
             rows={5}
+            onChange={(e) =>
+              setEjercicios(e.target.value)
+            }
           />
 
         </div>
+
+
+
 
 
         <div>
 
-          <label className="text-sm">
+          <label className="
+            text-sm
+            font-medium
+            text-slate-600
+            mb-1
+            block
+          ">
             Observaciones
           </label>
 
-          <textarea
+
+          <Textarea
             value={observaciones}
-            onChange={(e)=>setObservaciones(e.target.value)}
-            className="w-full border rounded px-3 py-2"
+            onChange={(e) =>
+              setObservaciones(e.target.value)
+            }
           />
 
         </div>
 
 
-        <div className="flex justify-end gap-2">
 
-          <button
+
+
+        <div className="
+          flex
+          justify-end
+          gap-3
+          pt-3
+        ">
+
+
+          <Button
+            variant="secondary"
             onClick={onClose}
-            className="px-4 py-2 border rounded"
           >
             Cancelar
-          </button>
+          </Button>
 
 
-          <button
+          <Button
+            variant="accent"
             onClick={guardar}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
           >
             Guardar
-          </button>
+          </Button>
+
 
         </div>
+
 
 
       </div>
 
-    </div>
+
+    </Modal>
+
   );
 }
