@@ -12,6 +12,7 @@ type Props = {
   onClick?: () => void;
   type?: "button" | "submit";
   className?: string;
+  disabled?: boolean;
 };
 
 
@@ -21,6 +22,7 @@ export default function Button({
   onClick,
   type = "button",
   className = "",
+  disabled = false,
 }: Props) {
 
 
@@ -46,6 +48,7 @@ export default function Button({
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={`
         inline-flex
         items-center
