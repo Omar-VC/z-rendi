@@ -1,5 +1,8 @@
 import { useState } from "react";
+
 import { actualizarFrecuenciaSemanal } from "../services/clientes.service";
+
+import { Card, Button, Select, SectionTitle } from "../../../../shared/ui";
 
 interface ClienteTrainingConfigProps {
   clienteId: string;
@@ -26,39 +29,42 @@ function ClienteTrainingConfig({
   };
 
   return (
-    <section className="p-6 rounded-xl border border-white/10">
-      <h2 className="text-xl font-bold mb-4">Configuración de entrenamiento</h2>
+    
+    <Card>
 
-      <div className="space-y-3">
-        <label className="block">Frecuencia semanal</label>
+      <SectionTitle
+        title="Configuración de entrenamiento"
+        description="Definí la frecuencia semanal utilizada para calcular la asistencia."
+      />
 
-        <select
-          value={frecuencia}
-          onChange={(e) => setFrecuencia(Number(e.target.value))}
-          className="p-3 rounded-lg bg-white/10 border border-white/20 text-white"
-        >
-          <option value={1}>1 día por semana</option>
+      <div className="mt-5 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
+        <div>
+          <label className="block mb-2 text-sm font-medium text-slate-600">
+            Frecuencia semanal
+          </label>
 
-          <option value={2}>2 días por semana</option>
+          <Select
+            value={frecuencia}
+            onChange={(e) => setFrecuencia(Number(e.target.value))}
+          >
+            <option value={1}>1 día por semana</option>
+            <option value={2}>2 días por semana</option>
+            <option value={3}>3 días por semana</option>
+            <option value={4}>4 días por semana</option>
+            <option value={5}>5 días por semana</option>
+            <option value={6}>6 días por semana</option>
+          </Select>
+        </div>
 
-          <option value={3}>3 días por semana</option>
-
-          <option value={4}>4 días por semana</option>
-
-          <option value={5}>5 días por semana</option>
-
-          <option value={6}>6 días por semana</option>
-        </select>
-        <button
-          type="button"
+        <Button
+          variant="accent"
           onClick={guardarFrecuencia}
           disabled={guardando}
-          className="px-4 py-2 rounded-lg"
         >
-          {guardando ? "Guardando..." : "Guardar frecuencia"}
-        </button>
+          {guardando ? "Guardando..." : "Guardar"}
+        </Button>
       </div>
-    </section>
+    </Card>
   );
 }
 

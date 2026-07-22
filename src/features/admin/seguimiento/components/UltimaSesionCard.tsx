@@ -1,54 +1,133 @@
 import type { SesionEntrenamiento } from "../types/seguimiento";
 
+import {
+  Card,
+  Badge,
+} from "../../../../shared/ui";
+
+
 type Props = {
   sesion?: SesionEntrenamiento;
 };
 
-export default function UltimaSesionCard({ sesion }: Props) {
+
+export default function UltimaSesionCard({
+  sesion,
+}: Props) {
+
 
   if (!sesion) {
+
     return (
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="font-semibold text-lg mb-2">
+
+      <Card>
+
+        <h3 className="font-semibold text-lg">
           Última sesión
         </h3>
 
-        <p className="text-gray-500">
+
+        <p className="mt-3 text-muted">
           Aún no hay sesiones registradas.
         </p>
-      </div>
+
+
+      </Card>
+
     );
+
   }
 
+
+
   return (
-    <div className="bg-grisSemiOscuro rounded-lg shadow p-4 space-y-2">
 
-      <h3 className="font-semibold text-lg">
-        Última sesión
-      </h3>
+    <Card>
 
-      <p className="font-semibold">
-        {sesion.libroNombre}
-      </p>
 
-      <p>
-        {sesion.fecha.toLocaleDateString()}
-      </p>
+      <div className="flex flex-col md:flex-row md:justify-between gap-4">
 
-      <p>
-        {sesion.duracion} minutos • RPE {sesion.rpe}
-      </p>
 
-      <p>
-        Carga: {sesion.carga}
-      </p>
+        <div>
 
-      {sesion.observaciones && (
-        <p className="text-sm text-gray-600">
-          {sesion.observaciones}
-        </p>
-      )}
 
-    </div>
+          <h3 className="font-semibold text-lg">
+            Última sesión
+          </h3>
+
+
+          <p className="mt-3 font-semibold">
+            {sesion.libroNombre}
+          </p>
+
+
+          <p className="text-sm text-muted mt-1">
+            {sesion.fecha.toLocaleDateString()}
+          </p>
+
+
+        </div>
+
+
+
+        <div className="flex gap-2">
+
+
+          <Badge variant="info">
+            RPE {sesion.rpe}
+          </Badge>
+
+
+          <Badge variant="neutral">
+            {sesion.duracion} min
+          </Badge>
+
+
+        </div>
+
+
+      </div>
+
+
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+
+
+        <div>
+
+          <p className="text-sm text-muted">
+            Carga
+          </p>
+
+
+          <p className="font-semibold mt-1">
+            {sesion.carga}
+          </p>
+
+
+        </div>
+
+
+
+        <div>
+
+          <p className="text-sm text-muted">
+            Observaciones
+          </p>
+
+
+          <p className="mt-1">
+            {sesion.observaciones || "-"}
+          </p>
+
+
+        </div>
+
+
+      </div>
+
+
+    </Card>
+
   );
 }

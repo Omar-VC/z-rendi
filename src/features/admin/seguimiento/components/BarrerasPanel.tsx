@@ -3,39 +3,39 @@ import { useState } from "react";
 import { useBarreras } from "../hooks/useBarreras";
 
 import NuevaBarreraModal from "./NuevaBarreraModal";
-
 import EvaluarBarreraModal from "./EvaluarBarreraModal";
+import NuevoObjetivoModal from "./NuevoObjetivoModal";
+import HistorialBarrera from "./HistorialBarrera";
 
 import type { Barrera } from "../types/barrera";
 
-import NuevoObjetivoModal from "./NuevoObjetivoModal";
-
 import { eliminarBarrera } from "../services/barrerasService";
 
-import HistorialBarrera from "./HistorialBarrera";
+import {
+  Card,
+  Button,
+  Badge,
+  SectionTitle,
+} from "../../../../shared/ui";
+
 
 type Props = {
   clienteId: string;
 };
 
-export default function BarrerasPanel({ clienteId }: Props) {
-  const { barreras, loading, recargar } = useBarreras(clienteId);
 
-  async function borrarBarrera(id: string) {
-    const confirmar = window.confirm("¿Eliminar esta barrera?");
+export default function BarrerasPanel({
+  clienteId,
+}: Props) {
 
-    if (!confirmar) return;
 
-    try {
-      await eliminarBarrera(id);
+  const {
+    barreras,
+    loading,
+    recargar,
+  } = useBarreras(clienteId);
 
-      recargar();
-    } catch (error) {
-      console.error(error);
 
-      alert("No se pudo eliminar la barrera.");
-    }
-  }
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
@@ -45,103 +45,293 @@ export default function BarrerasPanel({ clienteId }: Props) {
   const [barreraNuevoObjetivo, setBarreraNuevoObjetivo] =
     useState<Barrera | null>(null);
 
-  return (
-    <div className="bg-grisSemiOscuro rounded-lg shadow p-4">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="font-semibold">Barreras de progreso</h3>
 
-        <button
+
+  async function borrarBarrera(id: string) {
+
+    const confirmar =
+      window.confirm("¿Eliminar esta barrera?");
+
+
+    if (!confirmar) return;
+
+
+    try {
+
+      await eliminarBarrera(id);
+
+      recargar();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("No se pudo eliminar la barrera.");
+
+    }
+
+  }
+
+
+
+  function estadoVariant(
+    estado: Barrera["estado"]
+  ) {
+
+    if (estado === "superada") {
+      return "success" as const;
+    }
+
+    if (estado === "pendiente") {
+      return "warning" as const;
+    }
+
+    return "danger" as const;
+
+  }
+
+
+
+  return (
+
+    <Card>
+
+
+      <div className="flex flex-col md:flex-row md:justify-between gap-4">
+
+
+        <SectionTitle
+          title="Barreras de progreso"
+          description="Pruebas y objetivos de evolución del atleta."
+        />
+
+
+        <Button
+          variant="accent"
           onClick={() => setMostrarModal(true)}
-          className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
         >
-          + Nueva prueba
-        </button>
+          Nueva prueba
+        </Button>
+
+
       </div>
 
-      {loading && <p className="text-sm text-gray-500">Cargando...</p>}
 
-      {!loading && barreras.length === 0 && (
-        <p className="text-sm text-gray-500">No hay pruebas registradas.</p>
+
+      {loading && (
+
+        <p className="text-muted">
+          Cargando...
+        </p>
+
       )}
 
-      <div className="space-y-2">
+
+
+
+      {!loading && barreras.length === 0 && (
+
+        <p className="text-muted">
+          No hay pruebas registradas.
+        </p>
+
+      )}
+
+
+
+
+
+      <div className="space-y-4 mt-6">
+
+
         {barreras.map((barrera) => (
-          <div key={barrera.id} className="border rounded p-3">
-            <div className="font-medium">{barrera.nombre}</div>
-            
-            {barrera.categoria && (
-              <div className="text-sm text-gray-500">{barrera.categoria}</div>
-            )}
 
-            <div className="text-sm">Objetivo: {barrera.objetivo}</div>
 
-            <div className="text-sm">Estado: {barrera.estado}</div>
-            
-            <HistorialBarrera historial={barrera.historial} />
+          <div
+            key={barrera.id}
+            className="
+              rounded-xl
+              border
+              border-border
+              bg-surface
+              p-5
+            "
+          >
 
-            <div className="mt-3 flex justify-between">
+
+            <div className="flex flex-col md:flex-row md:justify-between gap-4">
+
+
+              <div>
+
+
+                <h3 className="font-semibold text-lg">
+                  {barrera.nombre}
+                </h3>
+
+
+                {barrera.categoria && (
+
+                  <p className="text-sm text-muted mt-1">
+                    {barrera.categoria}
+                  </p>
+
+                )}
+
+
+
+                <p className="mt-3">
+                  Objetivo:
+                  <span className="ml-2 font-semibold">
+                    {barrera.objetivo}
+                  </span>
+                </p>
+
+
+              </div>
+
+
+
+
+              <Badge
+                variant={estadoVariant(barrera.estado)}
+              >
+                {barrera.estado}
+              </Badge>
+
+
+            </div>
+
+
+
+
+            <div className="mt-5">
+
+              <HistorialBarrera
+                historial={barrera.historial}
+              />
+
+            </div>
+
+
+
+
+            <div className="flex flex-wrap gap-2 mt-5">
+
+
               {barrera.estado === "pendiente" ? (
-                <button
-                  onClick={() => setBarreraSeleccionada(barrera)}
-                  className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+
+                <Button
+                  variant="success"
+                  onClick={() =>
+                    setBarreraSeleccionada(barrera)
+                  }
                 >
                   Evaluar
-                </button>
+                </Button>
+
               ) : (
-                <button
-                  onClick={() => setBarreraNuevoObjetivo(barrera)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+
+                <Button
+                  variant="accent"
+                  onClick={() =>
+                    setBarreraNuevoObjetivo(barrera)
+                  }
                 >
                   Nuevo objetivo
-                </button>
+                </Button>
+
               )}
 
-              <button
-                onClick={() => borrarBarrera(barrera.id)}
-                className="px-3 py-1 border border-red-500 text-red-600 rounded text-sm hover:bg-red-50"
+
+
+              <Button
+                variant="danger"
+                onClick={() =>
+                  borrarBarrera(barrera.id)
+                }
               >
                 Eliminar
-              </button>
+              </Button>
+
+
             </div>
+
+
           </div>
+
+
         ))}
+
+
       </div>
 
+
+
+
+
       {mostrarModal && (
+
         <NuevaBarreraModal
           clienteId={clienteId}
           onClose={() => setMostrarModal(false)}
           onGuardado={() => {
+
             recargar();
 
             setMostrarModal(false);
+
           }}
         />
+
       )}
 
+
+
+
+
       {barreraSeleccionada && (
+
         <EvaluarBarreraModal
           barrera={barreraSeleccionada}
-          onClose={() => setBarreraSeleccionada(null)}
+          onClose={() =>
+            setBarreraSeleccionada(null)
+          }
           onGuardado={() => {
+
             recargar();
 
             setBarreraSeleccionada(null);
+
           }}
         />
+
       )}
 
+
+
+
+
       {barreraNuevoObjetivo && (
+
         <NuevoObjetivoModal
           barrera={barreraNuevoObjetivo}
-          onClose={() => setBarreraNuevoObjetivo(null)}
+          onClose={() =>
+            setBarreraNuevoObjetivo(null)
+          }
           onGuardado={() => {
+
             recargar();
 
             setBarreraNuevoObjetivo(null);
+
           }}
         />
+
       )}
-    </div>
+
+
+    </Card>
+
   );
 }

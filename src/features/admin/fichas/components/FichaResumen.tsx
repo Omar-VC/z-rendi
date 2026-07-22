@@ -1,4 +1,9 @@
 import type { FichaCliente } from "../types";
+import {
+  Card,
+  Button,
+  SectionTitle,
+} from "../../../../shared/ui";
 
 interface FichaResumenProps {
   ficha: FichaCliente | null;
@@ -37,124 +42,131 @@ function FichaResumen({
   }
 
 
-  return (
-    <section className="p-6 rounded-xl border border-white/10">
+ return (
+  <Card>
 
-      <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
 
-        <h2 className="text-xl font-bold">
-          Ficha
-        </h2>
+      <SectionTitle
+        title="Ficha"
+        description="Información general del atleta."
+      />
 
+      <Button
+        variant="secondary"
+        onClick={onEditar}
+      >
+        Editar
+      </Button>
 
-        <button
-          onClick={onEditar}
-          className="px-4 py-2 rounded-lg"
-        >
-          Editar
-        </button>
+    </div>
+
+    <div className="grid gap-5 md:grid-cols-2 mt-6">
+
+      {/* Datos personales */}
+
+      <div className="rounded-xl border border-border bg-surface p-5">
+
+        <h3 className="font-semibold mb-4">
+          Datos personales
+        </h3>
+
+        <div className="space-y-2 text-sm">
+
+          <p><strong>Nombre:</strong> {ficha.nombre ?? "-"} {ficha.apellido ?? ""}</p>
+
+          <p><strong>Edad:</strong> {ficha.edad ?? "-"} años</p>
+
+          <p><strong>Teléfono:</strong> {ficha.telefono || "-"}</p>
+
+        </div>
 
       </div>
 
+      {/* Datos físicos */}
 
-      <div className="space-y-6">
+      <div className="rounded-xl border border-border bg-surface p-5">
 
+        <h3 className="font-semibold mb-4">
+          Datos físicos
+        </h3>
 
-        <div>
-          <h3 className="font-semibold mb-2">
-            Datos personales
-          </h3>
+        <div className="space-y-2 text-sm">
 
-          <p>
-            Nombre: {ficha.nombre ?? "-"} {ficha.apellido ?? ""}
-          </p>
+          <p><strong>Peso:</strong> {ficha.peso ?? "-"} kg</p>
 
-          <p>
-            Edad: {ficha.edad ?? "-"} años
-          </p>
+          <p><strong>Altura:</strong> {ficha.altura ?? "-"} cm</p>
 
-          <p>
-            Teléfono: {ficha.telefono || "-"}
-          </p>
         </div>
-
-
-
-        <div>
-          <h3 className="font-semibold mb-2">
-            Datos físicos
-          </h3>
-
-          <p>
-            Peso: {ficha.peso ?? "-"} kg
-          </p>
-
-          <p>
-            Altura: {ficha.altura ?? "-"} cm
-          </p>
-        </div>
-
-
-
-        <div>
-          <h3 className="font-semibold mb-2">
-            Datos deportivos
-          </h3>
-
-          <p>
-            Deporte: {ficha.deporte ?? "-"}
-          </p>
-
-          <p>
-            Puesto: {ficha.puesto ?? "-"}
-          </p>
-
-          <p>
-            Nivel: {ficha.nivel ?? "-"}
-          </p>
-        </div>
-
-
-
-        <div>
-          <h3 className="font-semibold mb-2">
-            Salud
-          </h3>
-
-          <p>
-            Lesiones: {ficha.lesiones ?? "-"}
-          </p>
-        </div>
-
-
-
-        <div>
-          <h3 className="font-semibold mb-2">
-            Objetivos
-          </h3>
-
-          <p>
-            {ficha.objetivoPrincipal ?? "-"}
-          </p>
-        </div>
-
-
-
-        <div>
-          <h3 className="font-semibold mb-2">
-            Observaciones
-          </h3>
-
-          <p>
-            {ficha.observaciones ?? "-"}
-          </p>
-        </div>
-
 
       </div>
 
-    </section>
-  );
+      {/* Datos deportivos */}
+
+      <div className="rounded-xl border border-border bg-surface p-5">
+
+        <h3 className="font-semibold mb-4">
+          Datos deportivos
+        </h3>
+
+        <div className="space-y-2 text-sm">
+
+          <p><strong>Deporte:</strong> {ficha.deporte ?? "-"}</p>
+
+          <p><strong>Puesto:</strong> {ficha.puesto ?? "-"}</p>
+
+          <p><strong>Nivel:</strong> {ficha.nivel ?? "-"}</p>
+
+        </div>
+
+      </div>
+
+      {/* Salud */}
+
+      <div className="rounded-xl border border-border bg-surface p-5">
+
+        <h3 className="font-semibold mb-4">
+          Salud
+        </h3>
+
+        <p className="text-sm">
+          {ficha.lesiones ?? "-"}
+        </p>
+
+      </div>
+
+      {/* Objetivos */}
+
+      <div className="rounded-xl border border-border bg-surface p-5">
+
+        <h3 className="font-semibold mb-4">
+          Objetivos
+        </h3>
+
+        <p className="text-sm">
+          {ficha.objetivoPrincipal ?? "-"}
+        </p>
+
+      </div>
+
+      {/* Observaciones */}
+
+      <div className="rounded-xl border border-border bg-surface p-5">
+
+        <h3 className="font-semibold mb-4">
+          Observaciones
+        </h3>
+
+        <p className="text-sm">
+          {ficha.observaciones ?? "-"}
+        </p>
+
+      </div>
+
+    </div>
+
+  </Card>
+);
 }
 
 

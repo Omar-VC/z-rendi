@@ -1,6 +1,6 @@
-import React from "react";
+import type { SelectHTMLAttributes } from "react";
 
-type Props = React.SelectHTMLAttributes<HTMLSelectElement>;
+type Props = SelectHTMLAttributes<HTMLSelectElement>;
 
 export default function Select({
   className = "",
@@ -11,18 +11,18 @@ export default function Select({
     <select
       className={`
         w-full
-        h-11
-        px-4
         rounded-xl
         border
-        border-gray-200
-        bg-white
+        border-border
+        bg-surface
+        px-4
+        py-3
         text-primary
-        focus:outline-none
+        outline-none
+        transition
         focus:border-accent
         focus:ring-2
-        focus:ring-orange-200
-        transition
+        focus:ring-accent/20
         ${className}
       `}
       {...props}

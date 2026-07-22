@@ -2,89 +2,152 @@ import { useState } from "react";
 
 import type { SesionEntrenamiento } from "../types/seguimiento";
 
+import {
+  Card,
+  Button,
+  Badge,
+} from "../../../../shared/ui";
+
+
 type Props = {
   sesiones: SesionEntrenamiento[];
   onNuevaSesion: () => void;
 };
+
 
 export default function RegistroSesiones({
   sesiones,
   onNuevaSesion,
 }: Props) {
 
+
   const [abierto, setAbierto] = useState(false);
 
-  return (
-    <div className="bg-grisSemiOscuro rounded-lg shadow p-4">
 
-      <div className="flex justify-between items-center">
+
+  return (
+
+    <Card>
+
+
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+
 
         <button
           onClick={() => setAbierto(!abierto)}
-          className="font-semibold text-lg"
+          className="
+            text-left
+            font-semibold
+            text-lg
+          "
         >
+
           {abierto ? "▼" : "▶"} Registro de sesiones ({sesiones.length})
+
         </button>
 
 
-        <button
+
+        <Button
+          variant="accent"
           onClick={onNuevaSesion}
-          className="px-4 py-2 rounded bg-blue-600 text-white"
         >
-          + Nueva sesión
-        </button>
+          Nueva sesión
+        </Button>
+
 
       </div>
 
 
+
+
       {abierto && (
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-6 space-y-3">
+
 
           {sesiones.length === 0 ? (
 
-            <p className="text-gray-500">
+            <p className="text-muted">
               Sin sesiones registradas.
             </p>
 
           ) : (
 
+
             sesiones.map((sesion) => (
+
 
               <div
                 key={sesion.id}
-                className="border rounded p-2 flex justify-between items-center"
+                className="
+                  rounded-xl
+                  border
+                  border-border
+                  bg-surface
+                  p-4
+                  flex
+                  flex-col
+                  md:flex-row
+                  md:justify-between
+                  gap-4
+                "
               >
 
+
                 <div>
-                  <span className="font-medium">
+
+
+                  <p className="font-semibold">
                     {sesion.libroNombre}
-                  </span>
+                  </p>
 
-                  <span className="text-sm text-gray-500 ml-2">
+
+                  <p className="text-sm text-muted mt-1">
                     {sesion.fecha.toLocaleDateString()}
-                  </span>
+                  </p>
+
+
                 </div>
 
 
-                <div className="text-sm">
-                  {sesion.duracion}' 
-                  {" • "}
-                  RPE {sesion.rpe}
-                  {" • "}
-                  Carga {sesion.carga}
+
+
+                <div className="flex flex-wrap gap-2">
+
+
+                  <Badge variant="neutral">
+                    {sesion.duracion} min
+                  </Badge>
+
+
+                  <Badge variant="info">
+                    RPE {sesion.rpe}
+                  </Badge>
+
+
+                  <Badge variant="warning">
+                    Carga {sesion.carga}
+                  </Badge>
+
+
                 </div>
+
 
               </div>
+
 
             ))
 
           )}
 
+
         </div>
 
       )}
 
-    </div>
+
+    </Card>
+
   );
 }

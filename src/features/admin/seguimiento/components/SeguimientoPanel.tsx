@@ -7,44 +7,115 @@ import UltimaSesionCard from "./UltimaSesionCard";
 import RegistroSesiones from "./RegistroSesiones";
 import BarrerasPanel from "./BarrerasPanel";
 
+import {
+  Button,
+  SectionTitle,
+} from "../../../../shared/ui";
+
+
 type Props = {
   clienteId: string;
 };
 
-export default function SeguimientoPanel({ clienteId }: Props) {
+
+export default function SeguimientoPanel({
+  clienteId,
+}: Props) {
+
+
   const [mostrarModal, setMostrarModal] = useState(false);
 
-  const { sesiones, loading, recargar } = useSeguimiento(clienteId);
+
+  const {
+    sesiones,
+    loading,
+    recargar,
+  } = useSeguimiento(clienteId);
+
+
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Seguimiento deportivo</h3>
+
+    <div className="space-y-8">
+
+
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+
+
+        <SectionTitle
+          title="Seguimiento deportivo"
+          description="Control de evolución, sesiones y objetivos del atleta."
+        />
+
+
+
+        <Button
+          variant="accent"
+          onClick={() => setMostrarModal(true)}
+        >
+          Nueva sesión
+        </Button>
+
+
+      </div>
+
+
 
       {loading ? (
-        <p>Cargando sesiones...</p>
+
+        <p className="text-muted">
+          Cargando sesiones...
+        </p>
+
       ) : (
-        <>
-          <UltimaSesionCard sesion={sesiones[0]} />
+
+        <div className="space-y-8">
+
+
+          <UltimaSesionCard
+            sesion={sesiones[0]}
+          />
+
+
 
           <RegistroSesiones
             sesiones={sesiones}
             onNuevaSesion={() => setMostrarModal(true)}
           />
 
-          <BarrerasPanel clienteId={clienteId} />
-        </>
+
+
+          <BarrerasPanel
+            clienteId={clienteId}
+          />
+
+
+        </div>
+
       )}
 
+
+
+
       {mostrarModal && (
+
         <NuevaSesionModal
           clienteId={clienteId}
           onClose={() => setMostrarModal(false)}
+
           onGuardado={() => {
+
             recargar();
+
             setMostrarModal(false);
+
           }}
         />
+
       )}
+
+
     </div>
+
   );
 }

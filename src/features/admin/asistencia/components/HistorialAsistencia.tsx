@@ -1,8 +1,12 @@
+import { Badge } from "../../../../shared/ui";
+
+
 interface RegistroAsistencia {
   id: string;
   fecha: string;
   estado: "presente" | "falta";
 }
+
 
 interface HistorialAsistenciaProps {
   asistencias: RegistroAsistencia[];
@@ -13,6 +17,7 @@ function HistorialAsistencia({
   asistencias,
 }: HistorialAsistenciaProps) {
 
+
   const asistenciasOrdenadas = [...asistencias].sort(
     (a, b) =>
       new Date(b.fecha).getTime() -
@@ -20,25 +25,30 @@ function HistorialAsistencia({
   );
 
 
-  return (
-    <div className="mt-6">
 
-      <h3 className="font-semibold mb-3">
+  return (
+    <div className="mt-8">
+
+
+      <h3 className="font-semibold mb-4">
         Historial
       </h3>
 
 
+
       {asistenciasOrdenadas.length === 0 ? (
 
-        <p className="opacity-70">
+        <p className="text-muted">
           Sin registros este mes.
         </p>
 
       ) : (
 
-        <div className="space-y-2">
+        <div className="space-y-3">
+
 
           {asistenciasOrdenadas.map((registro) => {
+
 
             const fechaFormateada =
               new Date(
@@ -49,30 +59,53 @@ function HistorialAsistencia({
 
 
             return (
+
               <div
                 key={registro.id}
-                className="flex justify-between p-3 rounded-lg border border-white/10"
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  rounded-xl
+                  border
+                  border-border
+                  bg-surface
+                  px-4
+                  py-3
+                "
               >
 
-                <span>
+                <span className="text-sm">
                   {fechaFormateada}
                 </span>
 
 
-                <span>
-                  {registro.estado === "presente"
-                    ? "Presente"
-                    : "Falta"}
-                </span>
+                <Badge
+                  variant={
+                    registro.estado === "presente"
+                      ? "success"
+                      : "danger"
+                  }
+                >
+                  {
+                    registro.estado === "presente"
+                      ? "Presente"
+                      : "Falta"
+                  }
+                </Badge>
+
 
               </div>
+
             );
 
           })}
 
+
         </div>
 
       )}
+
 
     </div>
   );
