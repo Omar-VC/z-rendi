@@ -4,24 +4,42 @@ import type { SesionEntrenamiento } from "../types/seguimiento";
 
 import {
   Card,
-  Button,
   Badge,
+  Button,
 } from "../../../../shared/ui";
 
 
 type Props = {
   sesiones: SesionEntrenamiento[];
-  onNuevaSesion: () => void;
+  onEliminarSesion: (id: string) => Promise<void>;
 };
 
 
 export default function RegistroSesiones({
   sesiones,
-  onNuevaSesion,
+  onEliminarSesion,
 }: Props) {
 
 
   const [abierto, setAbierto] = useState(false);
+
+
+
+  async function eliminar(
+    id: string,
+  ) {
+
+    const confirmar = window.confirm(
+      "¿Eliminar esta sesión?"
+    );
+
+
+    if (!confirmar) return;
+
+
+    await onEliminarSesion(id);
+
+  }
 
 
 
@@ -30,33 +48,18 @@ export default function RegistroSesiones({
     <Card>
 
 
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      <button
+        onClick={() => setAbierto(!abierto)}
+        className="
+          text-left
+          font-semibold
+          text-lg
+        "
+      >
 
+        {abierto ? "▼" : "▶"} Registro de sesiones ({sesiones.length})
 
-        <button
-          onClick={() => setAbierto(!abierto)}
-          className="
-            text-left
-            font-semibold
-            text-lg
-          "
-        >
-
-          {abierto ? "▼" : "▶"} Registro de sesiones ({sesiones.length})
-
-        </button>
-
-
-
-        <Button
-          variant="accent"
-          onClick={onNuevaSesion}
-        >
-          Nueva sesión
-        </Button>
-
-
-      </div>
+      </button>
 
 
 
@@ -69,7 +72,7 @@ export default function RegistroSesiones({
           {sesiones.length === 0 ? (
 
             <p className="text-muted">
-              Sin sesiones registradas.
+              Todavía no hay sesiones registradas este mes.
             </p>
 
           ) : (
@@ -97,7 +100,6 @@ export default function RegistroSesiones({
 
                 <div>
 
-
                   <p className="font-semibold">
                     {sesion.libroNombre}
                   </p>
@@ -113,7 +115,7 @@ export default function RegistroSesiones({
 
 
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2">
 
 
                   <Badge variant="neutral">
@@ -129,6 +131,14 @@ export default function RegistroSesiones({
                   <Badge variant="warning">
                     Carga {sesion.carga}
                   </Badge>
+
+
+                  <Button
+                    variant="secondary"
+                    onClick={() => eliminar(sesion.id)}
+                  >
+                    Eliminar
+                  </Button>
 
 
                 </div>

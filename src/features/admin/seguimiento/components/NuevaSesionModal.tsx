@@ -3,8 +3,17 @@ import { useMemo, useState } from "react";
 import { useAuth } from "../../../../auth/useAuth";
 
 import { useTrainingBooks } from "../../biblioteca/hooks/useTrainingBooks";
-
 import { useSeguimiento } from "../hooks/useSeguimiento";
+
+import {
+  Modal,
+  Input,
+  Select,
+  Textarea,
+  Button,
+  Card,
+  Label,
+} from "../../../../shared/ui";
 
 type Props = {
   clienteId: string;
@@ -21,7 +30,9 @@ export default function NuevaSesionModal({
 
   if (!user) return null;
 
-  const { libros } = useTrainingBooks(user?.uid);
+  const preparadorId = user.uid;
+
+  const { libros } = useTrainingBooks(preparadorId);
 
   const { agregarSesion } = useSeguimiento(clienteId);
 
@@ -43,34 +54,48 @@ export default function NuevaSesionModal({
       return;
     }
 
+    const fechaSesion = new Date(fecha);
+
     await agregarSesion({
       clienteId,
-      preparadorId: user!.uid,
+      preparadorId,
+
+      fecha: fechaSesion,
+      mes: fechaSesion.getMonth() + 1,
+      anio: fechaSesion.getFullYear(),
+
       libroId: libro.id,
       libroNombre: libro.nombre,
-      fecha: new Date(fecha),
+
       duracion,
       rpe,
       carga,
       observaciones,
     });
-
     onGuardado();
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white text-black rounded-lg p-6 w-full max-w-md space-y-4">
-        <h2 className="text-xl font-bold">Nueva sesión</h2>
+    <Modal
+      title="Nueva sesión"
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose}>
+            Cancelar
+          </Button>
 
+          <Button variant="accent" onClick={guardarSesion}>
+            Guardar
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-5">
         <div>
-          <label className="font-medium">Libro</label>
+          <Label>Libro de entrenamiento</Label>
 
-          <select
-            value={libroId}
-            onChange={(e) => setLibroId(e.target.value)}
-            className="w-full border rounded p-2 mt-1"
-          >
+          <Select value={libroId} onChange={(e) => setLibroId(e.target.value)}>
             <option value="">Seleccionar libro</option>
 
             {libros.map((libro) => (
@@ -78,71 +103,61 @@ export default function NuevaSesionModal({
                 {libro.nombre}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
-          <label className="font-medium">Fecha</label>
+          <Label>Fecha</Label>
 
-          <input
+          <Input
             type="date"
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
-            className="w-full border rounded p-2 mt-1"
           />
         </div>
 
         <div>
-          <label className="font-medium">Duración (min)</label>
+          <Label>Duración (minutos)</Label>
 
-          <input
+          <Input
             type="number"
+            placeholder="Ej: 60"
             value={duracion}
             onChange={(e) => setDuracion(Number(e.target.value))}
-            className="w-full border rounded p-2 mt-1"
           />
         </div>
 
         <div>
-          <label className="font-medium">RPE</label>
+          <Label>RPE (1 a 10)</Label>
 
-          <input
+          <Input
             type="number"
             min={1}
             max={10}
+            placeholder="Ej: 5"
             value={rpe}
             onChange={(e) => setRpe(Number(e.target.value))}
-            className="w-full border rounded p-2 mt-1"
           />
         </div>
 
-        <div className="bg-gray-100 rounded p-3">
-          <strong>Carga:</strong> {carga}
-        </div>
+        <Card className="bg-slate-50">
+          <p className="text-sm text-slate-500">Carga de entrenamiento</p>
+
+          <p className="mt-1 text-3xl font-bold text-accent">{carga}</p>
+
+          <p className="text-xs text-slate-500">Duración × RPE</p>
+        </Card>
 
         <div>
-          <label className="font-medium">Observaciones</label>
+          <Label>Observaciones</Label>
 
-          <textarea
+          <Textarea
+            placeholder="Escriba alguna observación de la sesión..."
             value={observaciones}
             onChange={(e) => setObservaciones(e.target.value)}
-            className="w-full border rounded p-2 mt-1"
           />
         </div>
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 border rounded">
-            Cancelar
-          </button>
-
-          <button
-            onClick={guardarSesion}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Guardar
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }
