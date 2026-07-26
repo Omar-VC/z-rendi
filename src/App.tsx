@@ -10,7 +10,8 @@ import ClienteLayoutV2 from "./layouts/ClienteLayoutV2";
 import ClientesPageV2 from "./features/admin/clientes/pages/ClientesPageV2";
 import ClienteDetailV2 from "./features/admin/clientes/pages/ClienteDetailV2";
 import BibliotecaPageV2 from "./features/admin/biblioteca/pages/BibliotecaPageV2";
-
+import ClienteDashboard from "./features/usuario/dashboard/pages/ClienteDashboard";
+import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
 
 function App() {
   const { user, usuario, loading } = useAuth();
@@ -38,14 +39,10 @@ function App() {
       )}
 
       {user && usuario?.rol === "cliente" && (
-        <Route
-          path="/cliente"
-          element={
-            <ClienteLayoutV2
-              clienteNombre={`${usuario.nombre} ${usuario.apellido}`}
-            />
-          }
-        />
+        <Route path="/cliente" element={<ClienteLayoutV2 />}>
+          <Route index element={<ClienteDashboard />} />
+          <Route path="ficha" element={<MiFichaPage />} />
+        </Route>
       )}
 
       <Route

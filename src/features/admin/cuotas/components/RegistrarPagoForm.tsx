@@ -1,79 +1,149 @@
 import { useState } from "react";
 
 import { registrarPago } from "../services/cuotas.service";
-
 import type { Cuota } from "../types";
+
+import {
+  Card,
+  Label,
+  Select,
+  Button,
+} from "../../../../shared/ui";
 
 interface RegistrarPagoFormProps {
   cuota: Cuota;
-
   onGuardado: () => void;
-
   onCancelar: () => void;
 }
 
-function RegistrarPagoForm({
+export default function RegistrarPagoForm({
   cuota,
   onGuardado,
   onCancelar,
 }: RegistrarPagoFormProps) {
-  const [metodoPago, setMetodoPago] = useState<"efectivo" | "transferencia">(
-    "efectivo",
-  );
+
+  const [metodoPago, setMetodoPago] = useState<
+    "efectivo" | "transferencia"
+  >("efectivo");
 
   const [guardando, setGuardando] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent,
+  ) => {
+
     e.preventDefault();
 
     setGuardando(true);
 
     try {
-      await registrarPago(cuota, metodoPago);
+
+      await registrarPago(
+        cuota,
+        metodoPago,
+      );
 
       onGuardado();
+
     } finally {
+
       setGuardando(false);
+
     }
+
   };
 
   return (
-    <section className="p-6 rounded-xl border border-white/10">
-      <h2 className="text-xl font-bold mb-4">Registrar pago</h2>
 
-      <p>Cuota: {cuota.mes}</p>
+    <Card>
 
-      <p>Monto: ${cuota.monto}</p>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-5"
+      >
 
-      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-        <select
-          value={metodoPago}
-          onChange={(e) =>
-            setMetodoPago(e.target.value as "efectivo" | "transferencia")
-          }
-          className="p-3 rounded-lg bg-white/10"
-        >
-          <option value="efectivo">Efectivo</option>
+        <div>
 
-          <option value="transferencia">Transferencia</option>
-        </select>
+          <h2 className="text-xl font-semibold">
+            Registrar pago
+          </h2>
 
-        <div className="flex gap-3">
-          <button disabled={guardando} className="px-4 py-2 rounded-lg">
-            Confirmar pago
-          </button>
+          <p className="text-sm text-muted mt-1">
+            {cuota.mes} {cuota.anio}
+          </p>
 
-          <button
+        </div>
+
+
+        <div className="rounded-xl border border-border bg-surface p-4">
+
+          <p className="text-sm text-muted">
+            Monto a registrar
+          </p>
+
+          <p className="mt-1 text-3xl font-bold text-accent">
+            ${cuota.monto}
+          </p>
+
+        </div>
+
+
+        <div>
+
+          <Label>
+            Método de pago
+          </Label>
+
+          <Select
+            value={metodoPago}
+            onChange={(e) =>
+              setMetodoPago(
+                e.target.value as
+                  | "efectivo"
+                  | "transferencia",
+              )
+            }
+          >
+
+            <option value="efectivo">
+              Efectivo
+            </option>
+
+            <option value="transferencia">
+              Transferencia
+            </option>
+
+          </Select>
+
+        </div>
+
+
+        <div className="flex justify-end gap-3 pt-2">
+
+          <Button
+            variant="secondary"
             type="button"
             onClick={onCancelar}
-            className="px-4 py-2 rounded-lg"
           >
             Cancelar
-          </button>
-        </div>
-      </form>
-    </section>
-  );
-}
+          </Button>
 
-export default RegistrarPagoForm;
+          <Button
+            variant="accent"
+            type="submit"
+            disabled={guardando}
+          >
+            {guardando
+              ? "Registrando..."
+              : "Confirmar pago"}
+          </Button>
+
+        </div>
+
+      </form>
+
+    </Card>
+
+  );
+
+}

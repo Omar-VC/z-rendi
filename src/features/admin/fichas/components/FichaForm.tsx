@@ -2,6 +2,12 @@ import { useState } from "react";
 
 import type { FichaCliente } from "../types";
 import { guardarFichaCliente } from "../services/ficha.service";
+import {
+  Card,
+  Input,
+  Textarea,
+  Button,
+} from "../../../../shared/ui";
 
 interface FichaFormProps {
   clienteId: string;
@@ -80,170 +86,215 @@ function FichaForm({
   };
 
   return (
-    <section className="p-6 rounded-xl border border-white/10">
-      <h2 className="text-xl font-bold mb-6">
-        {ficha ? "Editar ficha" : "Crear ficha"}
-      </h2>
+  <Card>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <h3 className="font-semibold mb-3">Datos personales</h3>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-8"
+    >
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <input
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              placeholder="Nombre"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
+      <div>
 
-            <input
-              name="apellido"
-              value={form.apellido}
-              onChange={handleChange}
-              placeholder="Apellido"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
+        <h2 className="text-2xl font-bold">
+          {ficha ? "Editar ficha" : "Crear ficha"}
+        </h2>
 
-            <input
-              name="edad"
-              type="number"
-              value={form.edad}
-              onChange={handleChange}
-              placeholder="Edad"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
+        <p className="text-muted mt-1">
+          Información general y deportiva del atleta.
+        </p>
 
-            <input
-              name="telefono"
-              value={form.telefono}
-              onChange={handleChange}
-              placeholder="Teléfono"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
-          </div>
-        </div>
+      </div>
 
-        <div>
-          <h3 className="font-semibold mb-3">Datos físicos</h3>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <input
-              name="peso"
-              type="number"
-              value={form.peso}
-              onChange={handleChange}
-              placeholder="Peso (kg)"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
+      <div>
 
-            <input
-              name="altura"
-              type="number"
-              value={form.altura}
-              onChange={handleChange}
-              placeholder="Altura (cm)"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
-          </div>
-        </div>
+        <h3 className="text-lg font-semibold mb-4">
+          Datos personales
+        </h3>
 
-        <div>
-          <h3 className="font-semibold mb-3">Datos deportivos</h3>
+        <div className="grid gap-4 md:grid-cols-2">
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <input
-              name="deporte"
-              value={form.deporte}
-              onChange={handleChange}
-              placeholder="Deporte"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
-
-            <input
-              name="puesto"
-              value={form.puesto}
-              onChange={handleChange}
-              placeholder="Puesto"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
-
-            <input
-              name="nivel"
-              value={form.nivel}
-              onChange={handleChange}
-              placeholder="Nivel"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
-
-            <input
-              name="experiencia"
-              value={form.experiencia}
-              onChange={handleChange}
-              placeholder="Experiencia"
-              className="p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
-            />
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold mb-3">Objetivos</h3>
-
-          <textarea
-            name="objetivoPrincipal"
-            value={form.objetivoPrincipal}
+          <Input
+            name="nombre"
+            value={form.nombre}
             onChange={handleChange}
-            placeholder="Objetivo principal"
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
+            placeholder="Nombre"
           />
-        </div>
 
-        <div>
-          <h3 className="font-semibold mb-3">Salud</h3>
-
-          <textarea
-            name="lesiones"
-            value={form.lesiones}
+          <Input
+            name="apellido"
+            value={form.apellido}
             onChange={handleChange}
-            placeholder="Lesiones"
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
+            placeholder="Apellido"
           />
-        </div>
 
-        <div>
-          <h3 className="font-semibold mb-3">Observaciones</h3>
-
-          <textarea
-            name="observaciones"
-            value={form.observaciones}
+          <Input
+            name="edad"
+            type="number"
+            value={form.edad}
             onChange={handleChange}
-            placeholder="Observaciones"
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50"
+            placeholder="Edad"
           />
+
+          <Input
+            name="telefono"
+            value={form.telefono}
+            onChange={handleChange}
+            placeholder="Teléfono"
+          />
+
         </div>
 
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={guardando}
-            className="px-4 py-2 rounded-lg"
-          >
-            {guardando ? "Guardando..." : "Guardar"}
-          </button>
+      </div>
 
-          <button
-            type="button"
-            onClick={onCancelar}
-            disabled={guardando}
-            className="px-4 py-2 rounded-lg"
-          >
-            Cancelar
-          </button>
+
+      <div>
+
+        <h3 className="text-lg font-semibold mb-4">
+          Datos físicos
+        </h3>
+
+        <div className="grid gap-4 md:grid-cols-2">
+
+          <Input
+            name="peso"
+            type="number"
+            value={form.peso}
+            onChange={handleChange}
+            placeholder="Peso (kg)"
+          />
+
+          <Input
+            name="altura"
+            type="number"
+            value={form.altura}
+            onChange={handleChange}
+            placeholder="Altura (cm)"
+          />
+
         </div>
-      </form>
-    </section>
-  );
+
+      </div>
+
+
+      <div>
+
+        <h3 className="text-lg font-semibold mb-4">
+          Datos deportivos
+        </h3>
+
+        <div className="grid gap-4 md:grid-cols-2">
+
+          <Input
+            name="deporte"
+            value={form.deporte}
+            onChange={handleChange}
+            placeholder="Deporte"
+          />
+
+          <Input
+            name="puesto"
+            value={form.puesto}
+            onChange={handleChange}
+            placeholder="Puesto"
+          />
+
+          <Input
+            name="nivel"
+            value={form.nivel}
+            onChange={handleChange}
+            placeholder="Nivel"
+          />
+
+          <Input
+            name="experiencia"
+            value={form.experiencia}
+            onChange={handleChange}
+            placeholder="Experiencia"
+          />
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <h3 className="text-lg font-semibold mb-4">
+          Objetivos
+        </h3>
+
+        <Textarea
+          name="objetivoPrincipal"
+          value={form.objetivoPrincipal}
+          onChange={handleChange}
+          placeholder="Objetivo principal"
+        />
+
+      </div>
+
+
+      <div>
+
+        <h3 className="text-lg font-semibold mb-4">
+          Salud
+        </h3>
+
+        <Textarea
+          name="lesiones"
+          value={form.lesiones}
+          onChange={handleChange}
+          placeholder="Lesiones o antecedentes importantes"
+        />
+
+      </div>
+
+
+      <div>
+
+        <h3 className="text-lg font-semibold mb-4">
+          Observaciones
+        </h3>
+
+        <Textarea
+          name="observaciones"
+          value={form.observaciones}
+          onChange={handleChange}
+          placeholder="Observaciones generales"
+        />
+
+      </div>
+
+
+      <div className="flex justify-end gap-3 pt-2">
+
+        <Button
+          variant="secondary"
+          type="button"
+          onClick={onCancelar}
+          disabled={guardando}
+        >
+          Cancelar
+        </Button>
+
+
+        <Button
+          variant="accent"
+          type="submit"
+          disabled={guardando}
+        >
+          {guardando
+            ? "Guardando..."
+            : "Guardar"}
+        </Button>
+
+      </div>
+
+
+    </form>
+
+  </Card>
+);
 }
 
 export default FichaForm;

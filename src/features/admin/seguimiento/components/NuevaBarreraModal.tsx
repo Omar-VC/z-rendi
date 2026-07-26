@@ -8,6 +8,15 @@ import { usePhysicalTests } from "../../biblioteca/hooks/usePhysicalTests";
 
 import type { PhysicalTest } from "../../biblioteca/types/physicalTest";
 
+import {
+  Modal,
+  Select,
+  Input,
+  Button,
+  Label,
+  Card,
+} from "../../../../shared/ui";
+
 type Props = {
   clienteId: string;
   onClose: () => void;
@@ -19,6 +28,7 @@ export default function NuevaBarreraModal({
   onClose,
   onGuardado,
 }: Props) {
+
   const { user } = useAuth();
 
   const [pruebaId, setPruebaId] = useState("");
@@ -37,13 +47,19 @@ export default function NuevaBarreraModal({
   });
 
   async function guardarBarrera() {
+
     if (!pruebaSeleccionada || !objetivo) {
-      alert("Selecciona una prueba y completa el objetivo");
+
+      alert(
+        "Selecciona una prueba y completa el objetivo."
+      );
 
       return;
+
     }
 
     await crearBarrera({
+
       clienteId,
 
       preparadorId,
@@ -54,7 +70,8 @@ export default function NuevaBarreraModal({
 
       categoria: pruebaSeleccionada.categoria,
 
-      subcategoria: pruebaSeleccionada.subcategoria,
+      subcategoria:
+        pruebaSeleccionada.subcategoria,
 
       unidad: pruebaSeleccionada.unidad,
 
@@ -63,47 +80,70 @@ export default function NuevaBarreraModal({
       estado: "pendiente",
 
       resultado: "",
+
     });
 
     onGuardado();
+
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white text-black rounded-lg p-6 w-full max-w-md space-y-4">
 
-        <h2 className="text-xl font-bold">
-          Nueva barrera
-        </h2>
+    <Modal
+      title="Nueva barrera"
+      onClose={onClose}
+      footer={
+        <>
+          <Button
+            variant="secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
 
+          <Button
+            variant="accent"
+            onClick={guardarBarrera}
+          >
+            Guardar
+          </Button>
+        </>
+      }
+    >
+
+      <div className="space-y-5">
 
         <div>
-          <label className="font-medium">
-            Prueba física
-          </label>
 
-          <select
+          <Label>
+            Prueba física
+          </Label>
+
+          <Select
             value={pruebaId}
             onChange={(e) => {
 
-              const prueba = pruebas.find(
-                (p) => p.id === e.target.value
+              const prueba =
+                pruebas.find(
+                  (p) =>
+                    p.id ===
+                    e.target.value,
+                );
+
+              setPruebaId(
+                e.target.value,
               );
 
-              setPruebaId(e.target.value);
-
               setPruebaSeleccionada(
-                prueba || null
+                prueba ?? null,
               );
 
             }}
-            className="w-full border rounded p-2 mt-1"
           >
 
             <option value="">
               Seleccionar prueba
             </option>
-
 
             {pruebas.map((prueba) => (
 
@@ -116,65 +156,64 @@ export default function NuevaBarreraModal({
 
             ))}
 
-          </select>
+          </Select>
+
         </div>
 
 
         {pruebaSeleccionada && (
 
-          <div className="text-sm text-gray-600">
+          <Card className="bg-slate-50">
 
-            <p>
-              Categoría: {pruebaSeleccionada.categoria}
+            <p className="text-sm text-slate-500">
+              Categoría
+            </p>
+
+            <p className="font-semibold">
+              {pruebaSeleccionada.categoria}
             </p>
 
             {pruebaSeleccionada.unidad && (
 
-              <p>
-                Unidad: {pruebaSeleccionada.unidad}
-              </p>
+              <>
+                <p className="mt-3 text-sm text-slate-500">
+                  Unidad
+                </p>
+
+                <p className="font-semibold">
+                  {pruebaSeleccionada.unidad}
+                </p>
+              </>
 
             )}
 
-          </div>
+          </Card>
 
         )}
 
 
         <div>
-          <label className="font-medium">
+
+          <Label>
             Objetivo
-          </label>
+          </Label>
 
-          <input
+          <Input
             value={objetivo}
-            onChange={(e) => setObjetivo(e.target.value)}
+            onChange={(e) =>
+              setObjetivo(
+                e.target.value,
+              )
+            }
             placeholder="Ej: 100 kg"
-            className="w-full border rounded p-2 mt-1"
           />
-        </div>
-
-
-        <div className="flex justify-end gap-2">
-
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded"
-          >
-            Cancelar
-          </button>
-
-
-          <button
-            onClick={guardarBarrera}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Guardar
-          </button>
 
         </div>
 
       </div>
-    </div>
+
+    </Modal>
+
   );
+
 }

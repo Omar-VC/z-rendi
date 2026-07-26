@@ -4,6 +4,15 @@ import { actualizarBarrera } from "../services/barrerasService";
 
 import type { Barrera } from "../types/barrera";
 
+import {
+  Modal,
+  Card,
+  Label,
+  Input,
+  Textarea,
+  Button,
+} from "../../../../shared/ui";
+
 type Props = {
   barrera: Barrera;
   onClose: () => void;
@@ -41,81 +50,88 @@ export default function EvaluarBarreraModal({
 
   return (
 
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <Modal
+      title="Evaluar prueba"
+      onClose={onClose}
+      footer={
+        <>
+          <Button
+            variant="secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
 
-      <div className="bg-white text-black rounded-lg p-6 w-full max-w-md space-y-4">
+          <Button
+            variant="accent"
+            onClick={guardar}
+          >
+            Marcar como superada
+          </Button>
+        </>
+      }
+    >
 
-        <h2 className="text-xl font-bold">
-          Evaluar prueba
-        </h2>
+      <div className="space-y-5">
 
-        <div>
+        <Card className="bg-slate-50">
+
+          <p className="text-sm text-slate-500">
+            Prueba
+          </p>
 
           <p className="font-semibold">
             {barrera.nombre}
           </p>
 
-          <p className="text-sm text-gray-500">
-            Objetivo: {barrera.objetivo}
+          <p className="mt-3 text-sm text-slate-500">
+            Objetivo
           </p>
 
-        </div>
+          <p className="font-semibold">
+            {barrera.objetivo}
+          </p>
+
+        </Card>
+
 
         <div>
 
-          <label className="font-medium">
-            Resultado
-          </label>
+          <Label>
+            Resultado obtenido
+          </Label>
 
-          <input
+          <Input
             value={resultado}
             onChange={(e) =>
               setResultado(e.target.value)
             }
-            className="w-full border rounded p-2 mt-1"
             placeholder="Ej: 110 kg"
           />
 
         </div>
 
+
         <div>
 
-          <label className="font-medium">
+          <Label>
             Observaciones
-          </label>
+          </Label>
 
-          <textarea
+          <Textarea
             value={observaciones}
             onChange={(e) =>
               setObservaciones(e.target.value)
             }
-            className="w-full border rounded p-2 mt-1"
-            rows={3}
+            placeholder="Observaciones de la evaluación..."
+            rows={4}
           />
-
-        </div>
-
-        <div className="flex justify-end gap-2">
-
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded"
-          >
-            Cancelar
-          </button>
-
-          <button
-            onClick={guardar}
-            className="px-4 py-2 bg-green-600 text-white rounded"
-          >
-            Marcar como superada
-          </button>
 
         </div>
 
       </div>
 
-    </div>
+    </Modal>
 
   );
 

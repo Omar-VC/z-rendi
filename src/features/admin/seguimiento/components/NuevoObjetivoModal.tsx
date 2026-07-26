@@ -4,6 +4,14 @@ import { guardarNuevoObjetivo } from "../services/barrerasService";
 
 import type { Barrera } from "../types/barrera";
 
+import {
+  Modal,
+  Card,
+  Label,
+  Input,
+  Button,
+} from "../../../../shared/ui";
+
 type Props = {
   barrera: Barrera;
   onClose: () => void;
@@ -21,80 +29,98 @@ export default function NuevoObjetivoModal({
   async function guardar() {
 
     if (!nuevoObjetivo.trim()) {
-      alert("Ingresa un nuevo objetivo");
+
+      alert("Ingresa un nuevo objetivo.");
+
       return;
+
     }
 
     await guardarNuevoObjetivo(
       barrera.id,
-      nuevoObjetivo.trim()
+      nuevoObjetivo.trim(),
     );
 
     onGuardado();
+
   }
 
   return (
 
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <Modal
+      title="Nuevo objetivo"
+      onClose={onClose}
+      footer={
+        <>
+          <Button
+            variant="secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
 
-      <div className="bg-white text-black rounded-lg p-6 w-full max-w-md space-y-4">
+          <Button
+            variant="accent"
+            onClick={guardar}
+          >
+            Guardar
+          </Button>
+        </>
+      }
+    >
 
-        <h2 className="text-xl font-bold">
-          Nuevo objetivo
-        </h2>
+      <div className="space-y-5">
 
-        <div>
+        <Card className="bg-slate-50">
+
+          <p className="text-sm text-slate-500">
+            Prueba
+          </p>
 
           <p className="font-semibold">
             {barrera.nombre}
           </p>
 
-          <p className="text-sm text-gray-500">
-            Objetivo anterior: {barrera.objetivo}
+          <p className="mt-3 text-sm text-slate-500">
+            Objetivo anterior
           </p>
 
-          <p className="text-sm text-gray-500">
-            Resultado: {barrera.resultado || "-"}
+          <p className="font-semibold">
+            {barrera.objetivo}
           </p>
 
-        </div>
+          <p className="mt-3 text-sm text-slate-500">
+            Resultado obtenido
+          </p>
+
+          <p className="font-semibold">
+            {barrera.resultado || "-"}
+          </p>
+
+        </Card>
+
 
         <div>
 
-          <label className="font-medium">
+          <Label>
             Nuevo objetivo
-          </label>
+          </Label>
 
-          <input
+          <Input
             value={nuevoObjetivo}
-            onChange={(e) => setNuevoObjetivo(e.target.value)}
-            className="w-full border rounded p-2 mt-1"
+            onChange={(e) =>
+              setNuevoObjetivo(
+                e.target.value,
+              )
+            }
             placeholder="Ej: 120 kg"
           />
 
         </div>
 
-        <div className="flex justify-end gap-2">
-
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded"
-          >
-            Cancelar
-          </button>
-
-          <button
-            onClick={guardar}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Guardar
-          </button>
-
-        </div>
-
       </div>
 
-    </div>
+    </Modal>
 
   );
 
