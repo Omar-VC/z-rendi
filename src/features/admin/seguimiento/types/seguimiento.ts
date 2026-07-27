@@ -13,6 +13,8 @@ export interface SesionEntrenamiento {
   libroId: string;
   libroNombre: string;
 
+  ejercicios?: string[];
+
   duracion: number;
   rpe: number;
   carga: number;

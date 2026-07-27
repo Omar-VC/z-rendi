@@ -1,11 +1,37 @@
 import Card from "../../../../shared/ui/Card";
 import Badge from "../../../../shared/ui/Badge";
 
+import { useAuth } from "../../../../auth/useAuth";
+import { useBarreras } from "../../../admin/seguimiento/hooks/useBarreras";
+
 
 export default function ObjetivosCard() {
 
+  const { user } = useAuth();
+
+
+  const {
+    barreras,
+    loading,
+  } = useBarreras(user?.uid ?? "");
+
+
+
+  if (loading) {
+    return null;
+  }
+
+
+
+  const objetivosActivos = barreras.filter(
+    (barrera) => barrera.estado === "pendiente"
+  );
+
+
+
   return (
     <Card>
+
 
       <div className="flex justify-between items-center mb-5">
 
@@ -13,44 +39,55 @@ export default function ObjetivosCard() {
           Mis objetivos
         </h3>
 
+
         <Badge variant="info">
-          En progreso
+
+          {objetivosActivos.length > 0
+            ? `${objetivosActivos.length} activos`
+            : "Sin objetivos"}
+
         </Badge>
 
       </div>
 
 
-      <div className="space-y-5">
+
+      {objetivosActivos.length === 0 ? (
+
+        <p className="text-sm text-slate-500">
+          Todavía no tienes objetivos asignados.
+        </p>
+
+      ) : (
 
 
-        <div>
+        <div className="space-y-5">
 
-          <p className="font-semibold text-primary">
-            Press banca
-          </p>
 
-          <p className="text-sm text-slate-500 mt-1">
-            Meta: 100 kg
-          </p>
+          {objetivosActivos
+            .slice(0, 3)
+            .map((objetivo) => (
+
+              <div key={objetivo.id}>
+
+                <p className="font-semibold text-primary">
+                  {objetivo.nombre}
+                </p>
+
+
+                <p className="text-sm text-slate-500 mt-1">
+                  Meta: {objetivo.objetivo}
+                </p>
+
+
+              </div>
+
+          ))}
+
 
         </div>
 
-
-
-        <div>
-
-          <p className="font-semibold text-primary">
-            Velocidad 20 metros
-          </p>
-
-          <p className="text-sm text-slate-500 mt-1">
-            Meta: 3.10 segundos
-          </p>
-
-        </div>
-
-
-      </div>
+      )}
 
 
     </Card>

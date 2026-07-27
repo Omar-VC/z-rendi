@@ -1,7 +1,28 @@
 import Card from "../../../../shared/ui/Card";
+import { useAuth } from "../../../../auth/useAuth";
+import { useSeguimiento } from "../../../admin/seguimiento/hooks/useSeguimiento";
 
 
 export default function UltimaSesionCard() {
+
+  const { user } = useAuth();
+
+
+  const {
+    sesiones,
+    loading,
+  } = useSeguimiento(user?.uid);
+
+
+
+  if (loading) {
+    return null;
+  }
+
+
+  const ultimaSesion = sesiones[0];
+
+
 
   return (
     <Card>
@@ -11,12 +32,43 @@ export default function UltimaSesionCard() {
       </h3>
 
 
+
       <p className="mt-3 text-primary font-semibold">
-        Fuerza tren inferior
+        {ultimaSesion?.libroNombre ?? "Sin registros"}
       </p>
 
 
-      <div className="mt-4 grid grid-cols-2 gap-4">
+
+      {ultimaSesion?.ejercicios && (
+
+        <div className="mt-4">
+
+          <p className="text-sm text-slate-500">
+            Ejercicios
+          </p>
+
+
+          <ul className="mt-2 space-y-1 text-sm text-primary">
+
+            {ultimaSesion.ejercicios
+              .slice(0, 4)
+              .map((ejercicio) => (
+
+                <li key={ejercicio}>
+                  • {ejercicio}
+                </li>
+
+            ))}
+
+          </ul>
+
+        </div>
+
+      )}
+
+
+
+      <div className="mt-5 grid grid-cols-2 gap-4">
 
 
         <div>
@@ -25,8 +77,9 @@ export default function UltimaSesionCard() {
             Duración
           </p>
 
+
           <p className="font-bold text-primary">
-            70 min
+            {ultimaSesion?.duracion ?? 0} min
           </p>
 
         </div>
@@ -39,8 +92,9 @@ export default function UltimaSesionCard() {
             Carga
           </p>
 
+
           <p className="font-bold text-primary">
-            420
+            {ultimaSesion?.carga ?? 0}
           </p>
 
         </div>
