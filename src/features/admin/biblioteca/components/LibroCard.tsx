@@ -6,22 +6,22 @@ import { eliminarLibro } from "../services/trainingBooksService";
 
 import EditarLibroModal from "./EditarLibroModal";
 
-import { Card, Button } from "../../../../shared/ui";
-
+import {
+  Card,
+  Button,
+  Badge,
+} from "../../../../shared/ui";
 
 type Props = {
   libro: TrainingBook;
   onActualizado: () => void;
 };
 
-
 export default function LibroCard({
   libro,
   onActualizado,
 }: Props) {
-
   const [mostrarEditar, setMostrarEditar] = useState(false);
-
 
   async function borrarLibro() {
     const confirmar = window.confirm(
@@ -35,77 +35,70 @@ export default function LibroCard({
     onActualizado();
   }
 
-
   return (
     <Card>
 
-      <div className="flex flex-col gap-4">
-
+      <div className="flex flex-col gap-5">
 
         {/* Header */}
         <div>
 
-          <h3 className="text-lg font-bold text-primary">
+          <h3 className="text-xl font-bold text-text">
             {libro.nombre}
           </h3>
 
-          <p className="text-sm text-slate-500 mt-1">
-            {libro.categoria}
-          </p>
+          <div className="mt-3">
+            <Badge variant="info">
+              {libro.categoria}
+            </Badge>
+          </div>
 
         </div>
-
-
 
         {/* Ejercicios */}
         <div>
 
-          <p className="text-sm font-semibold text-primary mb-2">
-            Ejercicios:
+          <p className="mb-3 text-sm font-semibold text-text">
+            Ejercicios
           </p>
 
-
-          <ul className="
-            text-sm
-            text-slate-600
-            list-disc
-            ml-5
-            space-y-1
-          ">
+          <ul
+            className="
+              ml-5
+              list-disc
+              space-y-2
+              text-sm
+              text-muted
+            "
+          >
             {libro.ejercicios
-              .slice(0,4)
+              .slice(0, 4)
               .map((ejercicio) => (
                 <li key={ejercicio}>
                   {ejercicio}
                 </li>
-              ))
-            }
+              ))}
           </ul>
 
-
           {libro.ejercicios.length > 4 && (
-            <p className="
-              text-sm
-              text-slate-400
-              mt-2
-            ">
-              + {libro.ejercicios.length - 4} ejercicios más...
+            <p className="mt-3 text-sm text-muted">
+              + {libro.ejercicios.length - 4} ejercicios más
             </p>
           )}
 
         </div>
 
-
-
         {/* Acciones */}
-        <div className="
-          flex
-          justify-end
-          gap-2
-          pt-3
-          border-t
-          border-gray-100
-        ">
+        <div
+          className="
+            flex
+            justify-end
+            gap-3
+            pt-4
+            border-t
+            border-border
+          "
+        >
 
           <Button
             variant="secondary"
@@ -114,7 +107,6 @@ export default function LibroCard({
             Editar
           </Button>
 
-
           <Button
             variant="danger"
             onClick={borrarLibro}
@@ -122,13 +114,9 @@ export default function LibroCard({
             Eliminar
           </Button>
 
-
         </div>
 
-
       </div>
-
-
 
       {mostrarEditar && (
         <EditarLibroModal

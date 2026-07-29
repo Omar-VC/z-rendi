@@ -10,33 +10,56 @@ export default function Input({
   ...props
 }: Props) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
+
       {label && (
-        <label className="block text-sm font-medium text-primary">
+        <label
+          className="
+            block
+            text-sm
+            font-medium
+            text-text
+          "
+        >
           {label}
         </label>
       )}
 
+
       <input
         className={`
           w-full
+
           h-11
+
           px-4
-          rounded-xl
+
+          rounded-button
+
           border
-          border-gray-200
-          bg-white
-          text-primary
-          placeholder:text-slate-400
-          focus:outline-none
-          focus:border-accent
-          focus:ring-2
-          focus:ring-orange-200
+          border-border
+
+          bg-surface
+
+          text-text
+
+          placeholder:text-muted
+
           transition
+
+          focus:outline-none
+
+          focus:border-accent
+
+          focus:ring-2
+
+          focus:ring-primary/20
+
           ${className}
         `}
         {...props}
       />
+
     </div>
   );
 }

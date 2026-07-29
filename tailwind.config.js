@@ -1,42 +1,235 @@
-// tailwind.config.js
-
 export default {
+
+
   content: [
+
     "./index.html",
+
     "./src/**/*.{js,ts,jsx,tsx}",
+
   ],
 
+
+
   theme: {
+
     extend: {
+
+
       colors: {
-        background: "#EAEFEF",
 
-        surface: "#FFFFFF",
 
-        primary: "#25343F",
+        /* =====================
+           BRAND
+        ====================== */
 
-        secondary: "#BFC9D1",
+        brandOrange:
+          "var(--brand-orange)",
 
-        accent: "#FF9B51",
 
-        success: "#22C55E",
+        brandBlue:
+          "var(--brand-blue)",
 
-        warning: "#FACC15",
 
-        danger: "#EF4444",
+        brandDark:
+          "var(--brand-dark)",
+
+
+
+        /* =====================
+           APP
+        ====================== */
+
+        background:
+          "var(--background)",
+
+
+        surface:
+          "var(--surface)",
+
+
+        surfaceHover:
+          "var(--surface-hover)",
+
+
+        surfaceSoft:
+          "var(--surface-soft)",
+
+
+
+        /* =====================
+           TEXT
+        ====================== */
+
+        text:
+          "var(--text)",
+
+
+        muted:
+          "var(--text-muted)",
+
+
+
+        /* =====================
+           ACTIONS
+        ====================== */
+
+        primary:
+          "var(--primary)",
+
+
+        secondary:
+          "var(--secondary)",
+
+
+        accent:
+          "var(--accent)",
+
+
+
+        buttonSecondaryBg:
+          "var(--button-secondary-bg)",
+
+
+        buttonSecondaryText:
+          "var(--button-secondary-text)",
+
+
+        buttonSecondaryBorder:
+          "var(--button-secondary-border)",
+
+
+
+        /* =====================
+           STATUS
+        ====================== */
+
+        success:
+          "var(--success)",
+
+
+        warning:
+          "var(--warning)",
+
+
+        danger:
+          "var(--danger)",
+
+
+        info:
+          "var(--info)",
+
+
+
+        successBg:
+          "var(--success-bg)",
+
+
+        warningBg:
+          "var(--warning-bg)",
+
+
+        dangerBg:
+          "var(--danger-bg)",
+
+
+        infoBg:
+          "var(--info-bg)",
+
+
+        neutralBg:
+          "var(--neutral-bg)",
+
+
+
+        successText:
+          "var(--success-text)",
+
+
+        warningText:
+          "var(--warning-text)",
+
+
+        dangerText:
+          "var(--danger-text)",
+
+
+        infoText:
+          "var(--info-text)",
+
+
+        neutralText:
+          "var(--neutral-text)",
+
+
+
+        successBorder:
+          "var(--success-border)",
+
+
+        warningBorder:
+          "var(--warning-border)",
+
+
+        dangerBorder:
+          "var(--danger-border)",
+
+
+        infoBorder:
+          "var(--info-border)",
+
+
+        neutralBorder:
+          "var(--neutral-border)",
+
+
+
+        border:
+          "var(--border)",
+
       },
+
+
 
       borderRadius: {
-        xl: "14px",
-        "2xl": "18px",
+
+
+        card:
+          "var(--radius-card)",
+
+
+        button:
+          "var(--radius-button)",
+
+
+        pill:
+          "var(--radius-pill)",
+
+
       },
+
+
 
       boxShadow: {
-        card: "0 4px 14px rgba(37,52,63,.08)",
-        cardHover: "0 8px 24px rgba(37,52,63,.12)",
+
+
+        card:
+          "var(--shadow-card)",
+
+
+        cardHover:
+          "var(--shadow-card-hover)",
+
+
       },
+
+
     },
+
   },
 
+
   plugins: [],
+
+
 };

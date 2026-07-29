@@ -10,15 +10,27 @@ export default function SectionTitle({
 }: Props) {
 
   return (
-    <div className="mb-6">
+    <div className="mb-5">
 
-      <h1 className="text-2xl font-bold text-primary">
+      <h1
+        className="
+          text-2xl
+          font-bold
+          text-text
+        "
+      >
         {title}
       </h1>
 
 
       {description && (
-        <p className="text-sm text-slate-500 mt-1">
+        <p
+          className="
+            text-sm
+            text-muted
+            mt-1
+          "
+        >
           {description}
         </p>
       )}

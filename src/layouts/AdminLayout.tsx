@@ -1,34 +1,198 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
+
 import { auth } from "../firebase/firebase";
-import SidebarV2 from "../shared/components/SidebarV2";
+import AdminSidebar from "../features/admin/components/AdminSidebar";
+
 
 const AdminLayout = () => {
-  return (
-    <div className="flex min-h-screen bg-background text-primary flex-col md:flex-row">
 
-      <aside className="w-full md:w-64 md:fixed md:h-screen shadow-lg">
-        <SidebarV2 onLogout={() => auth.signOut()} />
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+
+  return (
+
+    <div
+      className="
+        min-h-screen
+        bg-background
+        text-text
+      "
+    >
+
+
+
+      {/* Botón hamburguesa móvil */}
+
+      <button
+
+        onClick={() => setSidebarOpen(true)}
+
+        className="
+          fixed
+
+          top-4
+          left-4
+
+          z-30
+
+          md:hidden
+
+          w-11
+          h-11
+
+          rounded-xl
+
+          bg-primary
+          text-white
+
+          flex
+          items-center
+          justify-center
+
+          text-xl
+
+          shadow-card
+        "
+
+      >
+        ☰
+      </button>
+
+
+
+
+
+
+      {/* Overlay móvil */}
+
+      {sidebarOpen && (
+
+        <div
+
+          onClick={() => setSidebarOpen(false)}
+
+          className="
+            fixed
+            inset-0
+
+            bg-black/40
+
+            z-40
+
+            md:hidden
+          "
+
+        />
+
+      )}
+
+
+
+
+
+
+
+      {/* Sidebar */}
+
+      <aside
+
+        className={`
+
+          fixed
+
+          top-0
+          left-0
+
+          z-50
+
+          h-screen
+
+          w-64
+
+
+          transition-transform
+          duration-300
+          ease-in-out
+
+
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+          }
+
+
+          md:translate-x-0
+
+        `}
+
+      >
+
+        <AdminSidebar
+
+          onLogout={() => auth.signOut()}
+
+          onNavigate={() => setSidebarOpen(false)}
+
+        />
+
       </aside>
 
+
+
+
+
+
+
+
+      {/* Contenido */}
+
       <main
+
         className="
-          flex-1
-          min-w-0
-          md:ml-64
+          min-h-screen
+
           p-6
           lg:p-8
-          pt-[72px]
+
+          pt-20
           md:pt-8
+
+          md:ml-64
+
           overflow-x-hidden
         "
+
       >
-        <div className="mx-auto w-full max-w-7xl space-y-6">
+
+        <div
+
+          className="
+            mx-auto
+
+            w-full
+
+            max-w-7xl
+
+            space-y-6
+          "
+
+        >
+
           <Outlet />
+
         </div>
+
+
       </main>
 
+
+
     </div>
+
   );
 };
+
 
 export default AdminLayout;

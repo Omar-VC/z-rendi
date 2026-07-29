@@ -3,18 +3,23 @@ type Props = {
   className?: string;
 };
 
-export default function Card({ children, className = "" }: Props) {
+export default function Card({
+  children,
+  className = "",
+}: Props) {
   return (
     <div
       className={`
         bg-surface
-        rounded-xl
         border
-        border-gray-200
+        border-border
+        rounded-card
         p-5
         shadow-card
         transition
+        duration-200
         hover:shadow-cardHover
+        hover:-translate-y-1
         ${className}
       `}
     >

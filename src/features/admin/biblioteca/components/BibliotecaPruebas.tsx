@@ -7,17 +7,20 @@ import { usePhysicalTests } from "../hooks/usePhysicalTests";
 import PruebaCard from "./PruebaCard";
 import NuevaPruebaModal from "./NuevaPruebaModal";
 
-import { Button, Card, SectionTitle } from "../../../../shared/ui";
-
+import {
+  Button,
+  SectionTitle,
+  Loading,
+  EmptyState,
+} from "../../../../shared/ui";
 
 export default function BibliotecaPruebas() {
+
   const { user } = useAuth();
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
-
   if (!user) return null;
-
 
   const {
     pruebas,
@@ -27,74 +30,59 @@ export default function BibliotecaPruebas() {
     preparadorId: user.uid,
   });
 
-
   return (
-    <div className="space-y-6">
 
+    <div className="space-y-6 animate-fadeIn">
 
-      <div className="
-        flex
-        justify-between
-        items-end
-        gap-4
-      ">
+      <div
+        className="
+          flex
+          flex-col
+          gap-4
+          md:flex-row
+          md:items-end
+          md:justify-between
+        "
+      >
 
         <SectionTitle
           title="Pruebas físicas"
-          description="Gestiona los indicadores utilizados para evaluar atletas."
+          description="Gestiona las pruebas utilizadas para evaluar el rendimiento de tus atletas."
         />
-
 
         <Button
           variant="accent"
           onClick={() => setMostrarModal(true)}
         >
-          Nueva prueba
+          + Nueva prueba
         </Button>
-
 
       </div>
 
-
-
       {loading && (
-        <p className="text-slate-500">
-          Cargando pruebas...
-        </p>
+        <Loading text="Cargando pruebas..." />
       )}
-
-
 
       {!loading && pruebas.length === 0 && (
 
-        <Card>
-
-          <div className="text-center py-6">
-
-            <p className="text-slate-500">
-              No hay pruebas registradas.
-            </p>
-
-            <p className="
-              mt-2
-              text-sm
-              text-primary
-              font-semibold
-            ">
-              Agrega pruebas para comenzar el seguimiento físico.
-            </p>
-
-          </div>
-
-        </Card>
+        <EmptyState
+          title="Todavía no hay pruebas registradas"
+          description="Creá tu primera prueba física para comenzar el seguimiento del rendimiento."
+          action={
+            <Button
+              variant="accent"
+              onClick={() => setMostrarModal(true)}
+            >
+              Crear primera prueba
+            </Button>
+          }
+        />
 
       )}
 
-
-
       {!loading && pruebas.length > 0 && (
 
-        <div className="space-y-3">
+        <div className="grid gap-5">
 
           {pruebas.map((prueba) => (
 
@@ -110,8 +98,6 @@ export default function BibliotecaPruebas() {
 
       )}
 
-
-
       {mostrarModal && (
 
         <NuevaPruebaModal
@@ -124,7 +110,7 @@ export default function BibliotecaPruebas() {
 
       )}
 
-
     </div>
+
   );
 }

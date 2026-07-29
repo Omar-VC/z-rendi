@@ -10,8 +10,8 @@ import {
   Select,
   Textarea,
   Button,
+  Badge,
 } from "../../../../shared/ui";
-
 
 type Props = {
   libro: TrainingBook;
@@ -19,36 +19,29 @@ type Props = {
   onGuardado: () => void;
 };
 
-
 export default function EditarLibroModal({
   libro,
   onClose,
   onGuardado,
 }: Props) {
 
-
   const [nombre, setNombre] =
     useState(libro.nombre);
-
 
   const [categoria, setCategoria] =
     useState<TrainingBook["categoria"]>(
       libro.categoria
     );
 
-
   const [ejercicios, setEjercicios] =
     useState(
       libro.ejercicios.join("\n")
     );
 
-
   const [observaciones, setObservaciones] =
     useState(
       libro.observaciones || ""
     );
-
-
 
   async function guardar() {
 
@@ -67,12 +60,9 @@ export default function EditarLibroModal({
 
     });
 
-
     onGuardado();
 
   }
-
-
 
   return (
 
@@ -81,103 +71,71 @@ export default function EditarLibroModal({
       onClose={onClose}
     >
 
+      <div className="space-y-6">
 
-      <div className="space-y-4">
+        <Input
+          label="Nombre"
+          value={nombre}
+          onChange={(e) =>
+            setNombre(e.target.value)
+          }
+        />
 
+        <Select
+          label="Categoría"
+          value={categoria}
+          onChange={(e) =>
+            setCategoria(
+              e.target.value as TrainingBook["categoria"]
+            )
+          }
+        >
 
+          <option value="Fuerza">
+            Fuerza
+          </option>
 
-        <div>
+          <option value="Potencia">
+            Potencia
+          </option>
 
-          <label className="
-            text-sm
-            font-medium
-            text-slate-600
-            mb-1
-            block
-          ">
-            Nombre
-          </label>
+          <option value="Velocidad">
+            Velocidad
+          </option>
 
+          <option value="Resistencia">
+            Resistencia
+          </option>
 
-          <Input
-            value={nombre}
-            onChange={(e) =>
-              setNombre(e.target.value)
-            }
-          />
+          <option value="Prevención">
+            Prevención
+          </option>
 
-        </div>
+        </Select>
 
+        <div className="space-y-3">
 
+          <div className="flex items-center justify-between">
 
+            <label className="text-sm font-medium text-text">
+              Ejercicios
+            </label>
 
+            <Badge variant="info">
+              {
+                ejercicios
+                  .split("\n")
+                  .filter((e) => e.trim())
+                  .length
+              } ejercicios
+            </Badge>
 
-        <div>
-
-          <label className="
-            text-sm
-            font-medium
-            text-slate-600
-            mb-1
-            block
-          ">
-            Categoría
-          </label>
-
-
-          <Select
-            value={categoria}
-            onChange={(e) =>
-              setCategoria(
-                e.target.value as TrainingBook["categoria"]
-              )
-            }
-          >
-
-            <option value="Fuerza">
-              Fuerza
-            </option>
-
-            <option value="Potencia">
-              Potencia
-            </option>
-
-            <option value="Velocidad">
-              Velocidad
-            </option>
-
-            <option value="Resistencia">
-              Resistencia
-            </option>
-
-            <option value="Prevención">
-              Prevención
-            </option>
-
-          </Select>
-
-        </div>
-
-
-
-
-
-        <div>
-
-          <label className="
-            text-sm
-            font-medium
-            text-slate-600
-            mb-1
-            block
-          ">
-            Ejercicios (uno por línea)
-          </label>
-
+          </div>
 
           <Textarea
+            rows={8}
+            placeholder="Un ejercicio por línea"
             value={ejercicios}
-            rows={5}
             onChange={(e) =>
               setEjercicios(e.target.value)
             }
@@ -185,43 +143,16 @@ export default function EditarLibroModal({
 
         </div>
 
+        <Textarea
+          label="Observaciones"
+          placeholder="Notas adicionales..."
+          value={observaciones}
+          onChange={(e) =>
+            setObservaciones(e.target.value)
+          }
+        />
 
-
-
-
-        <div>
-
-          <label className="
-            text-sm
-            font-medium
-            text-slate-600
-            mb-1
-            block
-          ">
-            Observaciones
-          </label>
-
-
-          <Textarea
-            value={observaciones}
-            onChange={(e) =>
-              setObservaciones(e.target.value)
-            }
-          />
-
-        </div>
-
-
-
-
-
-        <div className="
-          flex
-          justify-end
-          gap-3
-          pt-3
-        ">
-
+        <div className="flex justify-end gap-3">
 
           <Button
             variant="secondary"
@@ -230,21 +161,16 @@ export default function EditarLibroModal({
             Cancelar
           </Button>
 
-
           <Button
             variant="accent"
             onClick={guardar}
           >
-            Guardar
+            Guardar cambios
           </Button>
-
 
         </div>
 
-
-
       </div>
-
 
     </Modal>
 

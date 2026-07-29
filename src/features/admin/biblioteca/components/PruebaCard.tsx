@@ -8,25 +8,16 @@ import EditarPruebaModal from "./EditarPruebaModal";
 
 import { Card, Button } from "../../../../shared/ui";
 
-
 type Props = {
   prueba: PhysicalTest;
   onActualizado: () => void;
 };
 
-
-export default function PruebaCard({
-  prueba,
-  onActualizado,
-}: Props) {
-
+export default function PruebaCard({ prueba, onActualizado }: Props) {
   const [mostrarEditar, setMostrarEditar] = useState(false);
 
-
   async function borrarPrueba() {
-    const confirmar = window.confirm(
-      "¿Eliminar esta prueba física?"
-    );
+    const confirmar = window.confirm("¿Eliminar esta prueba física?");
 
     if (!confirmar) return;
 
@@ -35,73 +26,56 @@ export default function PruebaCard({
     onActualizado();
   }
 
-
   return (
     <Card>
-
-      <div className="
+      <div
+        className="
         flex
         items-center
         justify-between
         gap-4
-      ">
-
-
+      "
+      >
         {/* Información */}
         <div>
-
-          <h3 className="
+          <h3
+            className="
             font-bold
             text-primary
-          ">
+          "
+          >
             {prueba.nombre}
           </h3>
 
-
-          <p className="
-            text-sm
-            text-slate-500
-            mt-1
-          ">
+          <p
+            className="
+    mt-1
+    text-sm
+    text-muted
+  "
+          >
             {prueba.categoria}
 
-            {prueba.subcategoria !== "General" &&
-              ` • ${prueba.subcategoria}`
-            }
+            {prueba.subcategoria !== "General" && ` • ${prueba.subcategoria}`}
           </p>
-
         </div>
 
-
-
         {/* Acciones */}
-        <div className="
+        <div
+          className="
           flex
           gap-2
-        ">
-
-          <Button
-            variant="secondary"
-            onClick={() => setMostrarEditar(true)}
-          >
+        "
+        >
+          <Button variant="secondary" onClick={() => setMostrarEditar(true)}>
             Editar
           </Button>
 
-
-          <Button
-            variant="danger"
-            onClick={borrarPrueba}
-          >
+          <Button variant="danger" onClick={borrarPrueba}>
             Eliminar
           </Button>
-
-
         </div>
-
-
       </div>
-
-
 
       {mostrarEditar && (
         <EditarPruebaModal
@@ -113,8 +87,6 @@ export default function PruebaCard({
           }}
         />
       )}
-
-
     </Card>
   );
 }

@@ -1,5 +1,11 @@
 import type { Cliente } from "../types";
 
+import {
+  Card,
+  Button,
+  Badge,
+} from "../../../../shared/ui";
+
 interface ClienteRequestCardProps {
   cliente: Cliente;
   onAceptar: (id: string) => void;
@@ -12,33 +18,49 @@ function ClienteRequestCard({
   onRechazar,
 }: ClienteRequestCardProps) {
   return (
-    <div className="p-5 rounded-xl border border-white/10">
-      <div>
-        <h3 className="text-lg font-semibold">
-          {cliente.nombre} {cliente.apellido}
-        </h3>
+    <Card>
 
-        <p className="text-sm opacity-70">
-          {cliente.email}
-        </p>
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+
+        <div>
+
+          <h3 className="text-xl font-bold text-text">
+            {cliente.nombre} {cliente.apellido}
+          </h3>
+
+          <p className="mt-2 text-muted">
+            {cliente.email}
+          </p>
+
+        </div>
+
+        <Badge variant="warning">
+          Pendiente
+        </Badge>
+
       </div>
 
-      <div className="flex gap-3 mt-4">
-        <button
-          onClick={() => onAceptar(cliente.id)}
-          className="px-4 py-2 rounded-lg"
-        >
-          Aceptar
-        </button>
+      {/* Acciones */}
+      <div className="mt-6 flex gap-3">
 
-        <button
+        <Button
+          variant="success"
+          onClick={() => onAceptar(cliente.id)}
+        >
+          Aprobar
+        </Button>
+
+        <Button
+          variant="danger"
           onClick={() => onRechazar(cliente.id)}
-          className="px-4 py-2 rounded-lg"
         >
           Rechazar
-        </button>
+        </Button>
+
       </div>
-    </div>
+
+    </Card>
   );
 }
 

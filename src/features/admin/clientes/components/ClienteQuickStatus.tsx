@@ -11,26 +11,24 @@ function ClienteQuickStatus({
   asistencia = "Sin información",
   seguimiento = "Sin información",
 }: ClienteQuickStatusProps) {
-
   return (
-
     <div className="mt-6 grid gap-4 md:grid-cols-3">
 
-      <Card className="text-center">
+      <Card>
 
-        <p className="text-xs uppercase tracking-wider text-slate-500">
+        <p className="text-xs uppercase tracking-[0.15em] text-muted">
           Cuota
         </p>
 
-        <p className="mt-3 text-2xl font-bold text-primary">
+        <p className="mt-3 text-2xl font-bold text-text">
           {cuota}
         </p>
 
       </Card>
 
-      <Card className="text-center">
+      <Card>
 
-        <p className="text-xs uppercase tracking-wider text-slate-500">
+        <p className="text-xs uppercase tracking-[0.15em] text-muted">
           Asistencia
         </p>
 
@@ -40,20 +38,19 @@ function ClienteQuickStatus({
 
       </Card>
 
-      <Card className="text-center">
+      <Card>
 
-        <p className="text-xs uppercase tracking-wider text-slate-500">
+        <p className="text-xs uppercase tracking-[0.15em] text-muted">
           Seguimiento
         </p>
 
-        <p className="mt-3 text-lg font-semibold text-slate-600">
+        <p className="mt-3 text-lg font-semibold text-text">
           {seguimiento}
         </p>
 
       </Card>
 
     </div>
-
   );
 }
 

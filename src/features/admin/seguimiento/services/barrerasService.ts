@@ -69,17 +69,48 @@ export async function crearBarrera(
 
 
 export async function actualizarBarrera(
-  id:string,
-  cambios:Partial<Barrera>
-){
+  id: string,
+  cambios: Partial<Barrera>
+) {
 
-  await updateDoc(
-    doc(db,COLLECTION,id),
-    {
-      ...cambios,
-      updatedAt:serverTimestamp()
-    }
-  );
+  const ref = doc(db, COLLECTION, id);
+
+  const snapshot = await getDoc(ref);
+
+  if (!snapshot.exists()) {
+    throw new Error("La barrera no existe");
+  }
+
+  const barrera = snapshot.data();
+
+  const historialActual = barrera.historial || [];
+
+  let historial = historialActual;
+
+  if (cambios.resultado) {
+
+    historial = [
+      ...historialActual,
+      {
+        fecha: new Date().toISOString(),
+
+        objetivo: barrera.objetivo,
+
+        resultado: cambios.resultado,
+
+        observaciones: cambios.observaciones ?? "",
+      },
+    ];
+
+  }
+
+  await updateDoc(ref, {
+    ...cambios,
+
+    historial,
+
+    updatedAt: serverTimestamp(),
+  });
 
 }
 
@@ -104,7 +135,7 @@ export async function guardarNuevoObjetivo(
 
   const nuevoRegistro = {
 
-    fecha: new Date(),
+    fecha: new Date().toISOString(),
 
     objetivo: barrera.objetivo,
 

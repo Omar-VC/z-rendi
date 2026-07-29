@@ -27,20 +27,32 @@ export default function Button({
 
 
   const variants = {
+
     primary:
       "bg-primary text-white hover:opacity-90",
+
 
     accent:
       "bg-accent text-white hover:opacity-90",
 
+
     secondary:
-      "bg-secondary text-primary",
+      `
+      bg-buttonSecondaryBg
+      text-buttonSecondaryText
+      border
+      border-buttonSecondaryBorder
+      hover:bg-surfaceHover
+      `,
+
 
     success:
-      "bg-success text-white",
+      "bg-success text-white hover:opacity-90",
+
 
     danger:
-      "bg-danger text-white",
+      "bg-danger text-white hover:opacity-90",
+
   };
 
 
@@ -54,15 +66,28 @@ export default function Button({
         items-center
         justify-center
         gap-2
+
         px-4
         py-2
+
         min-h-[44px]
-        rounded-xl
+
+        rounded-button
+
         font-semibold
-        transition
+
+        transition-all
+        duration-200
+
         hover:-translate-y-[1px]
+
         active:scale-95
+
+        disabled:opacity-50
+        disabled:pointer-events-none
+
         ${variants[variant]}
+
         ${className}
       `}
     >

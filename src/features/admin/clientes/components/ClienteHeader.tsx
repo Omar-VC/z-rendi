@@ -1,50 +1,55 @@
 import type { Cliente } from "../types";
 
-import { Card } from "../../../../shared/ui";
+import {
+  Card,
+  Badge,
+} from "../../../../shared/ui";
 
 interface ClienteHeaderProps {
   cliente: Cliente;
 }
 
-function ClienteHeader({ cliente }: ClienteHeaderProps) {
+function ClienteHeader({
+  cliente,
+}: ClienteHeaderProps) {
   return (
     <Card>
 
-      <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
 
+        {/* Información */}
         <div>
 
-          <h1 className="text-4xl font-bold text-primary">
+          <h1 className="text-4xl font-bold text-text">
             {cliente.nombre} {cliente.apellido}
           </h1>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-muted">
             {cliente.email}
           </p>
 
         </div>
 
+        {/* Estado */}
+        <div className="flex flex-col items-start gap-3 md:items-end">
 
-
-        <div className="flex flex-col items-start md:items-end gap-3">
-
-          <span
-            className="
-              inline-flex
-              px-4
-              py-1.5
-              rounded-full
-              text-sm
-              font-semibold
-              bg-green-100
-              text-green-700
-            "
+          <Badge
+            variant={
+              cliente.estado === "aprobado"
+                ? "success"
+                : "warning"
+            }
           >
             {cliente.estado.toUpperCase()}
-          </span>
+          </Badge>
 
-          <p className="text-sm text-slate-500">
-            Rol: <span className="font-medium text-primary">{cliente.rol}</span>
+          <p className="text-sm text-muted">
+
+            Rol{" "}
+            <span className="font-semibold text-text">
+              {cliente.rol}
+            </span>
+
           </p>
 
         </div>

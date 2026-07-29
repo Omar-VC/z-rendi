@@ -5,8 +5,12 @@ import { useAuth } from "../../../../auth/useAuth";
 import BibliotecaLibros from "../components/BibliotecaLibros";
 import BibliotecaPruebas from "../components/BibliotecaPruebas";
 
-export default function BibliotecaPageV2() {
+import {
+  Button,
+  SectionTitle,
+} from "../../../../shared/ui";
 
+export default function BibliotecaPageV2() {
   const { user, usuario } = useAuth();
 
   const [tab, setTab] = useState<"libros" | "pruebas">("libros");
@@ -16,31 +20,28 @@ export default function BibliotecaPageV2() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 animate-fadeIn">
 
-      <div className="flex gap-2">
+      <SectionTitle
+        title="Biblioteca"
+        description="Gestioná libros de entrenamiento y pruebas físicas."
+      />
 
-        <button
+      <div className="flex flex-wrap gap-3">
+
+        <Button
+          variant={tab === "libros" ? "accent" : "secondary"}
           onClick={() => setTab("libros")}
-          className={`px-4 py-2 rounded ${
-            tab === "libros"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200"
-          }`}
         >
           📚 Libros
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant={tab === "pruebas" ? "accent" : "secondary"}
           onClick={() => setTab("pruebas")}
-          className={`px-4 py-2 rounded ${
-            tab === "pruebas"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200"
-          }`}
         >
           🧪 Pruebas
-        </button>
+        </Button>
 
       </div>
 

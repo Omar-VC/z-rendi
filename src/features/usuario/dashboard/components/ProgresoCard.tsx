@@ -1,55 +1,208 @@
 import Card from "../../../../shared/ui/Card";
+import Badge from "../../../../shared/ui/Badge";
+
+import { useAuth } from "../../../../auth/useAuth";
+import { useBarreras } from "../../../admin/seguimiento/hooks/useBarreras";
 
 
 export default function ProgresoCard() {
 
+  const { user } = useAuth();
+
+
+  const {
+    barreras,
+    loading,
+  } = useBarreras(user?.uid ?? "");
+
+
+
+  if (loading) {
+    return null;
+  }
+
+
+
+  const conHistorial = barreras.filter(
+    (barrera) =>
+      barrera.historial &&
+      barrera.historial.length > 0
+  );
+
+
+
   return (
     <Card>
 
-      <p className="text-sm text-slate-500">
-        Última mejora
-      </p>
+
+      <div
+        className="
+          flex
+          justify-between
+          items-center
+          mb-5
+        "
+      >
+
+        <h3
+          className="
+            text-xl
+            font-bold
+            text-text
+          "
+        >
+          📈 Mi progreso
+        </h3>
 
 
-      <h3 className="text-xl font-bold text-primary mt-2">
-        Sentadilla
-      </h3>
+        <Badge variant="info">
+          {conHistorial.length} pruebas
+        </Badge>
 
-
-      <div className="mt-5 flex items-center gap-4">
-
-        <div>
-          <p className="text-sm text-slate-500">
-            Anterior
-          </p>
-
-          <p className="text-lg font-bold text-primary">
-            120 kg
-          </p>
-        </div>
-
-
-        <span className="text-2xl text-accent">
-          →
-        </span>
-
-
-        <div>
-          <p className="text-sm text-slate-500">
-            Actual
-          </p>
-
-          <p className="text-lg font-bold text-primary">
-            130 kg
-          </p>
-        </div>
 
       </div>
 
 
-      <p className="mt-5 text-sm font-semibold text-green-600">
-        +10 kg de progreso
-      </p>
+
+
+
+      {conHistorial.length === 0 ? (
+
+        <p
+          className="
+            text-sm
+            text-muted
+          "
+        >
+          Todavía no hay registros de progreso.
+        </p>
+
+
+      ) : (
+
+
+        <div className="space-y-5">
+
+
+          {conHistorial
+            .slice(0,3)
+            .map((barrera)=>{
+
+
+            const historial = barrera.historial!;
+
+
+            const primero = historial[0];
+
+            const ultimo =
+              historial[historial.length - 1];
+
+
+
+            return (
+
+              <div
+                key={barrera.id}
+                className="
+                  border-b
+                  border-border/50
+                  pb-4
+                  last:border-none
+                  last:pb-0
+                "
+              >
+
+
+                <p
+                  className="
+                    font-semibold
+                    text-text
+                  "
+                >
+                  {barrera.nombre}
+                </p>
+
+
+
+
+                {historial.length > 1 ? (
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      mt-3
+                    "
+                  >
+
+                    <span
+                      className="
+                        font-bold
+                        text-text
+                      "
+                    >
+                      {primero.resultado}
+                    </span>
+
+
+
+                    <span
+                      className="
+                        text-accent
+                        text-xl
+                        font-bold
+                      "
+                    >
+                      →
+                    </span>
+
+
+
+
+                    <span
+                      className="
+                        font-bold
+                        text-accent
+                      "
+                    >
+                      {ultimo.resultado}
+                    </span>
+
+
+                  </div>
+
+
+                ) : (
+
+
+                  <p
+                    className="
+                      mt-3
+                      font-bold
+                      text-accent
+                    "
+                  >
+                    {ultimo.resultado}
+                  </p>
+
+
+                )}
+
+
+
+              </div>
+
+            );
+
+
+          })}
+
+
+
+        </div>
+
+      )}
 
 
     </Card>

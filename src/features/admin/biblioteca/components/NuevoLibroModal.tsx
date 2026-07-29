@@ -8,8 +8,8 @@ import {
   Select,
   Textarea,
   Button,
+  Badge,
 } from "../../../../shared/ui";
-
 
 interface Props {
   abierto: boolean;
@@ -19,7 +19,6 @@ interface Props {
   ) => Promise<void>;
   preparadorId: string;
 }
-
 
 export default function NuevoLibroModal({
   abierto,
@@ -41,11 +40,7 @@ export default function NuevoLibroModal({
   const [observaciones, setObservaciones] =
     useState("");
 
-
-
   if (!abierto) return null;
-
-
 
   async function guardar() {
 
@@ -66,8 +61,6 @@ export default function NuevoLibroModal({
     setObservaciones("");
   }
 
-
-
   function agregarEjercicio() {
 
     if (!ejercicio.trim()) return;
@@ -80,8 +73,6 @@ export default function NuevoLibroModal({
     setEjercicio("");
   }
 
-
-
   return (
 
     <Modal
@@ -89,21 +80,19 @@ export default function NuevoLibroModal({
       onClose={cerrar}
     >
 
-
-      <div className="space-y-4">
-
+      <div className="space-y-6">
 
         <Input
-          placeholder="Nombre del libro"
+          label="Nombre del libro"
+          placeholder="Ej.: Fuerza Tren Inferior"
           value={nombre}
           onChange={(e) =>
             setNombre(e.target.value)
           }
         />
 
-
-
         <Select
+          label="Categoría"
           value={categoria}
           onChange={(e) =>
             setCategoria(
@@ -111,84 +100,91 @@ export default function NuevoLibroModal({
             )
           }
         >
-
           <option>Fuerza</option>
           <option>Potencia</option>
           <option>Velocidad</option>
           <option>Resistencia</option>
           <option>Prevención</option>
-
         </Select>
 
+        <div className="space-y-3">
 
+          <label className="text-sm font-medium text-text">
+            Ejercicios
+          </label>
 
+          <div className="flex gap-3">
 
-        <div className="flex gap-2">
+            <Input
+              className="flex-1"
+              placeholder="Agregar ejercicio"
+              value={ejercicio}
+              onChange={(e) =>
+                setEjercicio(e.target.value)
+              }
+            />
 
-          <Input
-            placeholder="Ejercicio"
-            value={ejercicio}
-            onChange={(e) =>
-              setEjercicio(e.target.value)
-            }
-          />
+            <Button
+              variant="accent"
+              className="px-5"
+              onClick={agregarEjercicio}
+            >
+              +
+            </Button>
 
+          </div>
 
-          <Button
-            variant="accent"
-            onClick={agregarEjercicio}
+          <Badge variant="info">
+            {ejercicios.length} ejercicios
+          </Badge>
+
+          <div
+            className="
+              rounded-card
+              border
+              border-border
+              bg-background
+              p-4
+              min-h-[90px]
+            "
           >
-            +
-          </Button>
+
+            {ejercicios.length === 0 ? (
+
+              <p className="text-sm text-muted">
+                Todavía no agregaste ejercicios.
+              </p>
+
+            ) : (
+
+              <ul className="space-y-2 text-sm text-text">
+
+                {ejercicios.map((e, index) => (
+
+                  <li key={index}>
+                    • {e}
+                  </li>
+
+                ))}
+
+              </ul>
+
+            )}
+
+          </div>
 
         </div>
-
-
-
-
-        <div className="
-          rounded-xl
-          bg-slate-50
-          p-3
-        ">
-
-          <ul className="
-            text-sm
-            text-slate-600
-            space-y-1
-          ">
-
-            {ejercicios.map((e, index) => (
-              <li key={index}>
-                • {e}
-              </li>
-            ))}
-
-          </ul>
-
-        </div>
-
-
-
-
 
         <Textarea
-          placeholder="Observaciones"
+          label="Observaciones"
+          placeholder="Notas adicionales..."
           value={observaciones}
           onChange={(e) =>
             setObservaciones(e.target.value)
           }
         />
 
-
-
-
-        <div className="
-          flex
-          justify-end
-          gap-3
-          pt-3
-        ">
+        <div className="flex justify-end gap-3">
 
           <Button
             variant="secondary"
@@ -197,20 +193,16 @@ export default function NuevoLibroModal({
             Cancelar
           </Button>
 
-
           <Button
             variant="accent"
             onClick={guardar}
           >
-            Guardar
+            Guardar libro
           </Button>
-
 
         </div>
 
-
       </div>
-
 
     </Modal>
 

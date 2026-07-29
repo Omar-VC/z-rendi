@@ -24,7 +24,7 @@ export default function ObjetivosCard() {
 
 
   const objetivosActivos = barreras.filter(
-    (barrera) => barrera.estado === "pendiente"
+    (barrera) => barrera.estado !== "superada"
   );
 
 
@@ -33,59 +33,131 @@ export default function ObjetivosCard() {
     <Card>
 
 
-      <div className="flex justify-between items-center mb-5">
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+        "
+      >
 
-        <h3 className="text-xl font-bold text-primary">
-          Mis objetivos
+        <h3
+          className="
+            text-xl
+            font-bold
+            text-text
+          "
+        >
+          🎯 Objetivos actuales
         </h3>
 
 
         <Badge variant="info">
-
-          {objetivosActivos.length > 0
-            ? `${objetivosActivos.length} activos`
-            : "Sin objetivos"}
-
+          {objetivosActivos.length}
         </Badge>
+
 
       </div>
 
 
 
+
+
       {objetivosActivos.length === 0 ? (
 
-        <p className="text-sm text-slate-500">
-          Todavía no tienes objetivos asignados.
+        <p
+          className="
+            mt-5
+            text-sm
+            text-muted
+          "
+        >
+          No hay objetivos activos actualmente.
         </p>
+
 
       ) : (
 
 
-        <div className="space-y-5">
+        <div
+          className="
+            mt-6
+            space-y-4
+          "
+        >
 
 
           {objetivosActivos
-            .slice(0, 3)
-            .map((objetivo) => (
-
-              <div key={objetivo.id}>
-
-                <p className="font-semibold text-primary">
-                  {objetivo.nombre}
-                </p>
+            .slice(0,3)
+            .map((barrera)=>(
 
 
-                <p className="text-sm text-slate-500 mt-1">
-                  Meta: {objetivo.objetivo}
-                </p>
+            <div
+              key={barrera.id}
+              className="
+                rounded-card
+                bg-surfaceSoft
+                border
+                border-border
+                p-4
+              "
+            >
 
+
+              <p
+                className="
+                  font-bold
+                  text-text
+                "
+              >
+                {barrera.nombre}
+              </p>
+
+
+
+
+              <p
+                className="
+                  mt-2
+                  text-sm
+                  text-muted
+                "
+              >
+                Meta
+              </p>
+
+
+
+
+              <p
+                className="
+                  font-semibold
+                  text-accent
+                "
+              >
+                {barrera.objetivo}
+              </p>
+
+
+
+
+              <div className="mt-3">
+
+                <Badge variant="warning">
+                  En progreso
+                </Badge>
 
               </div>
+
+
+            </div>
+
 
           ))}
 
 
         </div>
+
 
       )}
 

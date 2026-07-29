@@ -9,101 +9,58 @@ import RegistrarAsistenciaModal from "../../asistencia/components/RegistrarAsist
 import { useCuotasCliente } from "../../cuotas/hooks/useCuotasCliente";
 import { useAsistencia } from "../../asistencia/hooks/useAsistencia";
 
-import { Card, Button } from "../../../../shared/ui";
-
+import { Card, Button, Badge } from "../../../../shared/ui";
 
 interface ClienteCardProps {
   cliente: Cliente;
 }
 
-
 function ClienteCard({ cliente }: ClienteCardProps) {
-
   const navigate = useNavigate();
 
-  const { cuotas } =
-    useCuotasCliente(cliente.id);
-
+  const { cuotas } = useCuotasCliente(cliente.id);
 
   const {
     porcentaje,
     cargando: cargandoAsistencia,
-  } =
-    useAsistencia(
-      cliente.id,
-      cliente.frecuenciaSemanal,
-    );
-
+  } = useAsistencia(
+    cliente.id,
+    cliente.frecuenciaSemanal
+  );
 
   const ultimaCuota = cuotas[0];
-
 
   const [
     mostrandoAsistencia,
     setMostrandoAsistencia,
   ] = useState(false);
 
-
-
   return (
-
-    <Card>
-
-      <div className="space-y-5">
-
+    <>
+      <Card>
 
         {/* Header */}
-        <div className="
-          flex
-          justify-between
-          items-start
-          gap-4
-        ">
-
+        <div className="flex items-start justify-between gap-4">
 
           <div>
 
-            <h3 className="
-              text-xl
-              font-bold
-              text-primary
-            ">
+            <h3 className="text-xl font-bold text-text">
               {cliente.nombre} {cliente.apellido}
             </h3>
 
-
-            <span className="
-              inline-flex
-              mt-2
-              px-3
-              py-1
-              rounded-full
-              text-xs
-              font-semibold
-              bg-green-100
-              text-green-700
-            ">
-              Activo
-            </span>
-
+            <div className="mt-3">
+              <Badge variant="success">
+                Activo
+              </Badge>
+            </div>
 
           </div>
 
-
-
-
-          <div className="
-            flex
-            gap-2
-          ">
-
+          <div className="flex gap-2">
 
             <RegistrarAsistenciaButton
-              onClick={() =>
-                setMostrandoAsistencia(true)
-              }
+              onClick={() => setMostrandoAsistencia(true)}
             />
-
 
             <Button
               variant="secondary"
@@ -111,110 +68,74 @@ function ClienteCard({ cliente }: ClienteCardProps) {
                 navigate(`/clientes/${cliente.id}`)
               }
             >
-              Ver
+              Ver perfil
             </Button>
 
-
           </div>
-
 
         </div>
 
-
-
-
-
         {/* Información */}
-        <div className="
-          border-t
-          border-gray-100
-          pt-4
-          space-y-3
-          text-sm
-        ">
+        <div className="mt-6 border-t border-border pt-5 space-y-4">
 
+          <div className="flex items-center justify-between">
 
-          <div className="flex justify-between">
-
-            <span className="text-slate-500">
+            <span className="text-muted">
               Cuota
             </span>
 
-            <span className="font-medium text-primary">
+            <span className="font-semibold text-text">
 
               {ultimaCuota
-                ? `${ultimaCuota.mes} ${ultimaCuota.estado}`
-                : "Sin cuota"
-              }
+                ? `${ultimaCuota.mes} • ${ultimaCuota.estado}`
+                : "Sin cuota"}
 
             </span>
 
           </div>
 
+          <div className="flex items-center justify-between">
 
-
-
-
-          <div className="flex justify-between">
-
-            <span className="text-slate-500">
+            <span className="text-muted">
               Asistencia
             </span>
 
-            <span className="font-medium text-primary">
+            <span className="font-semibold text-text">
 
               {cargandoAsistencia
                 ? "Cargando..."
-                : `${porcentaje}%`
-              }
+                : `${porcentaje}%`}
 
             </span>
 
           </div>
 
+          <div className="flex items-center justify-between">
 
-
-
-
-          <div className="flex justify-between">
-
-            <span className="text-slate-500">
+            <span className="text-muted">
               Seguimiento
             </span>
 
-            <span className="font-medium text-slate-400">
+            <span className="font-semibold text-muted">
               Sin información
             </span>
 
           </div>
 
-
         </div>
 
-
-
-      </div>
-
-
-
-
+      </Card>
 
       {mostrandoAsistencia && (
-
         <RegistrarAsistenciaModal
           cliente={cliente}
           onCerrar={() =>
             setMostrandoAsistencia(false)
           }
         />
-
       )}
-
-
-    </Card>
-
+    </>
   );
 }
-
 
 export default ClienteCard;

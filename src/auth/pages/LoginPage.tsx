@@ -38,14 +38,45 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <form
-        onSubmit={handleLogin}
-        className="w-full max-w-sm space-y-4"
-      >
-        <h1 className="text-3xl font-bold">
-          Login Z-Rendi
+  <div className="min-h-screen bg-background flex items-center justify-center p-6">
+
+    <form
+      onSubmit={handleLogin}
+      className="
+        w-full
+        max-w-sm
+        bg-surface
+        rounded-card
+        p-8
+        shadow-card
+        space-y-5
+        border
+        border-border
+      "
+    >
+
+      <div className="text-center space-y-2">
+
+        <h1 className="
+          text-3xl
+          font-bold
+          text-text
+        ">
+          Z-Rendi
         </h1>
+
+
+        <p className="
+          text-sm
+          text-muted
+        ">
+          Plataforma de rendimiento deportivo
+        </p>
+
+      </div>
+
+
+      <div className="space-y-3">
 
         <input
           type="email"
@@ -53,8 +84,21 @@ function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-3 rounded-lg"
+          className="
+            w-full
+            px-4
+            py-3
+            rounded-button
+            bg-background
+            border
+            border-border
+            text-text
+            placeholder:text-muted
+            focus:outline-none
+            focus:border-primary
+          "
         />
+
 
         <input
           type="password"
@@ -62,25 +106,66 @@ function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-3 rounded-lg"
+          className="
+            w-full
+            px-4
+            py-3
+            rounded-button
+            bg-background
+            border
+            border-border
+            text-text
+            placeholder:text-muted
+            focus:outline-none
+            focus:border-primary
+          "
         />
 
-        {error && (
-          <p className="text-red-500">
-            {error}
-          </p>
-        )}
+      </div>
 
-        <button
-          type="submit"
-          disabled={enviando}
-          className="w-full p-3 rounded-lg"
-        >
-          {enviando ? "Ingresando..." : "Ingresar"}
-        </button>
-      </form>
-    </div>
-  );
+
+      {error && (
+
+        <p className="
+          text-sm
+          text-danger
+          text-center
+        ">
+          {error}
+        </p>
+
+      )}
+
+
+
+      <button
+        type="submit"
+        disabled={enviando}
+        className="
+          w-full
+          py-3
+          rounded-button
+          bg-primary
+          text-white
+          font-semibold
+          transition
+          hover:opacity-90
+          disabled:opacity-50
+        "
+      >
+
+        {enviando
+          ? "Ingresando..."
+          : "Ingresar"
+        }
+
+      </button>
+
+
+    </form>
+
+  </div>
+);
 }
 
 export default LoginPage;

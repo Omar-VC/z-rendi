@@ -2,58 +2,288 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* =========================
    Z-RENDI DESIGN SYSTEM
+   DARK PERFORMANCE
 ========================= */
 
+
 :root {
-  --background: #EAEFEF;
-  --surface: #FFFFFF;
 
-  --primary: #25343F;
-  --secondary: #BFC9D1;
-  --accent: #FF9B51;
 
-  --success: #22C55E;
-  --warning: #FACC15;
-  --danger: #EF4444;
+  /* =====================
+     BRAND IDENTITY
+  ====================== */
 
-  --text: #25343F;
-  --text-muted: #64748B;
+  --brand-orange: #FF6500;
 
-  --border: #D7DEE3;
+  --brand-blue: #1E3E62;
+
+  --brand-dark: #0B192C;
+
+  --brand-black: #000000;
+
+
+
+  /* =====================
+     APP COLORS
+  ====================== */
+
+  --background:
+    #0B192C;
+
+
+  --surface:
+    #12263F;
+
+
+  --surface-soft:
+    #183452;
+
+
+  --surface-hover:
+    #1A3A5C;
+
+
+
+  /* =====================
+     TEXT
+  ====================== */
+
+  --text:
+    #F8FAFC;
+
+
+  --text-muted:
+    #94A3B8;
+
+
+
+  /* =====================
+     BORDERS
+  ====================== */
+
+  --border:
+    rgba(255,255,255,0.10);
+
+
+
+  /* =====================
+     ACTION COLORS
+  ====================== */
+
+  --primary:
+    #FF6500;
+
+
+  --secondary:
+    #1E3E62;
+
+
+  --accent:
+    #FF6500;
+
+
+
+  /* =====================
+     BUTTON SECONDARY
+  ====================== */
+
+  --button-secondary-bg:
+    rgba(255,255,255,0.08);
+
+
+  --button-secondary-text:
+    #F8FAFC;
+
+
+  --button-secondary-border:
+    rgba(255,255,255,0.15);
+
+
+
+  /* =====================
+     STATUS COLORS
+  ====================== */
+
+  --success:
+    #22C55E;
+
+
+  --warning:
+    #FACC15;
+
+
+  --danger:
+    #EF4444;
+
+
+  --info:
+    #38BDF8;
+
+
+
+  /* =====================
+     STATUS BACKGROUND
+  ====================== */
+
+  --success-bg:
+    rgba(34,197,94,.15);
+
+
+  --warning-bg:
+    rgba(250,204,21,.15);
+
+
+  --danger-bg:
+    rgba(239,68,68,.15);
+
+
+  --info-bg:
+    rgba(56,189,248,.15);
+
+
+  --neutral-bg:
+    rgba(148,163,184,.15);
+
+
+
+  /* =====================
+     STATUS TEXT
+  ====================== */
+
+  --success-text:
+    #86EFAC;
+
+
+  --warning-text:
+    #FDE68A;
+
+
+  --danger-text:
+    #FCA5A5;
+
+
+  --info-text:
+    #7DD3FC;
+
+
+  --neutral-text:
+    #CBD5E1;
+
+
+
+  /* =====================
+     STATUS BORDER
+  ====================== */
+
+  --success-border:
+    rgba(34,197,94,.35);
+
+
+  --warning-border:
+    rgba(250,204,21,.35);
+
+
+  --danger-border:
+    rgba(239,68,68,.35);
+
+
+  --info-border:
+    rgba(56,189,248,.35);
+
+
+  --neutral-border:
+    rgba(148,163,184,.35);
+
+
+
+  /* =====================
+     SHADOWS
+  ====================== */
+
+  --shadow-card:
+    0 8px 24px rgba(0,0,0,.25);
+
+
+  --shadow-card-hover:
+    0 12px 32px rgba(0,0,0,.35);
+
+
+
+  /* =====================
+     RADII
+  ====================== */
+
+  --radius-card:
+    16px;
+
+
+  --radius-button:
+    12px;
+
+
+  --radius-pill:
+    999px;
+
 }
+
 
 
 /* =========================
    BASE
 ========================= */
 
+
 * {
-  box-sizing: border-box;
+
+  box-sizing:
+    border-box;
+
 }
+
+
 
 html {
-  scroll-behavior: smooth;
+
+  scroll-behavior:
+    smooth;
+
 }
+
+
 
 body {
+
   @apply font-sans;
 
-  background-color: var(--background);
-  color: var(--text);
+  background:
+    var(--background);
 
-  margin: 0;
-  min-height: 100vh;
+  color:
+    var(--text);
 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  margin:
+    0;
+
+  min-height:
+    100vh;
+
+  -webkit-font-smoothing:
+    antialiased;
+
+  -moz-osx-font-smoothing:
+    grayscale;
+
 }
+
 
 
 /* =========================
    TYPOGRAPHY
 ========================= */
+
 
 h1,
 h2,
@@ -61,235 +291,139 @@ h3,
 h4,
 h5,
 h6 {
+
   @apply font-semibold;
-  color: var(--primary);
+
+  color:
+    var(--text);
+
 }
 
+
+
 p {
-  line-height: 1.6;
+
+  line-height:
+    1.6;
+
 }
+
 
 
 /* =========================
    CONTAINER
 ========================= */
 
+
 .page-container {
+
   @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+
 }
 
-
-/* =========================
-   CARDS
-========================= */
-
-.card {
-  @apply rounded-xl p-5 border;
-
-  background-color: var(--surface);
-
-  border-color: var(--border);
-
-  box-shadow:
-    0 4px 14px rgba(37, 52, 63, 0.08);
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 8px 24px rgba(37, 52, 63, 0.12);
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-.btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-semibold;
-
-  min-height: 44px;
-
-  transition:
-    transform .15s ease,
-    background-color .15s ease,
-    box-shadow .15s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: scale(.98);
-}
-
-
-.btn-primary {
-  background-color: var(--primary);
-  color:white;
-}
-
-.btn-primary:hover {
-  opacity:.9;
-}
-
-
-.btn-accent {
-  background-color: var(--accent);
-  color:white;
-}
-
-
-.btn-secondary {
-  background-color: var(--secondary);
-  color:var(--primary);
-}
-
-
-.btn-success {
-  background-color: var(--success);
-  color:white;
-}
-
-
-.btn-danger {
-  background-color: var(--danger);
-  color:white;
-}
-
-
-/* =========================
-   INPUTS
-========================= */
-
-.input {
-  @apply w-full rounded-xl px-4;
-
-  min-height:44px;
-
-  background:white;
-
-  border:1px solid var(--border);
-
-  color:var(--text);
-
-  transition:border-color .2s ease, box-shadow .2s ease;
-}
-
-
-.input::placeholder {
-  color:var(--text-muted);
-}
-
-
-.input:focus {
-  outline:none;
-
-  border-color:var(--accent);
-
-  box-shadow:
-    0 0 0 3px rgba(255,155,81,.2);
-}
-
-
-/* =========================
-   BADGES
-========================= */
-
-.badge {
-  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
-}
-
-
-.badge-success {
-  background:#DCFCE7;
-  color:#166534;
-}
-
-
-.badge-warning {
-  background:#FEF3C7;
-  color:#92400E;
-}
-
-
-.badge-danger {
-  background:#FEE2E2;
-  color:#991B1B;
-}
-
-
-.badge-default {
-  background:#E2E8F0;
-  color:#334155;
-}
 
 
 /* =========================
    TABLES
 ========================= */
 
+
 table {
-  width:100%;
-  border-collapse:collapse;
+
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+
 }
 
 
 tr {
-  transition:background-color .15s ease;
+
+  transition:
+    background-color .15s ease;
+
 }
 
 
 tr:hover {
-  background:#F8FAFC;
+
+  background:
+    var(--surface-hover);
+
 }
+
 
 
 /* =========================
    SCROLLBAR
 ========================= */
 
+
 ::-webkit-scrollbar {
-  width:10px;
+
+  width:
+    10px;
+
 }
 
 
 ::-webkit-scrollbar-track {
-  background:#EAEFEF;
+
+  background:
+    var(--background);
+
 }
 
 
 ::-webkit-scrollbar-thumb {
-  background:#BFC9D1;
-  border-radius:10px;
+
+  background:
+    var(--surface-hover);
+
+  border-radius:
+    10px;
+
 }
+
 
 
 /* =========================
    ANIMATIONS
 ========================= */
 
+
 @keyframes fadeIn {
 
   from {
-    opacity:0;
-    transform:translateY(8px);
+
+    opacity:
+      0;
+
+    transform:
+      translateY(8px);
+
   }
 
+
   to {
-    opacity:1;
-    transform:translateY(0);
+
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+
   }
 
 }
 
 
+
 .animate-fadeIn {
-  animation:fadeIn .25s ease-out;
+
+  animation:
+    fadeIn .25s ease-out;
+
 }
