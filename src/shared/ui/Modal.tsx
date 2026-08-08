@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-
 interface Props {
   title: string;
   children: ReactNode;
@@ -8,7 +7,6 @@ interface Props {
   footer?: ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
 }
-
 
 export default function Modal({
   title,
@@ -18,7 +16,6 @@ export default function Modal({
   size = "md",
 }: Props) {
 
-
   const sizes = {
     sm: "max-w-md",
     md: "max-w-xl",
@@ -26,35 +23,38 @@ export default function Modal({
     xl: "max-w-5xl",
   };
 
-
   return (
 
     <div
       className="
         fixed
         inset-0
-        z-50
-        flex
-        items-center
-        justify-center
+        z-[999]
         bg-black/50
+
+        flex
+        justify-center
+        items-start
+
+        overflow-y-auto
+
         p-4
+        md:items-center
       "
     >
-
 
       <div
         className={`
           w-full
-
           ${sizes[size]}
 
-          max-h-[90vh]
+          my-6
+          md:my-0
 
-          rounded-card
+          max-h-[calc(100dvh-3rem)]
 
           bg-surface
-
+          rounded-card
           shadow-2xl
 
           flex
@@ -63,7 +63,6 @@ export default function Modal({
           overflow-hidden
         `}
       >
-
 
         {/* Header */}
 
@@ -78,19 +77,21 @@ export default function Modal({
 
             border-b
             border-border
+
+            shrink-0
           "
         >
 
           <h2
             className="
-              text-2xl
+              text-xl
+              md:text-2xl
               font-bold
               text-text
             "
           >
             {title}
           </h2>
-
 
           <button
             onClick={onClose}
@@ -104,10 +105,7 @@ export default function Modal({
             ✕
           </button>
 
-
         </div>
-
-
 
         {/* Body */}
 
@@ -115,14 +113,13 @@ export default function Modal({
           className="
             flex-1
             overflow-y-auto
-            px-6
+
+            px-5
             py-5
           "
         >
           {children}
         </div>
-
-
 
         {/* Footer */}
 
@@ -130,6 +127,8 @@ export default function Modal({
 
           <div
             className="
+              shrink-0
+
               flex
               justify-end
               gap-3
@@ -148,9 +147,7 @@ export default function Modal({
 
         )}
 
-
       </div>
-
 
     </div>
 

@@ -18,8 +18,6 @@ export default function Card({
         shadow-card
         transition
         duration-200
-        hover:shadow-cardHover
-        hover:-translate-y-1
         ${className}
       `}
     >
