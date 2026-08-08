@@ -38,12 +38,14 @@ export default function NuevaSesionModal({
 
   const [libroId, setLibroId] = useState("");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
-  const [duracion, setDuracion] = useState(60);
-  const [rpe, setRpe] = useState(5);
+  const [duracion, setDuracion] = useState("");
+  const [rpe, setRpe] = useState("");
   const [observaciones, setObservaciones] = useState("");
 
   const carga = useMemo(() => {
-    return duracion * rpe;
+    if (!duracion || !rpe) return 0;
+
+    return Number(duracion) * Number(rpe);
   }, [duracion, rpe]);
 
   async function guardarSesion() {
@@ -69,8 +71,8 @@ export default function NuevaSesionModal({
 
       ejercicios: libro.ejercicios,
 
-      duracion,
-      rpe,
+      duracion: Number(duracion),
+      rpe: Number(rpe),
       carga,
       observaciones,
     });
@@ -125,7 +127,7 @@ export default function NuevaSesionModal({
             type="number"
             placeholder="Ej: 60"
             value={duracion}
-            onChange={(e) => setDuracion(Number(e.target.value))}
+            onChange={(e) => setDuracion(e.target.value)}
           />
         </div>
 
@@ -138,7 +140,7 @@ export default function NuevaSesionModal({
             max={10}
             placeholder="Ej: 5"
             value={rpe}
-            onChange={(e) => setRpe(Number(e.target.value))}
+            onChange={(e) => setRpe(e.target.value)}
           />
         </div>
 

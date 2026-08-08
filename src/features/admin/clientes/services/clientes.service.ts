@@ -26,6 +26,7 @@ export async function getClientes(): Promise<Cliente[]> {
         apellido: data.apellido,
         email: data.email,
         estado: data.estado,
+        estadoCuenta: data.estadoCuenta ?? "activo",
         rol: data.rol,
         createdAt: data.CreatedAt,
         frecuenciaSemanal: data.frecuenciaSemanal,
@@ -50,6 +51,7 @@ export async function getClienteById(id: string): Promise<Cliente | null> {
     apellido: data.apellido,
     email: data.email,
     estado: data.estado,
+    estadoCuenta: data.estadoCuenta ?? "activo",
     rol: data.rol,
     createdAt: data.CreatedAt,
     frecuenciaSemanal: data.frecuenciaSemanal,
@@ -68,6 +70,7 @@ export async function aprobarCliente(id: string): Promise<void> {
 
   await updateDoc(clienteRef, {
     estado: "aprobado",
+    estadoCuenta: "activo",
     preparadorId: preparador.uid,
   });
 }
@@ -77,6 +80,27 @@ export async function rechazarCliente(id: string): Promise<void> {
 
   await deleteDoc(clienteRef);
 }
+
+export async function darDeBajaCliente(id: string): Promise<void> {
+  const clienteRef = doc(db, USUARIOS_COLLECTION, id);
+
+  await updateDoc(clienteRef, {
+    estadoCuenta: "inactivo",
+  });
+}
+
+export async function reactivarCliente(id: string): Promise<void> {
+  const clienteRef = doc(db, USUARIOS_COLLECTION, id);
+
+  await updateDoc(clienteRef, {
+    estadoCuenta: "activo",
+  });
+}
+
+
+
+
+
 
 //Frecuncia semanal
 export async function actualizarFrecuenciaSemanal(
