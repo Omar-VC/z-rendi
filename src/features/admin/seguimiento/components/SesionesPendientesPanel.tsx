@@ -12,14 +12,11 @@ type Props = {
   preparadorId: string;
 };
 
-export default function SesionesPendientesPanel({ clienteId, preparadorId }: Props) {
-  const {
-  sesiones,
-  loading,
-} = useSesionesPendientes(
+export default function SesionesPendientesPanel({
   clienteId,
   preparadorId,
-);
+}: Props) {
+  const { sesiones, loading } = useSesionesPendientes(clienteId, preparadorId);
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
@@ -152,6 +149,35 @@ ${enlace}`;
                           {sesion.objetivo}
                         </span>
                       </p>
+
+                      {sesion.ejercicios.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-sm text-muted">
+                            Grupos musculares
+                          </p>
+
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {sesion.ejercicios.map((grupo, index) => (
+                              <span
+                                key={`${grupo}-${index}`}
+                                className="
+            rounded-full
+            border
+            border-border
+            bg-surface-soft
+            px-3
+            py-1
+            text-sm
+            font-medium
+            text-text
+          "
+                              >
+                                {String(grupo)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {sesion.observacionesPreparador && (
                         <p
