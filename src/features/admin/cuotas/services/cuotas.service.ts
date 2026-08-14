@@ -1,6 +1,7 @@
 import {
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
   collection,
   getDocs,
@@ -259,8 +260,32 @@ function calcularFechaVencimiento(
   numeroMes: number,
   anio: number,
 ): string {
-  return `${anio}-${String(numeroMes).padStart(
-    2,
-    "0",
-  )}-10`;
+  let mesVencimiento = numeroMes + 1;
+  let anioVencimiento = anio;
+
+  if (mesVencimiento > 12) {
+    mesVencimiento = 1;
+    anioVencimiento += 1;
+  }
+
+  return `${anioVencimiento}-${String(
+    mesVencimiento,
+  ).padStart(2, "0")}-10`;
+}
+
+/**
+ * Elimina una cuota.
+ *
+ * Se utiliza para corregir cuotas creadas por error.
+ */
+export async function eliminarCuota(
+  cuotaId: string,
+): Promise<void> {
+  await deleteDoc(
+    doc(
+      db,
+      CUOTAS_COLLECTION,
+      cuotaId,
+    ),
+  );
 }
