@@ -6,27 +6,38 @@ import {
   suscribirseSesionesPendientes,
 } from "../services/sesionesPendientes.service";
 
-export function useSesionesPendientes(clienteId: string) {
-  const [sesiones, setSesiones] = useState<SesionPendiente[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useSesionesPendientes(
+  clienteId: string,
+  preparadorId: string,
+) {
+  const [sesiones, setSesiones] =
+    useState<SesionPendiente[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    const unsubscribe = suscribirseSesionesPendientes(
-      clienteId,
-      (nuevasSesiones) => {
-        setSesiones(nuevasSesiones);
-        setLoading(false);
-      },
-    );
+    const unsubscribe =
+      suscribirseSesionesPendientes(
+        clienteId,
+        preparadorId,
+        (nuevasSesiones) => {
+          setSesiones(nuevasSesiones);
+          setLoading(false);
+          setError(null);
+        },
+      );
 
     return () => {
       unsubscribe();
     };
-  }, [clienteId]);
+  }, [clienteId, preparadorId]);
 
   return {
     sesiones,

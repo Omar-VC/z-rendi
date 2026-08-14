@@ -41,19 +41,19 @@ export default function SesionClientePage() {
     },
   );
 
-  return (
-    <div className="
-      max-w-3xl
-      mx-auto
-      space-y-6
-    ">
+  const duracionTotal = sesion.bloques.reduce(
+    (total, bloque) => total + bloque.duracion,
+    0,
+  );
 
-      {/* Encabezado */}
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+
+      {/* ENCABEZADO */}
 
       <div>
-
         <p className="text-sm text-muted">
-          Tu sesión de entrenamiento
+          Sesión de entrenamiento
         </p>
 
         <h1 className="
@@ -72,38 +72,33 @@ export default function SesionClientePage() {
         ">
           {fecha}
         </p>
-
       </div>
 
 
-      {/* Estado */}
+      {/* INFORMACIÓN GENERAL */}
 
       <Card>
 
         <div className="
           flex
-          items-center
+          items-start
           justify-between
           gap-4
         ">
 
           <div>
-
-            <p className="
-              text-sm
-              text-muted
-            ">
-              Estado
+            <p className="text-sm text-muted">
+              Objetivo
             </p>
 
             <p className="
               mt-1
+              text-lg
               font-semibold
               text-text
             ">
-              Sesión pendiente
+              {sesion.objetivo}
             </p>
-
           </div>
 
           <Badge variant="warning">
@@ -112,99 +107,231 @@ export default function SesionClientePage() {
 
         </div>
 
-      </Card>
 
+        {/* DURACIÓN */}
 
-      {/* Objetivo */}
-
-      <Card>
-
-        <p className="text-sm text-muted">
-          Objetivo de la sesión
-        </p>
-
-        <p className="
-          mt-2
-          text-lg
-          font-semibold
-          text-text
+        <div className="
+          mt-5
+          rounded-xl
+          border
+          border-border
+          bg-surface-soft
+          p-4
         ">
-          {sesion.objetivo}
-        </p>
 
-      </Card>
+          <p className="text-sm text-muted">
+            Duración programada
+          </p>
 
-
-      {/* Ejercicios */}
-
-      <Card>
-
-        <h2 className="
-          text-xl
-          font-bold
-          text-text
-        ">
-          Entrenamiento
-        </h2>
-
-        <div className="mt-5 space-y-3">
-
-          {sesion.ejercicios.map(
-            (ejercicio, index) => (
-
-              <div
-                key={index}
-                className="
-                  rounded-xl
-                  border
-                  border-border
-                  bg-surface-soft
-                  p-4
-                "
-              >
-
-                <div className="
-                  flex
-                  items-center
-                  gap-3
-                ">
-
-                  <span className="
-                    flex
-                    h-8
-                    w-8
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-primary
-                    text-white
-                    text-sm
-                    font-bold
-                  ">
-                    {index + 1}
-                  </span>
-
-                  <span className="
-                    font-medium
-                    text-text
-                  ">
-                    {String(ejercicio)}
-                  </span>
-
-                </div>
-
-              </div>
-
-            ),
-          )}
+          <p className="
+            mt-1
+            text-2xl
+            font-bold
+            text-text
+          ">
+            {duracionTotal} minutos
+          </p>
 
         </div>
 
       </Card>
 
 
-      {/* Indicaciones */}
+      {/* BLOQUES */}
+
+      <div className="space-y-5">
+
+        {sesion.bloques.map(
+          (bloque, bloqueIndex) => (
+
+            <Card key={bloque.id}>
+
+              {/* CABECERA BLOQUE */}
+
+              <div className="
+                flex
+                items-start
+                justify-between
+                gap-4
+              ">
+
+                <div>
+
+                  <p className="
+                    text-xs
+                    uppercase
+                    tracking-wide
+                    text-muted
+                  ">
+                    Bloque {bloqueIndex + 1}
+                  </p>
+
+                  <h2 className="
+                    mt-1
+                    text-xl
+                    font-bold
+                    text-text
+                  ">
+                    {bloque.nombre}
+                  </h2>
+
+                </div>
+
+                <div className="
+                  rounded-lg
+                  bg-surface-soft
+                  border
+                  border-border
+                  px-3
+                  py-2
+                  text-sm
+                  font-semibold
+                  text-text
+                ">
+                  {bloque.duracion} min
+                </div>
+
+              </div>
+
+
+              {/* EJERCICIOS */}
+
+              <div className="
+                mt-5
+                space-y-3
+              ">
+
+                {bloque.ejercicios.map(
+                  (ejercicio, ejercicioIndex) => (
+
+                    <div
+                      key={`${bloque.id}-${ejercicio.ejercicioId}-${ejercicioIndex}`}
+                      className="
+                        rounded-xl
+                        border
+                        border-border
+                        bg-surface-soft
+                        p-4
+                      "
+                    >
+
+                      <div className="
+                        flex
+                        items-start
+                        gap-3
+                      ">
+
+                        <span className="
+                          flex
+                          h-8
+                          w-8
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-full
+                          bg-primary
+                          text-white
+                          text-sm
+                          font-bold
+                        ">
+                          {ejercicioIndex + 1}
+                        </span>
+
+                        <div className="min-w-0">
+
+                          <p className="
+                            font-semibold
+                            text-text
+                          ">
+                            {ejercicio.nombre}
+                          </p>
+
+
+                          {/* REPETICIONES */}
+
+                          {ejercicio.repeticiones && (
+                            <p className="
+                              mt-2
+                              text-sm
+                              text-text
+                            ">
+                              <span className="font-semibold">
+                                Repeticiones:
+                              </span>{" "}
+                              {ejercicio.repeticiones}
+                            </p>
+                          )}
+
+
+                          {/* PAUSA */}
+
+                          {ejercicio.pausa && (
+                            <p className="
+                              mt-1
+                              text-sm
+                              text-muted
+                            ">
+                              <span className="font-semibold">
+                                Pausa:
+                              </span>{" "}
+                              {ejercicio.pausa}
+                            </p>
+                          )}
+
+
+                          {/* INDICACIONES */}
+
+                          {ejercicio.indicaciones && (
+                            <div className="
+                              mt-3
+                              rounded-lg
+                              border
+                              border-border
+                              bg-surface
+                              p-3
+                            ">
+
+                              <p className="
+                                text-xs
+                                uppercase
+                                tracking-wide
+                                text-muted
+                              ">
+                                Indicaciones
+                              </p>
+
+                              <p className="
+                                mt-1
+                                text-sm
+                                text-text
+                                whitespace-pre-line
+                              ">
+                                {ejercicio.indicaciones}
+                              </p>
+
+                            </div>
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  ),
+                )}
+
+              </div>
+
+            </Card>
+
+          ),
+        )}
+
+      </div>
+
+
+      {/* OBSERVACIONES DEL PREPARADOR */}
 
       {sesion.observacionesPreparador && (
         <Card>
@@ -214,7 +341,7 @@ export default function SesionClientePage() {
             font-bold
             text-text
           ">
-            Indicaciones
+            Indicaciones generales
           </h2>
 
           <p className="
@@ -229,14 +356,11 @@ export default function SesionClientePage() {
       )}
 
 
-      {/* Finalizar */}
+      {/* FINALIZAR */}
 
       <Card>
 
-        <div className="
-          space-y-4
-          text-center
-        ">
+        <div className="space-y-4 text-center">
 
           <div>
 
@@ -253,9 +377,8 @@ export default function SesionClientePage() {
               text-sm
               text-muted
             ">
-              Al finalizar vas a poder indicar cuánto
-              tiempo entrenaste y qué tan exigente fue
-              la sesión.
+              Cuando termines, registrá tu percepción
+              del esfuerzo para completar la sesión.
             </p>
 
           </div>

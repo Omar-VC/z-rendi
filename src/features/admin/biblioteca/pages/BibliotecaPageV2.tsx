@@ -4,6 +4,7 @@ import { useAuth } from "../../../../auth/useAuth";
 
 import BibliotecaLibros from "../tipo-sesion/components/BibliotecaLibros";
 import BibliotecaPruebas from "../pruebas/components/BibliotecaPruebas";
+import BibliotecaEjercicios from "../ejercicios/components/BibliotecaEjercicios";
 
 import {
   Button,
@@ -13,7 +14,8 @@ import {
 export default function BibliotecaPageV2() {
   const { user, usuario } = useAuth();
 
-  const [tab, setTab] = useState<"libros" | "pruebas">("libros");
+  const [tab, setTab] =
+    useState<"libros" | "pruebas" | "ejercicios">("libros");
 
   if (!user || !usuario) {
     return null;
@@ -24,7 +26,7 @@ export default function BibliotecaPageV2() {
 
       <SectionTitle
         title="Biblioteca"
-        description="Gestioná libros de entrenamiento y pruebas físicas."
+        description="Gestioná tipos de sesión, pruebas físicas y ejercicios."
       />
 
       <div className="flex flex-wrap gap-3">
@@ -33,7 +35,7 @@ export default function BibliotecaPageV2() {
           variant={tab === "libros" ? "accent" : "secondary"}
           onClick={() => setTab("libros")}
         >
-          📚 Libros
+          📚 Tipos de sesión
         </Button>
 
         <Button
@@ -43,12 +45,29 @@ export default function BibliotecaPageV2() {
           🧪 Pruebas
         </Button>
 
+        <Button
+          variant={tab === "ejercicios" ? "accent" : "secondary"}
+          onClick={() => setTab("ejercicios")}
+        >
+          🏋️ Ejercicios
+        </Button>
+
       </div>
 
-      {tab === "libros" ? (
-        <BibliotecaLibros preparadorId={user.uid} />
-      ) : (
+      {tab === "libros" && (
+        <BibliotecaLibros
+          preparadorId={user.uid}
+        />
+      )}
+
+      {tab === "pruebas" && (
         <BibliotecaPruebas />
+      )}
+
+      {tab === "ejercicios" && (
+        <BibliotecaEjercicios
+          preparadorId={user.uid}
+        />
       )}
 
     </div>

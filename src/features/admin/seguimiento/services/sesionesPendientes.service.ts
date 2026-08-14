@@ -34,37 +34,57 @@ export async function crearSesionPendiente(
 
 export function suscribirseSesionesPendientes(
   clienteId: string,
+  preparadorId: string,
   onChange: (sesiones: SesionPendiente[]) => void,
 ): Unsubscribe {
   const q = query(
     collection(db, SESIONES_COLLECTION),
     where("clienteId", "==", clienteId),
+    where("preparadorId", "==", preparadorId),
     where("estado", "==", "pendiente"),
   );
 
   return onSnapshot(q, (snapshot) => {
-    const sesiones: SesionPendiente[] = snapshot.docs.map((documento) => {
-      const data = documento.data();
+    const sesiones: SesionPendiente[] = snapshot.docs.map(
+      (documento) => {
+        const data = documento.data();
 
-      return {
-        id: documento.id,
-        clienteId: data.clienteId,
-        preparadorId: data.preparadorId,
-        fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
-        estado: data.estado,
-        libroId: data.libroId,
-        libroNombre: data.libroNombre,
-        ejercicios: data.ejercicios ?? [],
-        objetivo: data.objetivo,
-        observacionesPreparador: data.observacionesPreparador,
-        duracion: data.duracion,
-        rpe: data.rpe,
-        carga: data.carga,
-        observacionesCliente: data.observacionesCliente,
-        createdAt:
-          data.createdAt?.toDate?.() ?? new Date(data.createdAt),
-      };
-    });
+        return {
+          id: documento.id,
+
+          clienteId: data.clienteId,
+          preparadorId: data.preparadorId,
+
+          fecha:
+            data.fecha?.toDate?.() ??
+            new Date(data.fecha),
+
+          estado: data.estado,
+
+          libroId: data.libroId,
+          libroNombre: data.libroNombre,
+
+          ejercicios: data.ejercicios ?? [],
+          bloques: data.bloques ?? [],
+
+          objetivo: data.objetivo,
+
+          observacionesPreparador:
+            data.observacionesPreparador,
+
+          duracion: data.duracion,
+          rpe: data.rpe,
+          carga: data.carga,
+
+          observacionesCliente:
+            data.observacionesCliente,
+
+          createdAt:
+            data.createdAt?.toDate?.() ??
+            new Date(data.createdAt),
+        };
+      },
+    );
 
     onChange(sesiones);
   });
@@ -73,7 +93,11 @@ export function suscribirseSesionesPendientes(
 export async function obtenerSesionPendiente(
   id: string,
 ): Promise<SesionPendiente | null> {
-  const referencia = doc(db, SESIONES_COLLECTION, id);
+  const referencia = doc(
+    db,
+    SESIONES_COLLECTION,
+    id,
+  );
 
   const snapshot = await getDoc(referencia);
 
@@ -85,25 +109,40 @@ export async function obtenerSesionPendiente(
 
   return {
     id: snapshot.id,
+
     clienteId: data.clienteId,
     preparadorId: data.preparadorId,
-    fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
+
+    fecha:
+      data.fecha?.toDate?.() ??
+      new Date(data.fecha),
+
     estado: data.estado,
+
     libroId: data.libroId,
     libroNombre: data.libroNombre,
+
     ejercicios: data.ejercicios ?? [],
+
+    bloques: data.bloques ?? [],
+
     objetivo: data.objetivo,
-    observacionesPreparador: data.observacionesPreparador,
+
+    observacionesPreparador:
+      data.observacionesPreparador,
+
     duracion: data.duracion,
     rpe: data.rpe,
     carga: data.carga,
-    observacionesCliente: data.observacionesCliente,
+
+    observacionesCliente:
+      data.observacionesCliente,
+
     createdAt:
-      data.createdAt?.toDate?.() ?? new Date(data.createdAt),
+      data.createdAt?.toDate?.() ??
+      new Date(data.createdAt),
   };
 }
-
-
 
 export async function completarSesionPendiente(
   id: string,
@@ -114,12 +153,18 @@ export async function completarSesionPendiente(
     observacionesCliente?: string;
   },
 ): Promise<void> {
-  const referencia = doc(db, SESIONES_COLLECTION, id);
+  const referencia = doc(
+    db,
+    SESIONES_COLLECTION,
+    id,
+  );
 
   const snapshot = await getDoc(referencia);
 
   if (!snapshot.exists()) {
-    throw new Error("La sesión pendiente no existe.");
+    throw new Error(
+      "La sesión pendiente no existe.",
+    );
   }
 
   const data = snapshot.data();
@@ -142,6 +187,7 @@ export async function completarSesionPendiente(
     libroNombre: data.libroNombre,
 
     ejercicios: data.ejercicios ?? [],
+    bloques: data.bloques ?? [],
 
     objetivo: data.objetivo,
 
@@ -161,10 +207,77 @@ export async function completarSesionPendiente(
   await deleteDoc(referencia);
 }
 
-
-
 export async function eliminarSesionPendiente(
   id: string,
 ): Promise<void> {
-  await deleteDoc(doc(db, SESIONES_COLLECTION, id));
+  await deleteDoc(
+    doc(db, SESIONES_COLLECTION, id),
+  );
+}
+
+export function suscribirseSesionesPendientesCliente(
+  clienteId: string,
+  onChange: (sesiones: SesionPendiente[]) => void,
+  onError?: (error: Error) => void,
+): Unsubscribe {
+  const q = query(
+    collection(db, SESIONES_COLLECTION),
+    where("clienteId", "==", clienteId),
+    where("estado", "==", "pendiente"),
+  );
+
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const sesiones: SesionPendiente[] = snapshot.docs.map(
+        (documento) => {
+          const data = documento.data();
+
+          return {
+            id: documento.id,
+            clienteId: data.clienteId,
+            preparadorId: data.preparadorId,
+
+            fecha:
+              data.fecha?.toDate?.() ??
+              new Date(data.fecha),
+
+            estado: data.estado,
+
+            libroId: data.libroId,
+            libroNombre: data.libroNombre,
+
+            ejercicios: data.ejercicios ?? [],
+            bloques: data.bloques ?? [],
+
+            objetivo: data.objetivo,
+
+            observacionesPreparador:
+              data.observacionesPreparador,
+
+            duracion: data.duracion,
+            rpe: data.rpe,
+            carga: data.carga,
+
+            observacionesCliente:
+              data.observacionesCliente,
+
+            createdAt:
+              data.createdAt?.toDate?.() ??
+              new Date(data.createdAt),
+          };
+        },
+      );
+
+      onChange(sesiones);
+    },
+    (error) => {
+      console.error(
+        "Error al suscribirse a sesiones pendientes:",
+        error,
+      );
+
+      onError?.(error);
+    },
+  );
 }

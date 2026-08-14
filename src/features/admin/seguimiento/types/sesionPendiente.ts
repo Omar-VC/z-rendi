@@ -1,3 +1,5 @@
+import type { BloqueSesion } from "./bloqueSesion";
+
 export type EstadoSesionPendiente =
   | "pendiente"
   | "completada";
@@ -14,6 +16,11 @@ export interface SesionPendiente {
 
   libroId: string;
   libroNombre: string;
+
+  // Estructura nueva de la sesión
+  bloques: BloqueSesion[];
+
+  // Lo mantenemos temporalmente por compatibilidad
   ejercicios: unknown[];
 
   objetivo: string;

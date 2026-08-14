@@ -9,10 +9,17 @@ import { Card, Button, SectionTitle, EmptyState } from "../../../../shared/ui";
 
 type Props = {
   clienteId: string;
+  preparadorId: string;
 };
 
-export default function SesionesPendientesPanel({ clienteId }: Props) {
-  const { sesiones, loading } = useSesionesPendientes(clienteId);
+export default function SesionesPendientesPanel({ clienteId, preparadorId }: Props) {
+  const {
+  sesiones,
+  loading,
+} = useSesionesPendientes(
+  clienteId,
+  preparadorId,
+);
 
   const [mostrarModal, setMostrarModal] = useState(false);
 

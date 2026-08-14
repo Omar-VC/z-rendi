@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 
 import type { SesionPendiente } from "../../../admin/seguimiento/types/sesionPendiente";
 
-import { suscribirseSesionesPendientes } from "../../../admin/seguimiento/services/sesionesPendientes.service";
+import {
+  suscribirseSesionesPendientesCliente,
+} from "../../../admin/seguimiento/services/sesionesPendientes.service";
 
 export function useSesionesPendientesCliente(
   clienteId?: string,
@@ -13,6 +15,9 @@ export function useSesionesPendientesCliente(
   const [loading, setLoading] =
     useState(true);
 
+  const [error, setError] =
+    useState<string | null>(null);
+
   useEffect(() => {
     if (!clienteId) {
       setSesiones([]);
@@ -21,13 +26,24 @@ export function useSesionesPendientesCliente(
     }
 
     setLoading(true);
+    setError(null);
 
     const unsubscribe =
-      suscribirseSesionesPendientes(
+      suscribirseSesionesPendientesCliente(
         clienteId,
         (nuevasSesiones) => {
           setSesiones(nuevasSesiones);
           setLoading(false);
+          setError(null);
+        },
+        (error) => {
+          console.error(error);
+
+          setSesiones([]);
+          setLoading(false);
+          setError(
+            "No se pudieron cargar las sesiones pendientes.",
+          );
         },
       );
 
@@ -37,5 +53,6 @@ export function useSesionesPendientesCliente(
   return {
     sesiones,
     loading,
+    error,
   };
 }

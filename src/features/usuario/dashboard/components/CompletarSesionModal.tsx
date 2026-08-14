@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import type { SesionPendiente } from "../../../admin/seguimiento/types/sesionPendiente";
+
 import {
   Modal,
   Input,
@@ -9,6 +11,7 @@ import {
 } from "../../../../shared/ui";
 
 type Props = {
+  sesion: SesionPendiente;
   onClose: () => void;
   onGuardar: (datos: {
     duracion: number;
@@ -18,29 +21,28 @@ type Props = {
 };
 
 export default function CompletarSesionModal({
+  sesion,
   onClose,
   onGuardar,
 }: Props) {
-  const [duracion, setDuracion] = useState("");
   const [rpe, setRpe] = useState("");
   const [observaciones, setObservaciones] = useState("");
 
   const [guardando, setGuardando] = useState(false);
 
-  const duracionNumero = Number(duracion);
+  const duracionTotal = sesion.bloques.reduce(
+    (total, bloque) => total + bloque.duracion,
+    0,
+  );
+
   const rpeNumero = Number(rpe);
 
   const carga =
-    duracionNumero > 0 && rpeNumero > 0
-      ? duracionNumero * rpeNumero
+    duracionTotal > 0 && rpeNumero > 0
+      ? duracionTotal * rpeNumero
       : 0;
 
   async function handleGuardar() {
-    if (!duracionNumero || duracionNumero <= 0) {
-      alert("Ingresá la duración de la sesión.");
-      return;
-    }
-
     if (
       !rpeNumero ||
       rpeNumero < 1 ||
@@ -54,11 +56,10 @@ export default function CompletarSesionModal({
       setGuardando(true);
 
       await onGuardar({
-        duracion: duracionNumero,
+        duracion: duracionTotal,
         rpe: rpeNumero,
         observaciones,
       });
-
     } catch (error) {
       console.error(error);
       alert("No se pudo completar la sesión.");
@@ -67,9 +68,15 @@ export default function CompletarSesionModal({
     }
   }
 
+  const fecha = sesion.fecha.toLocaleDateString("es-AR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
   return (
     <Modal
-      title="Completar sesión"
+      title="Sesión de entrenamiento"
       onClose={onClose}
       footer={
         <>
@@ -78,7 +85,7 @@ export default function CompletarSesionModal({
             onClick={onClose}
             disabled={guardando}
           >
-            Cancelar
+            Cerrar
           </Button>
 
           <Button
@@ -93,39 +100,295 @@ export default function CompletarSesionModal({
         </>
       }
     >
-      <div className="space-y-5">
+      <div className="space-y-6">
 
-        {/* Duración */}
+        {/* INFORMACIÓN GENERAL */}
 
         <div>
-          <Label>
-            Duración (minutos)
-          </Label>
+          <p className="text-sm text-muted">
+            {fecha}
+          </p>
 
-          <Input
-            type="number"
-            min={1}
-            placeholder="Ej: 60"
-            value={duracion}
-            onChange={(e) =>
-              setDuracion(e.target.value)
-            }
-          />
+          <h2 className="
+            mt-1
+            text-2xl
+            font-bold
+            text-text
+          ">
+            {sesion.libroNombre}
+          </h2>
+
+          <p className="
+            mt-3
+            text-sm
+            text-muted
+          ">
+            Objetivo
+          </p>
+
+          <p className="
+            mt-1
+            font-semibold
+            text-text
+          ">
+            {sesion.objetivo}
+          </p>
+
+          <div className="
+            mt-4
+            rounded-xl
+            border
+            border-border
+            bg-surface-soft
+            p-4
+          ">
+            <p className="text-sm text-muted">
+              Duración total
+            </p>
+
+            <p className="
+              mt-1
+              text-2xl
+              font-bold
+              text-text
+            ">
+              {duracionTotal} minutos
+            </p>
+          </div>
         </div>
+
+
+        {/* BLOQUES */}
+
+        <div>
+          <h3 className="
+            text-xl
+            font-bold
+            text-text
+          ">
+            Entrenamiento
+          </h3>
+
+          <div className="mt-4 space-y-4">
+
+            {sesion.bloques.map(
+              (bloque, bloqueIndex) => (
+                <div
+                  key={bloque.id}
+                  className="
+                    rounded-xl
+                    border
+                    border-border
+                    bg-surface-soft
+                    p-4
+                  "
+                >
+
+                  {/* BLOQUE */}
+
+                  <div className="
+                    flex
+                    items-start
+                    justify-between
+                    gap-3
+                  ">
+                    <div>
+
+                      <p className="
+                        text-xs
+                        uppercase
+                        tracking-wide
+                        text-muted
+                      ">
+                        Bloque {bloqueIndex + 1}
+                      </p>
+
+                      <p className="
+                        mt-1
+                        font-bold
+                        text-text
+                      ">
+                        {bloque.nombre}
+                      </p>
+
+                    </div>
+
+                    <span className="
+                      shrink-0
+                      rounded-lg
+                      border
+                      border-border
+                      bg-surface
+                      px-3
+                      py-1.5
+                      text-sm
+                      font-semibold
+                      text-text
+                    ">
+                      {bloque.duracion} min
+                    </span>
+                  </div>
+
+
+                  {/* EJERCICIOS */}
+
+                  <div className="mt-4 space-y-3">
+
+                    {bloque.ejercicios.map(
+                      (ejercicio, ejercicioIndex) => (
+                        <div
+                          key={`${bloque.id}-${ejercicio.ejercicioId}-${ejercicioIndex}`}
+                          className="
+                            rounded-lg
+                            border
+                            border-border
+                            bg-surface
+                            p-4
+                          "
+                        >
+
+                          <div className="
+                            flex
+                            items-start
+                            gap-3
+                          ">
+
+                            <span className="
+                              flex
+                              h-8
+                              w-8
+                              shrink-0
+                              items-center
+                              justify-center
+                              rounded-full
+                              bg-primary
+                              text-sm
+                              font-bold
+                              text-white
+                            ">
+                              {ejercicioIndex + 1}
+                            </span>
+
+                            <div className="min-w-0">
+
+                              <p className="
+                                font-semibold
+                                text-text
+                              ">
+                                {ejercicio.nombre}
+                              </p>
+
+                              {ejercicio.repeticiones && (
+                                <p className="
+                                  mt-2
+                                  text-sm
+                                  text-text
+                                ">
+                                  <span className="font-semibold">
+                                    Repeticiones:
+                                  </span>{" "}
+                                  {ejercicio.repeticiones}
+                                </p>
+                              )}
+
+                              {ejercicio.pausa && (
+                                <p className="
+                                  mt-1
+                                  text-sm
+                                  text-muted
+                                ">
+                                  <span className="font-semibold">
+                                    Pausa:
+                                  </span>{" "}
+                                  {ejercicio.pausa}
+                                </p>
+                              )}
+
+                              {ejercicio.indicaciones && (
+                                <div className="
+                                  mt-3
+                                  rounded-lg
+                                  border
+                                  border-border
+                                  bg-surface-soft
+                                  p-3
+                                ">
+                                  <p className="
+                                    text-xs
+                                    uppercase
+                                    tracking-wide
+                                    text-muted
+                                  ">
+                                    Indicaciones
+                                  </p>
+
+                                  <p className="
+                                    mt-1
+                                    text-sm
+                                    text-text
+                                    whitespace-pre-line
+                                  ">
+                                    {ejercicio.indicaciones}
+                                  </p>
+                                </div>
+                              )}
+
+                            </div>
+
+                          </div>
+
+                        </div>
+                      ),
+                    )}
+
+                  </div>
+
+                </div>
+              ),
+            )}
+
+          </div>
+        </div>
+
+
+        {/* INDICACIONES GENERALES */}
+
+        {sesion.observacionesPreparador && (
+          <div>
+            <h3 className="
+              text-lg
+              font-bold
+              text-text
+            ">
+              Indicaciones generales
+            </h3>
+
+            <p className="
+              mt-2
+              text-sm
+              text-text
+              whitespace-pre-line
+            ">
+              {sesion.observacionesPreparador}
+            </p>
+          </div>
+        )}
 
 
         {/* RPE */}
 
         <div>
           <Label>
-            Percepción del esfuerzo
+            RPE
           </Label>
 
           <p className="
+            mb-2
             text-sm
             text-muted
-            mb-2
           ">
+            Indicá qué tan exigente fue la sesión.
+            <br />
             1 = muy fácil · 10 = máximo esfuerzo
           </p>
 
@@ -142,7 +405,7 @@ export default function CompletarSesionModal({
         </div>
 
 
-        {/* Carga */}
+        {/* CARGA */}
 
         <div className="
           rounded-xl
@@ -151,7 +414,6 @@ export default function CompletarSesionModal({
           bg-surface-soft
           p-5
         ">
-
           <p className="
             text-sm
             text-muted
@@ -172,13 +434,12 @@ export default function CompletarSesionModal({
             text-xs
             text-muted
           ">
-            Duración × RPE
+            Duración programada × RPE
           </p>
-
         </div>
 
 
-        {/* Observaciones */}
+        {/* OBSERVACIONES DEL CLIENTE */}
 
         <div>
           <Label>

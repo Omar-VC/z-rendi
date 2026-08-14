@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useAuth } from "../../../../auth/useAuth";
 import { useSeguimiento } from "../hooks/useSeguimiento";
 
 import NuevaSesionModal from "./NuevaSesionModal";
@@ -8,8 +9,9 @@ import RegistroSesiones from "./RegistroSesiones";
 import BarrerasPanel from "./BarrerasPanel";
 import CargaMensualCard from "./CargaMensualCard";
 import CargaSemanalCard from "./CargaSemanalCard";
-import { eliminarSesion } from "../services/seguimientoService";
 import SesionesPendientesPanel from "./SesionesPendientesPanel";
+
+import { eliminarSesion } from "../services/seguimientoService";
 
 import { Button, SectionTitle } from "../../../../shared/ui";
 
@@ -18,9 +20,16 @@ type Props = {
 };
 
 export default function SeguimientoPanel({ clienteId }: Props) {
+  const { user } = useAuth();
+
   const [mostrarModal, setMostrarModal] = useState(false);
 
-  const { sesiones, loading, recargar } = useSeguimiento(clienteId);
+  const { sesiones, loading, recargar } =
+    useSeguimiento(clienteId);
+
+  if (!user) return null;
+
+  const preparadorId = user.uid;
 
   return (
     <div className="space-y-8">
@@ -30,22 +39,33 @@ export default function SeguimientoPanel({ clienteId }: Props) {
           description="Control de evolución, sesiones y objetivos del atleta."
         />
 
-        <Button variant="accent" onClick={() => setMostrarModal(true)}>
+        <Button
+          variant="accent"
+          onClick={() => setMostrarModal(true)}
+        >
           Nueva sesión
         </Button>
       </div>
 
       {loading ? (
-        <p className="text-muted">Cargando sesiones...</p>
+        <p className="text-muted">
+          Cargando sesiones...
+        </p>
       ) : (
         <div className="space-y-8">
-          <SesionesPendientesPanel clienteId={clienteId} />
-          
+
+          <SesionesPendientesPanel
+            clienteId={clienteId}
+            preparadorId={preparadorId}
+          />
+
           <CargaMensualCard sesiones={sesiones} />
 
           <CargaSemanalCard sesiones={sesiones} />
 
-          <UltimaSesionCard sesion={sesiones[0]} />
+          <UltimaSesionCard
+            sesion={sesiones[0]}
+          />
 
           <RegistroSesiones
             sesiones={sesiones}
@@ -55,7 +75,10 @@ export default function SeguimientoPanel({ clienteId }: Props) {
             }}
           />
 
-          <BarrerasPanel clienteId={clienteId} />
+          <BarrerasPanel
+            clienteId={clienteId}
+          />
+
         </div>
       )}
 
@@ -65,7 +88,6 @@ export default function SeguimientoPanel({ clienteId }: Props) {
           onClose={() => setMostrarModal(false)}
           onGuardado={() => {
             recargar();
-
             setMostrarModal(false);
           }}
         />

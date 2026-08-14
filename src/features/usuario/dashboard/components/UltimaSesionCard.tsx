@@ -1,23 +1,17 @@
 import Card from "../../../../shared/ui/Card";
 
 import { useAuth } from "../../../../auth/useAuth";
-
 import { useUltimaSesion } from "../hooks/useUltimaSesion";
-import { useLibroSesion } from "../hooks/useLibroSesion";
 
 export default function UltimaSesionCard() {
-  const { user, usuario } = useAuth();
+  const { user } = useAuth();
 
-  const { sesion: ultimaSesion, loading } =
-    useUltimaSesion(user?.uid);
+  const {
+    sesion: ultimaSesion,
+    loading,
+  } = useUltimaSesion(user?.uid);
 
-  const { libro, loading: loadingLibro } =
-    useLibroSesion(
-      ultimaSesion?.libroId,
-      usuario?.preparadorId,
-    );
-
-  if (loading || loadingLibro) {
+  if (loading) {
     return null;
   }
 
@@ -46,6 +40,8 @@ export default function UltimaSesionCard() {
       </Card>
     );
   }
+
+  const ejercicios = ultimaSesion.ejercicios ?? [];
 
   return (
     <Card>
@@ -80,7 +76,9 @@ export default function UltimaSesionCard() {
         {ultimaSesion.fecha.toLocaleDateString()}
       </p>
 
-      {libro && (
+      {/* Ejercicios */}
+
+      {ejercicios.length > 0 && (
         <div className="mt-5">
           <p
             className="
@@ -101,10 +99,10 @@ export default function UltimaSesionCard() {
               gap-2
             "
           >
-            {libro.ejercicios.slice(0, 5).map(
-              (ejercicio) => (
+            {ejercicios.slice(0, 5).map(
+              (ejercicio, index) => (
                 <span
-                  key={ejercicio}
+                  key={`${ejercicio}-${index}`}
                   className="
                     px-3
                     py-1.5
@@ -124,6 +122,8 @@ export default function UltimaSesionCard() {
           </div>
         </div>
       )}
+
+      {/* Datos de entrenamiento */}
 
       <div
         className="
@@ -183,6 +183,8 @@ export default function UltimaSesionCard() {
           </p>
         </div>
       </div>
+
+      {/* Observación */}
 
       {ultimaSesion.observaciones && (
         <div className="mt-5">
