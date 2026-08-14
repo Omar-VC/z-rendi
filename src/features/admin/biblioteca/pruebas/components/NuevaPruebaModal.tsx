@@ -1,11 +1,10 @@
 import { useState } from "react";
 
-import {
-  actualizarPrueba,
-} from "../services/physicalTestsService";
+import { useAuth } from "../../../../../auth/useAuth";
+
+import { crearPrueba } from "../services/physicalTestsService";
 
 import type {
-  PhysicalTest,
   CategoriaPrueba,
   SubcategoriaPrueba,
 } from "../types/physicalTest";
@@ -15,10 +14,9 @@ import {
   Input,
   Select,
   Button,
-} from "../../../../shared/ui";
+} from "../../../../../shared/ui";
 
 type Props = {
-  prueba: PhysicalTest;
   onClose: () => void;
   onGuardado: () => void;
 };
@@ -31,50 +29,41 @@ const categorias: CategoriaPrueba[] = [
   "Movilidad",
 ];
 
-const subcategorias: SubcategoriaPrueba[] = [
-  "General",
-  "Superior",
-  "Inferior",
-];
-
-export default function EditarPruebaModal({
-  prueba,
+export default function NuevaPruebaModal({
   onClose,
   onGuardado,
 }: Props) {
-  const [nombre, setNombre] =
-    useState(prueba.nombre);
+  const { user } = useAuth();
+
+  const [nombre, setNombre] = useState("");
 
   const [categoria, setCategoria] =
-    useState<CategoriaPrueba>(
-      prueba.categoria
-    );
+    useState<CategoriaPrueba>("Fuerza");
 
   const [subcategoria, setSubcategoria] =
-    useState<SubcategoriaPrueba>(
-      prueba.subcategoria
-    );
+    useState<SubcategoriaPrueba>("General");
 
-  const [unidad, setUnidad] =
-    useState(prueba.unidad);
+  const [unidad, setUnidad] = useState("");
 
   async function guardar() {
-    await actualizarPrueba(
-      prueba.id,
-      {
-        nombre,
-        categoria,
-        subcategoria,
-        unidad,
-      }
-    );
+    if (!user) return;
+
+    if (!nombre.trim()) return;
+
+    await crearPrueba({
+      preparadorId: user.uid,
+      nombre: nombre.trim(),
+      categoria,
+      subcategoria,
+      unidad: unidad.trim(),
+    });
 
     onGuardado();
   }
 
   return (
     <Modal
-      title="Editar prueba"
+      title="Nueva prueba física"
       onClose={onClose}
     >
       <div className="space-y-4">
@@ -82,9 +71,8 @@ export default function EditarPruebaModal({
         <Input
           label="Nombre"
           value={nombre}
-          onChange={(e) =>
-            setNombre(e.target.value)
-          }
+          onChange={(e) => setNombre(e.target.value)}
+          placeholder="Ej: Sprint 20 m"
         />
 
         <Select
@@ -106,6 +94,13 @@ export default function EditarPruebaModal({
           ))}
         </Select>
 
+        <Input
+          label="Unidad"
+          value={unidad}
+          onChange={(e) => setUnidad(e.target.value)}
+          placeholder="Ej: kg, cm, seg"
+        />
+
         <Select
           label="Subcategoría"
           value={subcategoria}
@@ -115,23 +110,18 @@ export default function EditarPruebaModal({
             )
           }
         >
-          {subcategorias.map((sub) => (
-            <option
-              key={sub}
-              value={sub}
-            >
-              {sub}
-            </option>
-          ))}
-        </Select>
+          <option value="General">
+            General
+          </option>
 
-        <Input
-          label="Unidad"
-          value={unidad}
-          onChange={(e) =>
-            setUnidad(e.target.value)
-          }
-        />
+          <option value="Superior">
+            Superior
+          </option>
+
+          <option value="Inferior">
+            Inferior
+          </option>
+        </Select>
 
         <div className="flex justify-end gap-3 pt-3">
           <Button

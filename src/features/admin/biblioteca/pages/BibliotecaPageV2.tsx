@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { useAuth } from "../../../../auth/useAuth";
 
-import BibliotecaLibros from "../components/BibliotecaLibros";
-import BibliotecaPruebas from "../components/BibliotecaPruebas";
+import BibliotecaLibros from "../tipo-sesion/components/BibliotecaLibros";
+import BibliotecaPruebas from "../pruebas/components/BibliotecaPruebas";
 
 import {
   Button,

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { useAuth } from "../../../../auth/useAuth";
 
-import { useTrainingBooks } from "../../biblioteca/hooks/useTrainingBooks";
+import { useTrainingBooks } from "../../biblioteca/tipo-sesion/hooks/useTrainingBooks";
 import { useSeguimiento } from "../hooks/useSeguimiento";
 
 import {

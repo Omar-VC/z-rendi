@@ -4,9 +4,9 @@ import { useAuth } from "../../../../auth/useAuth";
 
 import { crearBarrera } from "../services/barrerasService";
 
-import { usePhysicalTests } from "../../biblioteca/hooks/usePhysicalTests";
+import { usePhysicalTests } from "../../biblioteca/pruebas/hooks/usePhysicalTests";
 
-import type { PhysicalTest } from "../../biblioteca/types/physicalTest";
+import type { PhysicalTest } from "../../biblioteca/pruebas/types/physicalTest";
 
 import {
   Modal,

@@ -9,6 +9,7 @@ import BarrerasPanel from "./BarrerasPanel";
 import CargaMensualCard from "./CargaMensualCard";
 import CargaSemanalCard from "./CargaSemanalCard";
 import { eliminarSesion } from "../services/seguimientoService";
+import SesionesPendientesPanel from "./SesionesPendientesPanel";
 
 import { Button, SectionTitle } from "../../../../shared/ui";
 
@@ -38,6 +39,8 @@ export default function SeguimientoPanel({ clienteId }: Props) {
         <p className="text-muted">Cargando sesiones...</p>
       ) : (
         <div className="space-y-8">
+          <SesionesPendientesPanel clienteId={clienteId} />
+          
           <CargaMensualCard sesiones={sesiones} />
 
           <CargaSemanalCard sesiones={sesiones} />

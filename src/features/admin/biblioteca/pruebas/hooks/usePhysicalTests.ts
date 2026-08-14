@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { PhysicalTest } from "../types/physicalTest";
 
-import { obtenerPruebas } from "../services/physicalTestsService";
+import { obtenerPruebas } from "../../../../../features/admin/biblioteca/pruebas/services/physicalTestsService";
 
 type Props = {
   preparadorId: string;

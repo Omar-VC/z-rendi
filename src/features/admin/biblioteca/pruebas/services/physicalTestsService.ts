@@ -10,8 +10,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 
-import { db } from "../../../../firebase/firebase";
-
+import { db } from "../../../../../firebase/firebase";
 import type { PhysicalTest } from "../types/physicalTest";
 
 const COLLECTION = "physicalTests";

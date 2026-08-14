@@ -41,14 +41,26 @@ export async function obtenerSesionesCliente(
     const data = doc.data();
 
     return {
-      id: doc.id,
-      ...data,
-      fecha: data.fecha?.toDate ? data.fecha.toDate() : new Date(data.fecha),
+  id: doc.id,
+  ...data,
 
-      createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : undefined,
+  fecha: data.fecha?.toDate
+    ? data.fecha.toDate()
+    : new Date(data.fecha),
 
-      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : undefined,
-    } as SesionEntrenamiento;
+  createdAt: data.createdAt?.toDate
+    ? data.createdAt.toDate()
+    : undefined,
+
+  updatedAt: data.updatedAt?.toDate
+    ? data.updatedAt.toDate()
+    : undefined,
+
+  observaciones:
+    data.observacionesCliente ??
+    data.observaciones ??
+    "",
+} as SesionEntrenamiento;
   });
 }
 

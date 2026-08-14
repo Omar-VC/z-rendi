@@ -10,7 +10,7 @@ import {
   SectionTitle,
   EmptyState,
   Loading,
-} from "../../../../shared/ui";
+} from "../../../../../shared/ui";
 
 interface Props {
   preparadorId: string;

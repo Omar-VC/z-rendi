@@ -10,7 +10,7 @@ import {
   Card,
   Button,
   Badge,
-} from "../../../../shared/ui";
+} from "../../../../../shared/ui";
 
 type Props = {
   libro: TrainingBook;

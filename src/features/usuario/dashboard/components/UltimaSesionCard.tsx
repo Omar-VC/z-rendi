@@ -1,44 +1,29 @@
 import Card from "../../../../shared/ui/Card";
 
 import { useAuth } from "../../../../auth/useAuth";
-import { useSeguimiento } from "../../../admin/seguimiento/hooks/useSeguimiento";
+
+import { useUltimaSesion } from "../hooks/useUltimaSesion";
 import { useLibroSesion } from "../hooks/useLibroSesion";
 
-
 export default function UltimaSesionCard() {
-
   const { user, usuario } = useAuth();
 
+  const { sesion: ultimaSesion, loading } =
+    useUltimaSesion(user?.uid);
 
-  const {
-    sesiones,
-    loading: loadingSesion,
-  } = useSeguimiento(user?.uid);
+  const { libro, loading: loadingLibro } =
+    useLibroSesion(
+      ultimaSesion?.libroId,
+      usuario?.preparadorId,
+    );
 
-
-  const ultimaSesion = sesiones[0];
-
-
-  const {
-    libro,
-    loading: loadingLibro,
-  } = useLibroSesion(
-    ultimaSesion?.libroId,
-    usuario?.preparadorId,
-  );
-
-
-  if (loadingSesion || loadingLibro) {
+  if (loading || loadingLibro) {
     return null;
   }
 
-
-
   if (!ultimaSesion) {
-
     return (
       <Card>
-
         <h3
           className="
             text-xl
@@ -49,7 +34,6 @@ export default function UltimaSesionCard() {
           🏋 Último entrenamiento
         </h3>
 
-
         <p
           className="
             mt-4
@@ -59,20 +43,12 @@ export default function UltimaSesionCard() {
         >
           Todavía no hay sesiones registradas.
         </p>
-
-
       </Card>
     );
-
   }
 
-
-
   return (
-
     <Card>
-
-
       <h3
         className="
           text-xl
@@ -82,9 +58,6 @@ export default function UltimaSesionCard() {
       >
         🏋 Último entrenamiento
       </h3>
-
-
-
 
       <p
         className="
@@ -97,8 +70,6 @@ export default function UltimaSesionCard() {
         {ultimaSesion.libroNombre}
       </p>
 
-
-
       <p
         className="
           mt-1
@@ -109,15 +80,8 @@ export default function UltimaSesionCard() {
         {ultimaSesion.fecha.toLocaleDateString()}
       </p>
 
-
-
-
-
       {libro && (
-
         <div className="mt-5">
-
-
           <p
             className="
               text-xs
@@ -129,8 +93,6 @@ export default function UltimaSesionCard() {
             Ejercicios
           </p>
 
-
-
           <div
             className="
               mt-3
@@ -139,41 +101,29 @@ export default function UltimaSesionCard() {
               gap-2
             "
           >
-
-            {libro.ejercicios
-              .slice(0,5)
-              .map((ejercicio)=>(
-
-              <span
-                key={ejercicio}
-                className="
-                  px-3
-                  py-1.5
-                  rounded-pill
-                  bg-surfaceSoft
-                  border
-                  border-border
-                  text-sm
-                  font-semibold
-                  text-text
-                "
-              >
-                {ejercicio}
-              </span>
-
-            ))}
-
+            {libro.ejercicios.slice(0, 5).map(
+              (ejercicio) => (
+                <span
+                  key={ejercicio}
+                  className="
+                    px-3
+                    py-1.5
+                    rounded-pill
+                    bg-surfaceSoft
+                    border
+                    border-border
+                    text-sm
+                    font-semibold
+                    text-text
+                  "
+                >
+                  {ejercicio}
+                </span>
+              ),
+            )}
           </div>
-
-
         </div>
-
       )}
-
-
-
-
-
 
       <div
         className="
@@ -183,8 +133,6 @@ export default function UltimaSesionCard() {
           gap-3
         "
       >
-
-
         <div
           className="
             rounded-card
@@ -194,16 +142,9 @@ export default function UltimaSesionCard() {
             p-4
           "
         >
-
-          <p
-            className="
-              text-xs
-              text-muted
-            "
-          >
+          <p className="text-xs text-muted">
             Duración
           </p>
-
 
           <p
             className="
@@ -215,12 +156,7 @@ export default function UltimaSesionCard() {
           >
             {ultimaSesion.duracion} min
           </p>
-
-
         </div>
-
-
-
 
         <div
           className="
@@ -231,16 +167,9 @@ export default function UltimaSesionCard() {
             p-4
           "
         >
-
-          <p
-            className="
-              text-xs
-              text-muted
-            "
-          >
+          <p className="text-xs text-muted">
             Carga
           </p>
-
 
           <p
             className="
@@ -252,16 +181,27 @@ export default function UltimaSesionCard() {
           >
             {ultimaSesion.carga}
           </p>
-
-
         </div>
-
-
       </div>
 
+      {ultimaSesion.observaciones && (
+        <div className="mt-5">
+          <p className="text-xs text-muted">
+            Tu observación
+          </p>
 
-
+          <p
+            className="
+              mt-1
+              text-sm
+              text-text
+              whitespace-pre-line
+            "
+          >
+            {ultimaSesion.observaciones}
+          </p>
+        </div>
+      )}
     </Card>
-
   );
 }

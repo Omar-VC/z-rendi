@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import type { PhysicalTest } from "../types/physicalTest";
 
-import { eliminarPrueba } from "../services/physicalTestsService";
+import { eliminarPrueba } from "../../../../../features/admin/biblioteca/pruebas/services/physicalTestsService";
 
 import EditarPruebaModal from "./EditarPruebaModal";
 
-import { Card, Button } from "../../../../shared/ui";
+import { Card, Button } from "../../../../../shared/ui";
 
 type Props = {
   prueba: PhysicalTest;

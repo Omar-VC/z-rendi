@@ -11,7 +11,7 @@ import {
   Textarea,
   Button,
   Badge,
-} from "../../../../shared/ui";
+} from "../../../../../shared/ui";
 
 type Props = {
   libro: TrainingBook;

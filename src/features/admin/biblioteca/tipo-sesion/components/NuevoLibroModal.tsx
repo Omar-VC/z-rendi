@@ -9,7 +9,7 @@ import {
   Textarea,
   Button,
   Badge,
-} from "../../../../shared/ui";
+} from "../../../../../shared/ui";
 
 interface Props {
   abierto: boolean;

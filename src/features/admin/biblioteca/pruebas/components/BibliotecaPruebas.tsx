@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useAuth } from "../../../../auth/useAuth";
+import { useAuth } from "../../../../../auth/useAuth";
 
 import { usePhysicalTests } from "../hooks/usePhysicalTests";
 
@@ -12,7 +12,7 @@ import {
   SectionTitle,
   Loading,
   EmptyState,
-} from "../../../../shared/ui";
+} from "../../../../../shared/ui";
 
 export default function BibliotecaPruebas() {
 
