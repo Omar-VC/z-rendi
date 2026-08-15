@@ -88,7 +88,7 @@ export default function SesionDeHoyCard({ sesion, onAbrir }: Props) {
 
         {/* Grupos musculares */}
 
-        {sesion.ejercicios.length > 0 && (
+        {sesion.gruposMusculares.length > 0 && (
           <div>
             <p
               className="
@@ -107,7 +107,7 @@ export default function SesionDeHoyCard({ sesion, onAbrir }: Props) {
       gap-2
     "
             >
-              {sesion.ejercicios.map((grupo, index) => (
+              {sesion.gruposMusculares.map((grupo, index) => (
                 <span
                   key={`${grupo}-${index}`}
                   className="

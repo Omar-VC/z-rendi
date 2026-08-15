@@ -1,4 +1,5 @@
 import type { BloqueSesion } from "./bloqueSesion";
+import type { GrupoMuscular } from "../../biblioteca/tipo-sesion/types/trainingBook";
 
 export type EstadoSesionPendiente =
   | "pendiente"
@@ -17,11 +18,9 @@ export interface SesionPendiente {
   libroId: string;
   libroNombre: string;
 
-  // Estructura nueva de la sesión
-  bloques: BloqueSesion[];
+  gruposMusculares: GrupoMuscular[];
 
-  // Lo mantenemos temporalmente por compatibilidad
-  ejercicios: unknown[];
+  bloques: BloqueSesion[];
 
   objetivo: string;
 

@@ -1,9 +1,9 @@
+import { useState } from "react";
 import type { Cuota } from "../types";
 
 import RevertirPagoButton from "./RevertirPagoButton";
 
 import { Card, Button, Badge, SectionTitle } from "../../../../shared/ui";
-
 import { eliminarCuota } from "../services/cuotas.service";
 
 interface CuotaResumenProps {
@@ -23,38 +23,13 @@ function CuotaResumen({
   onVerRecibo,
   onRevertido,
 }: CuotaResumenProps) {
-  function estadoVariant(estado: Cuota["estado"]) {
-    if (estado === "pagada") {
-      return "success";
-    }
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
 
-    if (estado === "pendiente") {
-      return "warning";
-    }
+  const cuotasPendientes = cuotas.filter(
+    (cuota) => cuota.estado === "pendiente",
+  );
 
-    return "danger";
-  }
-
-  if (cuotas.length === 0) {
-    return (
-      <Card>
-        <SectionTitle
-          title="Cuotas"
-          description="Gestioná pagos y estados de las cuotas del cliente."
-        />
-
-        <p className="text-muted">
-          El cliente todavía no tiene cuotas iniciadas.
-        </p>
-
-        <div className="mt-5">
-          <Button variant="accent" onClick={onCrear}>
-            Generar primera cuota
-          </Button>
-        </div>
-      </Card>
-    );
-  }
+  const cuotasPagadas = cuotas.filter((cuota) => cuota.estado === "pagada");
 
   async function handleEliminarCuota(cuota: Cuota) {
     const confirmar = window.confirm(
@@ -65,7 +40,6 @@ function CuotaResumen({
 
     try {
       await eliminarCuota(cuota.id);
-
       onRevertido();
     } catch (error) {
       console.error(error);
@@ -87,21 +61,23 @@ function CuotaResumen({
       </div>
 
       <div className="space-y-4 mt-6">
-        {cuotas.map((cuota) => (
+        {/* CUOTAS PENDIENTES */}
+
+        {cuotasPendientes.map((cuota) => (
           <div
             key={cuota.id}
             className="
-              rounded-xl
-              border
-              border-border
-              bg-surface
-              p-5
-            "
+        rounded-xl
+        border
+        border-border
+        bg-surface
+        p-5
+      "
           >
             <div className="flex flex-col md:flex-row md:justify-between gap-5">
               <div>
                 <h3 className="font-semibold text-lg capitalize">
-                  {cuota.mes} {cuota.anio ?? ""}
+                  {cuota.mes} {cuota.anio}
                 </h3>
 
                 <p className="text-sm text-muted mt-2">
@@ -109,63 +85,108 @@ function CuotaResumen({
                 </p>
 
                 <div className="mt-3">
-                  <Badge variant={estadoVariant(cuota.estado)}>
-                    {cuota.estado}
-                  </Badge>
+                  <Badge variant="warning">Pendiente</Badge>
                 </div>
               </div>
 
               <div className="md:text-right">
                 <p className="text-xl font-bold">${cuota.monto}</p>
 
-                {cuota.estado === "pendiente" && (
-                  <Button
-                    variant="accent"
-                    className="mt-4"
-                    onClick={() => onRegistrarPago(cuota)}
-                  >
-                    Registrar pago
-                  </Button>
-                )}
-
-                {cuota.estado === "pagada" && (
-                  <div className="mt-4 space-y-2 text-sm text-muted">
-                    <p>Método: {cuota.metodoPago ?? "-"}</p>
-
-                    <p>Fecha pago: {cuota.fechaPago ?? "-"}</p>
-
-                    <RevertirPagoButton
-                      cuotaId={cuota.id}
-                      onRevertido={onRevertido}
-                    />
-                  </div>
-                )}
+                <Button
+                  variant="accent"
+                  className="mt-4"
+                  onClick={() => onRegistrarPago(cuota)}
+                >
+                  Registrar pago
+                </Button>
 
                 <div className="flex md:justify-end gap-2 mt-4">
                   <Button variant="secondary" onClick={() => onEditar(cuota)}>
                     Editar
                   </Button>
-
-                  <Button
-                    variant="secondary"
-                    onClick={() => onVerRecibo(cuota)}
-                  >
-                    Recibo
-                  </Button>
-
-                  {cuota.estado === "pendiente" && (
-                    <Button
-                      variant="danger"
-                      onClick={() => handleEliminarCuota(cuota)}
-                    >
-                      Eliminar
-                    </Button>
-                  )}
                 </div>
               </div>
             </div>
           </div>
         ))}
+
+        {/* HISTORIAL */}
+
+        {cuotasPagadas.length > 0 && (
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setMostrarHistorial(!mostrarHistorial)}
+              className="
+          w-full
+          flex
+          items-center
+          justify-between
+          py-3
+          text-sm
+          font-semibold
+          text-text
+          border-b
+          border-border
+        "
+            >
+              <span>Historial de cuotas</span>
+
+              <span>{mostrarHistorial ? "▲" : "▼"}</span>
+            </button>
+
+            {mostrarHistorial && (
+              <div className="divide-y divide-border">
+                {cuotasPagadas.map((cuota) => (
+                  <div
+                    key={cuota.id}
+                    className="
+                py-4
+                text-sm
+                text-muted
+              "
+                  >
+                    <div className="flex flex-col gap-1">
+                      <p className="font-semibold text-text capitalize">
+                        {cuota.mes} {cuota.anio}
+                        {" · "}${cuota.monto}
+                      </p>
+
+                      <p>
+                        Pagada · {cuota.fechaPago ?? "-"}
+                        {" · "}
+                        {cuota.metodoPago ?? "-"}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        variant="secondary"
+                        className="!h-8 !px-3 !py-1 text-xs"
+                        onClick={() => onVerRecibo(cuota)}
+                      >
+                        Recibo
+                      </Button>
+
+                      <RevertirPagoButton
+                        cuotaId={cuota.id}
+                        onRevertido={onRevertido}
+                      />
+
+                      <Button
+                        variant="danger"
+                        className="!h-8 !px-3 !py-1 text-xs"
+                        onClick={() => handleEliminarCuota(cuota)}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );

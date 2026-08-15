@@ -25,7 +25,7 @@ export default function LibroCard({
 
   async function borrarLibro() {
     const confirmar = window.confirm(
-      "¿Eliminar este libro de ejercicios?"
+      "¿Eliminar este tipo de sesión?",
     );
 
     if (!confirmar) return;
@@ -37,12 +37,11 @@ export default function LibroCard({
 
   return (
     <Card>
-
       <div className="flex flex-col gap-5">
 
         {/* Header */}
-        <div>
 
+        <div>
           <h3 className="text-xl font-bold text-text">
             {libro.nombre}
           </h3>
@@ -52,43 +51,35 @@ export default function LibroCard({
               {libro.categoria}
             </Badge>
           </div>
-
         </div>
 
-        {/* Ejercicios */}
-        <div>
+        {/* Grupos musculares */}
 
+        <div>
           <p className="mb-3 text-sm font-semibold text-text">
-            Ejercicios
+            Grupos musculares
           </p>
 
-          <ul
-            className="
-              ml-5
-              list-disc
-              space-y-2
-              text-sm
-              text-muted
-            "
-          >
-            {libro.ejercicios
-              .slice(0, 4)
-              .map((ejercicio) => (
-                <li key={ejercicio}>
-                  {ejercicio}
-                </li>
-              ))}
-          </ul>
+          <div className="flex flex-wrap gap-2">
+            {libro.gruposMusculares.map((grupo) => (
+              <Badge
+                key={grupo}
+                variant="neutral"
+              >
+                {grupo}
+              </Badge>
+            ))}
+          </div>
 
-          {libro.ejercicios.length > 4 && (
-            <p className="mt-3 text-sm text-muted">
-              + {libro.ejercicios.length - 4} ejercicios más
+          {libro.gruposMusculares.length === 0 && (
+            <p className="text-sm text-muted">
+              Sin grupos musculares definidos.
             </p>
           )}
-
         </div>
 
         {/* Acciones */}
+
         <div
           className="
             flex
@@ -99,7 +90,6 @@ export default function LibroCard({
             border-border
           "
         >
-
           <Button
             variant="secondary"
             onClick={() => setMostrarEditar(true)}
@@ -113,7 +103,6 @@ export default function LibroCard({
           >
             Eliminar
           </Button>
-
         </div>
 
       </div>
@@ -128,7 +117,6 @@ export default function LibroCard({
           }}
         />
       )}
-
     </Card>
   );
 }

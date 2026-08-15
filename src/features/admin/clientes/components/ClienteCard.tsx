@@ -7,7 +7,6 @@ import RegistrarAsistenciaButton from "../../asistencia/components/RegistrarAsis
 import RegistrarAsistenciaModal from "../../asistencia/components/RegistrarAsistenciaModal";
 
 import { useCuotasCliente } from "../../cuotas/hooks/useCuotasCliente";
-import { useAsistencia } from "../../asistencia/hooks/useAsistencia";
 
 import { Card, Button, Badge } from "../../../../shared/ui";
 
@@ -18,21 +17,22 @@ interface ClienteCardProps {
   onReactivar?: (id: string) => void;
 }
 
-function ClienteCard({ cliente, onDarDeBaja, onReactivar }: ClienteCardProps) {
+function ClienteCard({
+  cliente,
+  onDarDeBaja,
+  onReactivar,
+}: ClienteCardProps) {
   const navigate = useNavigate();
 
-  const [mostrandoAsistencia, setMostrandoAsistencia] = useState(false);
+  const [mostrandoAsistencia, setMostrandoAsistencia] =
+    useState(false);
 
   const { cuotas } = useCuotasCliente(cliente.id);
 
-  const { porcentaje, cargando: cargandoAsistencia } = useAsistencia(
-    cliente.id,
-    cliente.frecuenciaSemanal,
-  );
-
   const ultimaCuota = cuotas[0];
 
-  const estaActivo = cliente.estadoCuenta === "activo";
+  const estaActivo =
+    cliente.estadoCuenta === "activo";
 
   async function manejarBaja() {
     const confirmar = window.confirm(
@@ -56,96 +56,131 @@ function ClienteCard({ cliente, onDarDeBaja, onReactivar }: ClienteCardProps) {
 
   return (
     <Card>
-      {/* Header */}
+      <div className="space-y-3">
 
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-xl font-bold text-text">
+        {/* Encabezado */}
+
+        <div className="flex items-center justify-between gap-3">
+
+          <h3 className="text-lg font-semibold text-text truncate">
             {cliente.nombre} {cliente.apellido}
           </h3>
 
-          <div className="mt-3">
-            {estaActivo ? (
-              <Badge variant="success">Activo</Badge>
-            ) : (
-              <Badge variant="warning">Dado de baja</Badge>
-            )}
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          {estaActivo && (
-            <>
-              <RegistrarAsistenciaButton
-                onClick={() => setMostrandoAsistencia(true)}
-              />
-
-              <Button
-                variant="secondary"
-                className="w-full sm:w-auto"
-                onClick={() => navigate(`/clientes/${cliente.id}`)}
-              >
-                Ver perfil
-              </Button>
-
-              <Button
-                variant="danger"
-                className="w-full sm:w-auto"
-                onClick={manejarBaja}
-              >
-                Dar de baja
-              </Button>
-            </>
+          {estaActivo ? (
+            <Badge variant="success">
+              Activo
+            </Badge>
+          ) : (
+            <Badge variant="warning">
+              Dado de baja
+            </Badge>
           )}
 
-          {!estaActivo && (
-            <Button
-              variant="success"
-              className="w-full sm:w-auto"
-              onClick={manejarReactivacion}
-            >
-              Reactivar
-            </Button>
-          )}
         </div>
-      </div>
 
-      {/* Información */}
 
-      <div className="mt-6 border-t border-border pt-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-muted">Cuota</span>
+        {/* Cuota */}
 
-          <span className="font-semibold text-text">
+        <div className="
+          flex
+          items-center
+          justify-between
+          gap-3
+          rounded-lg
+          bg-surface
+          px-3
+          py-2
+        ">
+
+          <span className="text-sm text-muted">
+            Cuota
+          </span>
+
+          <span className="text-sm font-semibold text-text capitalize">
             {ultimaCuota
-              ? `${ultimaCuota.mes} • ${ultimaCuota.estado}`
+              ? `${ultimaCuota.mes} · ${ultimaCuota.estado}`
               : "Sin cuota"}
           </span>
+
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-muted">Asistencia</span>
 
-          <span className="font-semibold text-text">
-            {cargandoAsistencia ? "Cargando..." : `${porcentaje}%`}
-          </span>
-        </div>
+        {/* Acciones */}
 
-        <div className="flex items-center justify-between">
-          <span className="text-muted">Seguimiento</span>
+        {estaActivo ? (
 
-          <span className="font-semibold text-muted">Sin información</span>
-        </div>
+          <div className="grid grid-cols-3 gap-2">
+
+            <RegistrarAsistenciaButton
+              onClick={() =>
+                setMostrandoAsistencia(true)
+              }
+            />
+
+            <Button
+              variant="secondary"
+              className="
+                !min-h-0
+                !h-9
+                !px-2
+                !py-1
+                text-sm
+              "
+              onClick={() =>
+                navigate(`/clientes/${cliente.id}`)
+              }
+            >
+              Perfil
+            </Button>
+
+            <Button
+              variant="danger"
+              className="
+                !min-h-0
+                !h-9
+                !px-2
+                !py-1
+                text-sm
+              "
+              onClick={manejarBaja}
+            >
+              Baja
+            </Button>
+
+          </div>
+
+        ) : (
+
+          <Button
+            variant="success"
+            className="
+              !min-h-0
+              !h-9
+              !px-3
+              !py-1
+              text-sm
+            "
+            onClick={manejarReactivacion}
+          >
+            Reactivar
+          </Button>
+
+        )}
+
       </div>
+
 
       {/* Modal asistencia */}
 
       {mostrandoAsistencia && (
         <RegistrarAsistenciaModal
           cliente={cliente}
-          onCerrar={() => setMostrandoAsistencia(false)}
+          onCerrar={() =>
+            setMostrandoAsistencia(false)
+          }
         />
       )}
+
     </Card>
   );
 }

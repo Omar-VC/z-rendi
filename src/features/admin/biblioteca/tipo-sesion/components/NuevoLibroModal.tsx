@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { TrainingBook } from "../types/trainingBook";
+import type { TrainingBook, GrupoMuscular } from "../types/trainingBook";
 
 import {
   Modal,
@@ -8,15 +8,12 @@ import {
   Select,
   Textarea,
   Button,
-  Badge,
 } from "../../../../../shared/ui";
 
 interface Props {
   abierto: boolean;
   cerrar: () => void;
-  agregarLibro: (
-    libro: Omit<TrainingBook, "id">
-  ) => Promise<void>;
+  agregarLibro: (libro: Omit<TrainingBook, "id">) => Promise<void>;
   preparadorId: string;
 }
 
@@ -26,78 +23,64 @@ export default function NuevoLibroModal({
   agregarLibro,
   preparadorId,
 }: Props) {
-
   const [nombre, setNombre] = useState("");
 
   const [categoria, setCategoria] =
     useState<TrainingBook["categoria"]>("Fuerza");
 
-  const [ejercicio, setEjercicio] = useState("");
+  const [gruposMusculares, setGruposMusculares] = useState<GrupoMuscular[]>([]);
 
-  const [ejercicios, setEjercicios] =
-    useState<string[]>([]);
+  const gruposDisponibles: GrupoMuscular[] = [
+    "Cuádriceps",
+    "Isquiosurales",
+    "Glúteos",
+    "Bíceps",
+    "Tríceps",
+    "Pectoral",
+    "Espalda",
+    "Hombros",
+    "Abdominales",
+    "Pantorrillas",
+    "Otro",
+  ];
 
-  const [observaciones, setObservaciones] =
-    useState("");
+  const [observaciones, setObservaciones] = useState("");
 
   if (!abierto) return null;
 
   async function guardar() {
-
     if (!nombre.trim()) return;
 
     await agregarLibro({
       preparadorId,
       nombre,
       categoria,
-      ejercicios,
+      gruposMusculares,
       observaciones,
     });
 
     cerrar();
 
     setNombre("");
-    setEjercicios([]);
+    setGruposMusculares([]);
     setObservaciones("");
   }
 
-  function agregarEjercicio() {
-
-    if (!ejercicio.trim()) return;
-
-    setEjercicios([
-      ...ejercicios,
-      ejercicio,
-    ]);
-
-    setEjercicio("");
-  }
-
   return (
-
-    <Modal
-      title="Nuevo libro"
-      onClose={cerrar}
-    >
-
+    <Modal title="Nuevo libro" onClose={cerrar}>
       <div className="space-y-6">
-
         <Input
           label="Nombre del libro"
           placeholder="Ej.: Fuerza Tren Inferior"
           value={nombre}
-          onChange={(e) =>
-            setNombre(e.target.value)
-          }
+          onChange={(e) => setNombre(e.target.value)}
         />
 
         <Select
           label="Categoría"
           value={categoria}
           onChange={(e) =>
-            setCategoria(
-              e.target.value as TrainingBook["categoria"]
-            )
+            setCategoria(e.target.value as TrainingBook["categoria"])
           }
         >
           <option>Fuerza</option>
@@ -108,103 +91,63 @@ export default function NuevoLibroModal({
         </Select>
 
         <div className="space-y-3">
-
           <label className="text-sm font-medium text-text">
-            Ejercicios
+            Grupos musculares
           </label>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2">
+            {gruposDisponibles.map((grupo) => {
+              const seleccionado = gruposMusculares.includes(grupo);
 
-            <Input
-              className="flex-1"
-              placeholder="Agregar ejercicio"
-              value={ejercicio}
-              onChange={(e) =>
-                setEjercicio(e.target.value)
-              }
-            />
-
-            <Button
-              variant="accent"
-              className="px-5"
-              onClick={agregarEjercicio}
-            >
-              +
-            </Button>
-
+              return (
+                <button
+                  key={grupo}
+                  type="button"
+                  onClick={() => {
+                    setGruposMusculares((actuales) =>
+                      seleccionado
+                        ? actuales.filter((item) => item !== grupo)
+                        : [...actuales, grupo],
+                    );
+                  }}
+                  className={`
+            rounded-lg
+            border
+            px-3
+            py-2
+            text-sm
+            transition
+            ${
+              seleccionado
+                ? "border-accent bg-accent text-white"
+                : "border-border bg-surface text-text hover:bg-surfaceHover"
+            }
+          `}
+                >
+                  {grupo}
+                </button>
+              );
+            })}
           </div>
-
-          <Badge variant="info">
-            {ejercicios.length} ejercicios
-          </Badge>
-
-          <div
-            className="
-              rounded-card
-              border
-              border-border
-              bg-background
-              p-4
-              min-h-[90px]
-            "
-          >
-
-            {ejercicios.length === 0 ? (
-
-              <p className="text-sm text-muted">
-                Todavía no agregaste ejercicios.
-              </p>
-
-            ) : (
-
-              <ul className="space-y-2 text-sm text-text">
-
-                {ejercicios.map((e, index) => (
-
-                  <li key={index}>
-                    • {e}
-                  </li>
-
-                ))}
-
-              </ul>
-
-            )}
-
-          </div>
-
         </div>
 
         <Textarea
           label="Observaciones"
           placeholder="Notas adicionales..."
           value={observaciones}
-          onChange={(e) =>
-            setObservaciones(e.target.value)
-          }
+          onChange={(e) => setObservaciones(e.target.value)}
         />
 
         <div className="flex justify-end gap-3">
-
-          <Button
-            variant="secondary"
-            onClick={cerrar}
-          >
+          <Button variant="secondary" onClick={cerrar}>
             Cancelar
           </Button>
 
-          <Button
-            variant="accent"
-            onClick={guardar}
-          >
+          <Button variant="accent" onClick={guardar}>
             Guardar libro
           </Button>
-
         </div>
-
       </div>
-
     </Modal>
-
   );
 }

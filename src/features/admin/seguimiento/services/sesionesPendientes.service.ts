@@ -45,46 +45,38 @@ export function suscribirseSesionesPendientes(
   );
 
   return onSnapshot(q, (snapshot) => {
-    const sesiones: SesionPendiente[] = snapshot.docs.map(
-      (documento) => {
-        const data = documento.data();
+    const sesiones: SesionPendiente[] = snapshot.docs.map((documento) => {
+      const data = documento.data();
 
-        return {
-          id: documento.id,
+      return {
+        id: documento.id,
 
-          clienteId: data.clienteId,
-          preparadorId: data.preparadorId,
+        clienteId: data.clienteId,
+        preparadorId: data.preparadorId,
 
-          fecha:
-            data.fecha?.toDate?.() ??
-            new Date(data.fecha),
+        fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
 
-          estado: data.estado,
+        estado: data.estado,
 
-          libroId: data.libroId,
-          libroNombre: data.libroNombre,
+        libroId: data.libroId,
+        libroNombre: data.libroNombre,
 
-          ejercicios: data.ejercicios ?? [],
-          bloques: data.bloques ?? [],
+        gruposMusculares: data.gruposMusculares ?? [],
+        bloques: data.bloques ?? [],
 
-          objetivo: data.objetivo,
+        objetivo: data.objetivo,
 
-          observacionesPreparador:
-            data.observacionesPreparador,
+        observacionesPreparador: data.observacionesPreparador,
 
-          duracion: data.duracion,
-          rpe: data.rpe,
-          carga: data.carga,
+        duracion: data.duracion,
+        rpe: data.rpe,
+        carga: data.carga,
 
-          observacionesCliente:
-            data.observacionesCliente,
+        observacionesCliente: data.observacionesCliente,
 
-          createdAt:
-            data.createdAt?.toDate?.() ??
-            new Date(data.createdAt),
-        };
-      },
-    );
+        createdAt: data.createdAt?.toDate?.() ?? new Date(data.createdAt),
+      };
+    });
 
     onChange(sesiones);
   });
@@ -93,11 +85,7 @@ export function suscribirseSesionesPendientes(
 export async function obtenerSesionPendiente(
   id: string,
 ): Promise<SesionPendiente | null> {
-  const referencia = doc(
-    db,
-    SESIONES_COLLECTION,
-    id,
-  );
+  const referencia = doc(db, SESIONES_COLLECTION, id);
 
   const snapshot = await getDoc(referencia);
 
@@ -113,34 +101,27 @@ export async function obtenerSesionPendiente(
     clienteId: data.clienteId,
     preparadorId: data.preparadorId,
 
-    fecha:
-      data.fecha?.toDate?.() ??
-      new Date(data.fecha),
+    fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
 
     estado: data.estado,
 
     libroId: data.libroId,
     libroNombre: data.libroNombre,
 
-    ejercicios: data.ejercicios ?? [],
-
+    gruposMusculares: data.gruposMusculares ?? [],
     bloques: data.bloques ?? [],
 
     objetivo: data.objetivo,
 
-    observacionesPreparador:
-      data.observacionesPreparador,
+    observacionesPreparador: data.observacionesPreparador,
 
     duracion: data.duracion,
     rpe: data.rpe,
     carga: data.carga,
 
-    observacionesCliente:
-      data.observacionesCliente,
+    observacionesCliente: data.observacionesCliente,
 
-    createdAt:
-      data.createdAt?.toDate?.() ??
-      new Date(data.createdAt),
+    createdAt: data.createdAt?.toDate?.() ?? new Date(data.createdAt),
   };
 }
 
@@ -153,18 +134,12 @@ export async function completarSesionPendiente(
     observacionesCliente?: string;
   },
 ): Promise<void> {
-  const referencia = doc(
-    db,
-    SESIONES_COLLECTION,
-    id,
-  );
+  const referencia = doc(db, SESIONES_COLLECTION, id);
 
   const snapshot = await getDoc(referencia);
 
   if (!snapshot.exists()) {
-    throw new Error(
-      "La sesión pendiente no existe.",
-    );
+    throw new Error("La sesión pendiente no existe.");
   }
 
   const data = snapshot.data();
@@ -186,20 +161,18 @@ export async function completarSesionPendiente(
     libroId: data.libroId,
     libroNombre: data.libroNombre,
 
-    ejercicios: data.ejercicios ?? [],
+    gruposMusculares: data.gruposMusculares ?? [],
     bloques: data.bloques ?? [],
 
     objetivo: data.objetivo,
 
-    observacionesPreparador:
-      data.observacionesPreparador ?? "",
+    observacionesPreparador: data.observacionesPreparador ?? "",
 
     duracion: datos.duracion,
     rpe: datos.rpe,
     carga: datos.carga,
 
-    observacionesCliente:
-      datos.observacionesCliente ?? "",
+    observacionesCliente: datos.observacionesCliente ?? "",
 
     createdAt: new Date(),
   });
@@ -207,12 +180,8 @@ export async function completarSesionPendiente(
   await deleteDoc(referencia);
 }
 
-export async function eliminarSesionPendiente(
-  id: string,
-): Promise<void> {
-  await deleteDoc(
-    doc(db, SESIONES_COLLECTION, id),
-  );
+export async function eliminarSesionPendiente(id: string): Promise<void> {
+  await deleteDoc(doc(db, SESIONES_COLLECTION, id));
 }
 
 export function suscribirseSesionesPendientesCliente(
@@ -229,53 +198,42 @@ export function suscribirseSesionesPendientesCliente(
   return onSnapshot(
     q,
     (snapshot) => {
-      const sesiones: SesionPendiente[] = snapshot.docs.map(
-        (documento) => {
-          const data = documento.data();
+      const sesiones: SesionPendiente[] = snapshot.docs.map((documento) => {
+        const data = documento.data();
 
-          return {
-            id: documento.id,
-            clienteId: data.clienteId,
-            preparadorId: data.preparadorId,
+        return {
+          id: documento.id,
+          clienteId: data.clienteId,
+          preparadorId: data.preparadorId,
 
-            fecha:
-              data.fecha?.toDate?.() ??
-              new Date(data.fecha),
+          fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
 
-            estado: data.estado,
+          estado: data.estado,
 
-            libroId: data.libroId,
-            libroNombre: data.libroNombre,
+          libroId: data.libroId,
+          libroNombre: data.libroNombre,
 
-            ejercicios: data.ejercicios ?? [],
-            bloques: data.bloques ?? [],
+          gruposMusculares: data.gruposMusculares ?? [],
+          bloques: data.bloques ?? [],
 
-            objetivo: data.objetivo,
+          objetivo: data.objetivo,
 
-            observacionesPreparador:
-              data.observacionesPreparador,
+          observacionesPreparador: data.observacionesPreparador,
 
-            duracion: data.duracion,
-            rpe: data.rpe,
-            carga: data.carga,
+          duracion: data.duracion,
+          rpe: data.rpe,
+          carga: data.carga,
 
-            observacionesCliente:
-              data.observacionesCliente,
+          observacionesCliente: data.observacionesCliente,
 
-            createdAt:
-              data.createdAt?.toDate?.() ??
-              new Date(data.createdAt),
-          };
-        },
-      );
+          createdAt: data.createdAt?.toDate?.() ?? new Date(data.createdAt),
+        };
+      });
 
       onChange(sesiones);
     },
     (error) => {
-      console.error(
-        "Error al suscribirse a sesiones pendientes:",
-        error,
-      );
+      console.error("Error al suscribirse a sesiones pendientes:", error);
 
       onError?.(error);
     },

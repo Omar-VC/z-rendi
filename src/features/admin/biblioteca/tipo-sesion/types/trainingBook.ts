@@ -1,3 +1,16 @@
+export type GrupoMuscular =
+  | "Cuádriceps"
+  | "Isquiosurales"
+  | "Glúteos"
+  | "Bíceps"
+  | "Tríceps"
+  | "Pectoral"
+  | "Espalda"
+  | "Hombros"
+  | "Abdominales"
+  | "Pantorrillas"
+  | "Otro";
+
 export interface TrainingBook {
   id: string;
 
@@ -12,7 +25,7 @@ export interface TrainingBook {
     | "Resistencia"
     | "Prevención";
 
-  ejercicios: string[];
+  gruposMusculares: GrupoMuscular[];
 
   observaciones?: string;
 

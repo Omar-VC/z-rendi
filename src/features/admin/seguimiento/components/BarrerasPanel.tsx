@@ -18,24 +18,19 @@ import {
   SectionTitle,
 } from "../../../../shared/ui";
 
-
 type Props = {
   clienteId: string;
 };
 
-
 export default function BarrerasPanel({
   clienteId,
 }: Props) {
-
 
   const {
     barreras,
     loading,
     recargar,
   } = useBarreras(clienteId);
-
-
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
@@ -45,16 +40,15 @@ export default function BarrerasPanel({
   const [barreraNuevoObjetivo, setBarreraNuevoObjetivo] =
     useState<Barrera | null>(null);
 
-
+  const [barreraAbierta, setBarreraAbierta] =
+    useState<string | null>(null);
 
   async function borrarBarrera(id: string) {
 
     const confirmar =
       window.confirm("¿Eliminar esta barrera?");
 
-
     if (!confirmar) return;
-
 
     try {
 
@@ -69,10 +63,7 @@ export default function BarrerasPanel({
       alert("No se pudo eliminar la barrera.");
 
     }
-
   }
-
-
 
   function estadoVariant(
     estado: Barrera["estado"]
@@ -82,29 +73,35 @@ export default function BarrerasPanel({
       return "success" as const;
     }
 
-    if (estado === "pendiente") {
-      return "warning" as const;
-    }
+    return "warning" as const;
+  }
 
-    return "danger" as const;
+  function alternarBarrera(id: string) {
+
+    setBarreraAbierta((actual) =>
+      actual === id ? null : id
+    );
 
   }
 
-
-
   return (
-
     <Card>
 
+      {/* Encabezado */}
 
-      <div className="flex flex-col md:flex-row md:justify-between gap-4">
-
+      <div className="
+        flex
+        flex-col
+        gap-4
+        md:flex-row
+        md:items-center
+        md:justify-between
+      ">
 
         <SectionTitle
           title="Barreras de progreso"
           description="Pruebas y objetivos de evolución del atleta."
         />
-
 
         <Button
           variant="accent"
@@ -113,168 +110,240 @@ export default function BarrerasPanel({
           Nueva prueba
         </Button>
 
-
       </div>
 
 
+      {/* Estado */}
 
       {loading && (
-
-        <p className="text-muted">
+        <p className="mt-6 text-sm text-muted">
           Cargando...
         </p>
-
       )}
-
-
-
 
       {!loading && barreras.length === 0 && (
-
-        <p className="text-muted">
+        <p className="mt-6 text-sm text-muted">
           No hay pruebas registradas.
         </p>
-
       )}
 
 
+      {/* Lista */}
+
+      {!loading && barreras.length > 0 && (
+
+        <div className="mt-5">
+
+          {barreras.map((barrera, index) => {
+
+            const abierta =
+              barreraAbierta === barrera.id;
+
+            const evaluaciones =
+              barrera.historial?.length ?? 0;
+
+            return (
+
+              <div
+                key={barrera.id}
+                className={`
+                  py-4
+                  ${
+                    index !== barreras.length - 1
+                      ? "border-b border-border"
+                      : ""
+                  }
+                `}
+              >
+
+                {/* Resumen */}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    alternarBarrera(barrera.id)
+                  }
+                  className="
+                    w-full
+                    text-left
+                  "
+                >
+
+                  <div className="
+                    flex
+                    flex-col
+                    gap-3
+                    md:flex-row
+                    md:items-center
+                    md:justify-between
+                  ">
+
+                    {/* Información */}
+
+                    <div className="min-w-0">
+
+                      <div className="
+                        flex
+                        flex-wrap
+                        items-center
+                        gap-2
+                      ">
+
+                        <p className="
+                          font-semibold
+                          text-text
+                        ">
+                          {barrera.nombre}
+                        </p>
+
+                        <Badge
+                          variant={estadoVariant(
+                            barrera.estado
+                          )}
+                        >
+                          {barrera.estado}
+                        </Badge>
+
+                      </div>
 
 
+                      <div className="
+                        mt-1
+                        flex
+                        flex-wrap
+                        items-center
+                        gap-x-2
+                        gap-y-1
+                        text-sm
+                        text-muted
+                      ">
 
-      <div className="space-y-4 mt-6">
+                        {barrera.categoria && (
+                          <>
+                            <span>
+                              {barrera.categoria}
+                            </span>
+
+                            <span>·</span>
+                          </>
+                        )}
+
+                        <span>
+                          Objetivo: {barrera.objetivo}
+                        </span>
+
+                      </div>
+
+                    </div>
 
 
-        {barreras.map((barrera) => (
+                    {/* Resumen derecho */}
+
+                    <div className="
+                      flex
+                      items-center
+                      gap-4
+                      text-sm
+                      text-muted
+                    ">
+
+                      <span>
+                        {evaluaciones}{" "}
+                        {evaluaciones === 1
+                          ? "evaluación"
+                          : "evaluaciones"}
+                      </span>
+
+                      <span>
+                        {abierta ? "▲" : "▼"}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </button>
 
 
-          <div
-            key={barrera.id}
-            className="
-              rounded-xl
-              border
-              border-border
-              bg-surface
-              p-5
-            "
-          >
+                {/* Detalle */}
+
+                {abierta && (
+
+                  <div className="mt-4">
+
+                    <HistorialBarrera
+                      historial={barrera.historial}
+                    />
 
 
-            <div className="flex flex-col md:flex-row md:justify-between gap-4">
+                    {/* Acciones */}
 
+                    <div className="
+                      mt-5
+                      flex
+                      flex-wrap
+                      gap-2
+                    ">
 
-              <div>
+                      {barrera.estado === "pendiente" ? (
 
+                        <Button
+                          variant="success"
+                          onClick={() =>
+                            setBarreraSeleccionada(barrera)
+                          }
+                        >
+                          Evaluar
+                        </Button>
 
-                <h3 className="font-semibold text-lg">
-                  {barrera.nombre}
-                </h3>
+                      ) : (
 
+                        <Button
+                          variant="accent"
+                          onClick={() =>
+                            setBarreraNuevoObjetivo(barrera)
+                          }
+                        >
+                          Nuevo objetivo
+                        </Button>
 
-                {barrera.categoria && (
+                      )}
 
-                  <p className="text-sm text-muted mt-1">
-                    {barrera.categoria}
-                  </p>
+                      <Button
+                        variant="danger"
+                        onClick={() =>
+                          borrarBarrera(barrera.id)
+                        }
+                      >
+                        Eliminar
+                      </Button>
+
+                    </div>
+
+                  </div>
 
                 )}
 
-
-
-                <p className="mt-3">
-                  Objetivo:
-                  <span className="ml-2 font-semibold">
-                    {barrera.objetivo}
-                  </span>
-                </p>
-
-
               </div>
 
+            );
+
+          })}
+
+        </div>
+
+      )}
 
 
-
-              <Badge
-                variant={estadoVariant(barrera.estado)}
-              >
-                {barrera.estado}
-              </Badge>
-
-
-            </div>
-
-
-
-
-            <div className="mt-5">
-
-              <HistorialBarrera
-                historial={barrera.historial}
-              />
-
-            </div>
-
-
-
-
-            <div className="flex flex-wrap gap-2 mt-5">
-
-
-              {barrera.estado === "pendiente" ? (
-
-                <Button
-                  variant="success"
-                  onClick={() =>
-                    setBarreraSeleccionada(barrera)
-                  }
-                >
-                  Evaluar
-                </Button>
-
-              ) : (
-
-                <Button
-                  variant="accent"
-                  onClick={() =>
-                    setBarreraNuevoObjetivo(barrera)
-                  }
-                >
-                  Nuevo objetivo
-                </Button>
-
-              )}
-
-
-
-              <Button
-                variant="danger"
-                onClick={() =>
-                  borrarBarrera(barrera.id)
-                }
-              >
-                Eliminar
-              </Button>
-
-
-            </div>
-
-
-          </div>
-
-
-        ))}
-
-
-      </div>
-
-
-
-
+      {/* Modales */}
 
       {mostrarModal && (
 
         <NuevaBarreraModal
           clienteId={clienteId}
-          onClose={() => setMostrarModal(false)}
+          onClose={() =>
+            setMostrarModal(false)
+          }
           onGuardado={() => {
 
             recargar();
@@ -285,9 +354,6 @@ export default function BarrerasPanel({
         />
 
       )}
-
-
-
 
 
       {barreraSeleccionada && (
@@ -309,9 +375,6 @@ export default function BarrerasPanel({
       )}
 
 
-
-
-
       {barreraNuevoObjetivo && (
 
         <NuevoObjetivoModal
@@ -330,8 +393,6 @@ export default function BarrerasPanel({
 
       )}
 
-
     </Card>
-
   );
 }

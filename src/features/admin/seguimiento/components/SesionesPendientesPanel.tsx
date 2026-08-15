@@ -150,14 +150,14 @@ ${enlace}`;
                         </span>
                       </p>
 
-                      {sesion.ejercicios.length > 0 && (
+                      {sesion.gruposMusculares.length > 0 && (
                         <div className="mt-4">
                           <p className="text-sm text-muted">
                             Grupos musculares
                           </p>
 
                           <div className="mt-2 flex flex-wrap gap-2">
-                            {sesion.ejercicios.map((grupo, index) => (
+                            {sesion.gruposMusculares.map((grupo, index) => (
                               <span
                                 key={`${grupo}-${index}`}
                                 className="

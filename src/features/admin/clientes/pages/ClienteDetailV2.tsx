@@ -4,8 +4,6 @@ import { useParams } from "react-router-dom";
 import type { Cliente } from "../types";
 import { getClienteById } from "../services/clientes.service";
 import ClienteHeader from "../components/ClienteHeader";
-import ClienteQuickStatus from "../components/ClienteQuickStatus";
-
 import FichaResumen from "../../fichas/components/FichaResumen";
 import FichaForm from "../../fichas/components/FichaForm";
 import { useFichaCliente } from "../../fichas/hooks/useFichaCliente";
@@ -26,8 +24,7 @@ function ClienteDetailV2() {
   const { id } = useParams();
   const { ficha, recargar: recargarFicha } = useFichaCliente(id);
   const { cuotas, recargar: recargarCuotas } = useCuotasCliente(id);
-  const ultimaCuota = cuotas[0];
-  
+
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const {
     asistencias,
@@ -71,18 +68,15 @@ function ClienteDetailV2() {
     <div className="p-6">
       <ClienteHeader cliente={cliente} />
 
-      <ClienteQuickStatus
-        cuota={
-          ultimaCuota ? `${ultimaCuota.mes} ${ultimaCuota.estado}` : "Sin cuota"
-        }
-        asistencia={`${porcentaje}%`}
-        seguimiento="Sin registros"
-      />
-
-      <ClienteTrainingConfig
-        clienteId={cliente.id}
-        frecuenciaSemanal={cliente.frecuenciaSemanal}
-      />
+      <div className="mt-3">
+        <ClienteTrainingConfig
+          clienteId={cliente.id}
+          frecuenciaSemanal={cliente.frecuenciaSemanal}
+          onGuardado={(frecuencia) => {
+            setCliente({ ...cliente, frecuenciaSemanal: frecuencia });
+          }}
+        />
+      </div>
 
       <div className="mt-6 space-y-6">
         {creandoCuota && id ? (

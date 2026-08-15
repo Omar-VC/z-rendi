@@ -205,7 +205,7 @@ export default function NuevaSesionPendienteModal({
 
         libroId: libroSeleccionado.id,
         libroNombre: libroSeleccionado.nombre,
-        ejercicios: libroSeleccionado.ejercicios,
+        gruposMusculares: libroSeleccionado.gruposMusculares,
 
         bloques,
 

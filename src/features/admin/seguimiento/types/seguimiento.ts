@@ -6,12 +6,13 @@ export interface SesionEntrenamiento {
 
   fecha: Date;
 
-  // NUEVOS
   mes: number;
   anio: number;
 
   libroId: string;
   libroNombre: string;
+
+  gruposMusculares?: string[];
 
   ejercicios?: string[];
 

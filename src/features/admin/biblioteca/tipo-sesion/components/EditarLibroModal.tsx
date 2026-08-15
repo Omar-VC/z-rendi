@@ -1,6 +1,9 @@
 import { useState } from "react";
 
-import type { TrainingBook } from "../types/trainingBook";
+import type {
+  TrainingBook,
+  GrupoMuscular,
+} from "../types/trainingBook";
 
 import { actualizarLibro } from "../services/trainingBooksService";
 
@@ -10,7 +13,6 @@ import {
   Select,
   Textarea,
   Button,
-  Badge,
 } from "../../../../../shared/ui";
 
 type Props = {
@@ -19,66 +21,58 @@ type Props = {
   onGuardado: () => void;
 };
 
+const gruposDisponibles: GrupoMuscular[] = [
+  "Cuádriceps",
+  "Isquiosurales",
+  "Glúteos",
+  "Bíceps",
+  "Tríceps",
+  "Pectoral",
+  "Espalda",
+  "Hombros",
+  "Abdominales",
+  "Pantorrillas",
+  "Otro",
+];
+
 export default function EditarLibroModal({
   libro,
   onClose,
   onGuardado,
 }: Props) {
-
-  const [nombre, setNombre] =
-    useState(libro.nombre);
+  const [nombre, setNombre] = useState(libro.nombre);
 
   const [categoria, setCategoria] =
-    useState<TrainingBook["categoria"]>(
-      libro.categoria
-    );
+    useState<TrainingBook["categoria"]>(libro.categoria);
 
-  const [ejercicios, setEjercicios] =
-    useState(
-      libro.ejercicios.join("\n")
-    );
+  const [gruposMusculares, setGruposMusculares] =
+    useState<GrupoMuscular[]>(libro.gruposMusculares ?? []);
 
   const [observaciones, setObservaciones] =
-    useState(
-      libro.observaciones || ""
-    );
+    useState(libro.observaciones || "");
 
   async function guardar() {
-
     await actualizarLibro(libro.id, {
-
       nombre,
-
       categoria,
-
-      ejercicios: ejercicios
-        .split("\n")
-        .map((e) => e.trim())
-        .filter(Boolean),
-
+      gruposMusculares,
       observaciones,
-
     });
 
     onGuardado();
-
   }
 
   return (
-
     <Modal
       title="Editar libro"
       onClose={onClose}
     >
-
       <div className="space-y-6">
 
         <Input
           label="Nombre"
           value={nombre}
-          onChange={(e) =>
-            setNombre(e.target.value)
-          }
+          onChange={(e) => setNombre(e.target.value)}
         />
 
         <Select
@@ -86,61 +80,59 @@ export default function EditarLibroModal({
           value={categoria}
           onChange={(e) =>
             setCategoria(
-              e.target.value as TrainingBook["categoria"]
+              e.target.value as TrainingBook["categoria"],
             )
           }
         >
-
-          <option value="Fuerza">
-            Fuerza
-          </option>
-
-          <option value="Potencia">
-            Potencia
-          </option>
-
-          <option value="Velocidad">
-            Velocidad
-          </option>
-
-          <option value="Resistencia">
-            Resistencia
-          </option>
-
-          <option value="Prevención">
-            Prevención
-          </option>
-
+          <option value="Fuerza">Fuerza</option>
+          <option value="Potencia">Potencia</option>
+          <option value="Velocidad">Velocidad</option>
+          <option value="Resistencia">Resistencia</option>
+          <option value="Prevención">Prevención</option>
         </Select>
 
         <div className="space-y-3">
+          <label className="text-sm font-medium text-text">
+            Grupos musculares
+          </label>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            {gruposDisponibles.map((grupo) => {
+              const seleccionado =
+                gruposMusculares.includes(grupo);
 
-            <label className="text-sm font-medium text-text">
-              Ejercicios
-            </label>
-
-            <Badge variant="info">
-              {
-                ejercicios
-                  .split("\n")
-                  .filter((e) => e.trim())
-                  .length
-              } ejercicios
-            </Badge>
-
+              return (
+                <button
+                  key={grupo}
+                  type="button"
+                  onClick={() => {
+                    setGruposMusculares((actuales) =>
+                      seleccionado
+                        ? actuales.filter(
+                            (item) => item !== grupo,
+                          )
+                        : [...actuales, grupo],
+                    );
+                  }}
+                  className={`
+                    rounded-lg
+                    border
+                    px-3
+                    py-2
+                    text-sm
+                    transition
+                    ${
+                      seleccionado
+                        ? "border-accent bg-accent text-white"
+                        : "border-border bg-surface text-text hover:bg-surfaceHover"
+                    }
+                  `}
+                >
+                  {grupo}
+                </button>
+              );
+            })}
           </div>
-
-          <Textarea
-            rows={8}
-            placeholder="Un ejercicio por línea"
-            value={ejercicios}
-            onChange={(e) =>
-              setEjercicios(e.target.value)
-            }
-          />
-
         </div>
 
         <Textarea
@@ -153,7 +145,6 @@ export default function EditarLibroModal({
         />
 
         <div className="flex justify-end gap-3">
-
           <Button
             variant="secondary"
             onClick={onClose}
@@ -167,12 +158,9 @@ export default function EditarLibroModal({
           >
             Guardar cambios
           </Button>
-
         </div>
 
       </div>
-
     </Modal>
-
   );
 }

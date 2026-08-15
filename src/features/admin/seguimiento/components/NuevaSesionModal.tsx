@@ -69,7 +69,7 @@ export default function NuevaSesionModal({
       libroId: libro.id,
       libroNombre: libro.nombre,
 
-      ejercicios: libro.ejercicios,
+      gruposMusculares: libro.gruposMusculares,
 
       duracion: Number(duracion),
       rpe: Number(rpe),

@@ -7,8 +7,7 @@ import NuevaSesionModal from "./NuevaSesionModal";
 import UltimaSesionCard from "./UltimaSesionCard";
 import RegistroSesiones from "./RegistroSesiones";
 import BarrerasPanel from "./BarrerasPanel";
-import CargaMensualCard from "./CargaMensualCard";
-import CargaSemanalCard from "./CargaSemanalCard";
+import CargaResumen from "./CargaResumen";
 import SesionesPendientesPanel from "./SesionesPendientesPanel";
 
 import { eliminarSesion } from "../services/seguimientoService";
@@ -59,9 +58,7 @@ export default function SeguimientoPanel({ clienteId }: Props) {
             preparadorId={preparadorId}
           />
 
-          <CargaMensualCard sesiones={sesiones} />
-
-          <CargaSemanalCard sesiones={sesiones} />
+          <CargaResumen sesiones={sesiones} />
 
           <UltimaSesionCard
             sesion={sesiones[0]}

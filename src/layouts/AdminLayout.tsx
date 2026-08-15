@@ -4,14 +4,10 @@ import { Outlet } from "react-router-dom";
 import { auth } from "../firebase/firebase";
 import AdminSidebar from "../features/admin/components/AdminSidebar";
 
-
 const AdminLayout = () => {
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
   return (
-
     <div
       className="
         min-h-screen
@@ -19,15 +15,10 @@ const AdminLayout = () => {
         text-text
       "
     >
-
-
-
       {/* Botón hamburguesa móvil */}
 
       <button
-
         onClick={() => setSidebarOpen(true)}
-
         className="
           fixed
 
@@ -54,24 +45,15 @@ const AdminLayout = () => {
 
           shadow-card
         "
-
       >
         ☰
       </button>
 
-
-
-
-
-
       {/* Overlay móvil */}
 
       {sidebarOpen && (
-
         <div
-
           onClick={() => setSidebarOpen(false)}
-
           className="
             fixed
             inset-0
@@ -82,21 +64,12 @@ const AdminLayout = () => {
 
             md:hidden
           "
-
         />
-
       )}
-
-
-
-
-
-
 
       {/* Sidebar */}
 
       <aside
-
         className={`
 
           fixed
@@ -116,58 +89,38 @@ const AdminLayout = () => {
           ease-in-out
 
 
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full"
-          }
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
 
 
           md:translate-x-0
 
         `}
-
       >
-
         <AdminSidebar
-
           onLogout={() => auth.signOut()}
-
           onNavigate={() => setSidebarOpen(false)}
-
         />
-
       </aside>
-
-
-
-
-
-
-
 
       {/* Contenido */}
 
       <main
-
         className="
-          min-h-screen
+    min-h-screen
 
-          p-6
-          lg:p-8
+    px-3
+    sm:px-4
+    lg:px-8
 
-          pt-20
-          md:pt-8
+    pt-20
+    md:pt-8
 
-          md:ml-64
+    md:ml-64
 
-          overflow-x-hidden
-        "
-
+    overflow-x-hidden
+  "
       >
-
         <div
-
           className="
             mx-auto
 
@@ -177,22 +130,12 @@ const AdminLayout = () => {
 
             space-y-6
           "
-
         >
-
           <Outlet />
-
         </div>
-
-
       </main>
-
-
-
     </div>
-
   );
 };
-
 
 export default AdminLayout;
