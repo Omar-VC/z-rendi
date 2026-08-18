@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 import {
   obtenerInvitacionPorToken,
 } from "../../features/admin/invitaciones/services/invitaciones.service";
-
 import type { Invitacion } from "../../features/admin/invitaciones/types";
-
 import {
   registrarCliente,
 } from "../services/registro.service";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/firebase";
+
 
 function RegistroPage() {
   const navigate = useNavigate();
@@ -123,6 +123,8 @@ function RegistroPage() {
           deporte: deporte.trim(),
         },
       );
+
+      await signOut(auth);
 
       navigate("/login", {
         replace: true,
