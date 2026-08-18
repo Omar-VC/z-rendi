@@ -1,20 +1,15 @@
 ﻿import { Routes, Route, Navigate } from "react-router-dom";
-
 import { useAuth } from "./auth/useAuth";
-
 import LoginPage from "./auth/pages/LoginPage";
-
 import AdminLayout from "./layouts/AdminLayout";
 import ClienteLayoutV2 from "./layouts/ClienteLayoutV2";
-
 import ClientesPageV2 from "./features/admin/clientes/pages/ClientesPageV2";
 import ClienteDetailV2 from "./features/admin/clientes/pages/ClienteDetailV2";
 import BibliotecaPageV2 from "./features/admin/biblioteca/pages/BibliotecaPageV2";
-
 import ClienteDashboard from "./features/usuario/dashboard/pages/ClienteDashboard";
 import SesionClientePage from "./features/usuario/dashboard/pages/SesionClientePage";
-
 import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
+import RegistroPage from "./auth/pages/RegistroPage";
 
 function App() {
   const { user, usuario, loading } = useAuth();
@@ -34,6 +29,13 @@ function App() {
       <Route
         path="/login"
         element={<LoginPage />}
+      />
+
+      {/* REGISTRO */}
+
+      <Route
+        path="/registro"
+        element={<RegistroPage />}
       />
 
       {/* ADMIN */}

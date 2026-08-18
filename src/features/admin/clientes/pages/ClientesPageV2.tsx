@@ -8,10 +8,11 @@ import Input from "../../../../shared/ui/Input";
 import SectionTitle from "../../../../shared/ui/SectionTitle";
 import Loading from "../../../../shared/ui/Loading";
 import EmptyState from "../../../../shared/ui/EmptyState";
+import Button from "../../../../shared/ui/Button";
 
+import { crearInvitacion } from "../../invitaciones/services/invitaciones.service";
 
 function ClientesPageV2() {
-
   const {
     pendientes,
     activos,
@@ -24,119 +25,114 @@ function ClientesPageV2() {
     reactivar,
   } = useClientes();
 
-
   const [busqueda, setBusqueda] = useState("");
-
+  const [generandoInvitacion, setGenerandoInvitacion] = useState(false);
 
   const filtrarClientes = (clientes: typeof activos) => {
-
     return clientes.filter((cliente) => {
+      const texto = `${cliente.nombre} ${cliente.apellido}`.toLowerCase();
 
-      const texto =
-        `${cliente.nombre} ${cliente.apellido}`.toLowerCase();
-
-      return texto.includes(
-        busqueda.toLowerCase()
-      );
-
+      return texto.includes(busqueda.toLowerCase());
     });
-
   };
 
+  const clientesActivosFiltrados = filtrarClientes(activos);
 
-  const clientesActivosFiltrados =
-    filtrarClientes(activos);
+  const clientesInactivosFiltrados = filtrarClientes(inactivos);
 
+  async function invitarCliente() {
+    try {
+      setGenerandoInvitacion(true);
 
-  const clientesInactivosFiltrados =
-    filtrarClientes(inactivos);
+      const invitacion = await crearInvitacion();
 
+      const link = `${window.location.origin}/registro?token=${invitacion.token}`;
+
+      await navigator.clipboard.writeText(link);
+
+      alert("Invitación creada y enlace copiado al portapapeles.");
+    } catch (error) {
+      console.error(error);
+
+      alert("No se pudo generar la invitación.");
+    } finally {
+      setGenerandoInvitacion(false);
+    }
+  }
 
   if (loading) {
     return <Loading />;
   }
 
-
   if (error) {
-    return (
-      <EmptyState
-        title={error}
-      />
-    );
+    return <EmptyState title={error} />;
   }
 
-
   return (
-
     <div className="space-y-8">
+      {/* ENCABEZADO */}
 
+      <div
+        className="
+          flex
+          flex-col
+          gap-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+      >
+        <SectionTitle
+          title="Clientes"
+          description="Gestiona solicitudes, clientes activos y cuentas dadas de baja."
+        />
 
-      <SectionTitle
-        title="Clientes"
-        description="Gestiona solicitudes, clientes activos y cuentas dadas de baja."
-      />
-
-
+        <Button
+          variant="accent"
+          onClick={invitarCliente}
+          disabled={generandoInvitacion}
+        >
+          {generandoInvitacion ? "Generando..." : "Invitar cliente"}
+        </Button>
+      </div>
 
       <Input
         placeholder="Buscar cliente..."
         value={busqueda}
-        onChange={(e) =>
-          setBusqueda(e.target.value)
-        }
+        onChange={(e) => setBusqueda(e.target.value)}
       />
-
-
 
       {/* SOLICITUDES PENDIENTES */}
 
       <section className="space-y-4">
-
         <h2 className="text-xl font-bold text-text">
           Solicitudes pendientes ({pendientes.length})
         </h2>
 
-
         {pendientes.length === 0 ? (
-
-          <EmptyState
-            title="No hay solicitudes pendientes"
-          />
-
+          <EmptyState title="No hay solicitudes pendientes" />
         ) : (
-
           <div className="space-y-4">
-
             {pendientes.map((cliente) => (
-
               <ClienteRequestCard
                 key={cliente.id}
                 cliente={cliente}
                 onAceptar={aceptar}
                 onRechazar={rechazar}
               />
-
             ))}
-
           </div>
-
         )}
-
       </section>
-
-
 
       {/* CLIENTES ACTIVOS */}
 
       <section className="space-y-4">
-
         <h2 className="text-xl font-bold text-text">
           Clientes activos ({activos.length})
         </h2>
 
-
         {clientesActivosFiltrados.length === 0 ? (
-
           <EmptyState
             title={
               activos.length === 0
@@ -144,73 +140,44 @@ function ClientesPageV2() {
                 : "No se encontraron clientes"
             }
           />
-
         ) : (
-
           <div className="space-y-4">
-
             {clientesActivosFiltrados.map((cliente) => (
-
               <ClienteCard
                 key={cliente.id}
                 cliente={cliente}
                 onDarDeBaja={darDeBaja}
               />
-
             ))}
-
           </div>
-
         )}
-
       </section>
-
-
 
       {/* CLIENTES DADOS DE BAJA */}
 
       {inactivos.length > 0 && (
-
         <section className="space-y-4">
-
           <h2 className="text-xl font-bold text-text">
             Dados de baja ({inactivos.length})
           </h2>
 
-
           {clientesInactivosFiltrados.length === 0 ? (
-
-            <EmptyState
-              title="No se encontraron clientes"
-            />
-
+            <EmptyState title="No se encontraron clientes" />
           ) : (
-
             <div className="space-y-4">
-
               {clientesInactivosFiltrados.map((cliente) => (
-
                 <ClienteCard
                   key={cliente.id}
                   cliente={cliente}
                   onReactivar={reactivar}
                 />
-
               ))}
-
             </div>
-
           )}
-
         </section>
-
       )}
-
-
     </div>
-
   );
 }
-
 
 export default ClientesPageV2;
