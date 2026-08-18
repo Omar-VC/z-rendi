@@ -3,18 +3,17 @@ import {
   getDocs,
   query,
   where,
-  addDoc,
   updateDoc,
   doc,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import { db } from "../../../../firebase/firebase";
 
 import type { FichaCliente } from "../types";
 
-
 const FICHAS_COLLECTION = "fichas";
-
 
 export async function getFichaCliente(
   clienteId: string
@@ -25,23 +24,18 @@ export async function getFichaCliente(
     FICHAS_COLLECTION
   );
 
-
   const q = query(
     fichasRef,
     where("clienteId", "==", clienteId)
   );
 
-
   const snapshot = await getDocs(q);
-
 
   if (snapshot.empty) {
     return null;
   }
 
-
   const documento = snapshot.docs[0];
-
 
   return {
     id: documento.id,
@@ -49,41 +43,23 @@ export async function getFichaCliente(
   } as FichaCliente;
 }
 
-
-
 export async function guardarFichaCliente(
   clienteId: string,
   ficha: FichaCliente
 ): Promise<void> {
 
-
-  const fichasRef = collection(
+  const fichaRef = doc(
     db,
-    FICHAS_COLLECTION
+    FICHAS_COLLECTION,
+    clienteId
   );
 
+  const snapshot = await getDoc(fichaRef);
 
-  const q = query(
-    fichasRef,
-    where("clienteId", "==", clienteId)
-  );
-
-
-  const snapshot = await getDocs(q);
-
-
-
-  if (!snapshot.empty) {
-
-    const fichaExistente = snapshot.docs[0];
-
+  if (snapshot.exists()) {
 
     await updateDoc(
-      doc(
-        db,
-        FICHAS_COLLECTION,
-        fichaExistente.id
-      ),
+      fichaRef,
       {
         ...ficha,
         clienteId,
@@ -91,14 +67,11 @@ export async function guardarFichaCliente(
       }
     );
 
-
     return;
   }
 
-
-
-  await addDoc(
-    fichasRef,
+  await setDoc(
+    fichaRef,
     {
       ...ficha,
       clienteId,

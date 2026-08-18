@@ -13,8 +13,6 @@ import { auth, db } from "../../firebase/firebase";
 import type { Invitacion } from "../../features/admin/invitaciones/types";
 import type { FichaCliente } from "../../features/admin/fichas/types";
 
-import { guardarFichaCliente } from "../../features/admin/fichas/services/ficha.service";
-
 interface DatosRegistro {
   nombre: string;
   apellido: string;
@@ -31,16 +29,24 @@ export async function registrarCliente(
 ): Promise<void> {
 
   if (invitacion.estado !== "pendiente") {
-    throw new Error("Esta invitación ya no está disponible.");
+    throw new Error(
+      "Esta invitación ya no está disponible."
+    );
   }
 
-  const credencial = await createUserWithEmailAndPassword(
-    auth,
-    datos.email,
-    datos.password,
-  );
+  // 1. Crear cuenta en Firebase Authentication
+
+  const credencial =
+    await createUserWithEmailAndPassword(
+      auth,
+      datos.email,
+      datos.password,
+    );
 
   const clienteId = credencial.user.uid;
+
+
+  // 2. Crear usuario
 
   await setDoc(
     doc(db, "usuarios", clienteId),
@@ -62,8 +68,11 @@ export async function registrarCliente(
     },
   );
 
+
+  // 3. Crear ficha inicial
+
   const fichaInicial: FichaCliente = {
-    id: "",
+    id: clienteId,
     clienteId,
 
     nombre: datos.nombre,
@@ -85,13 +94,25 @@ export async function registrarCliente(
     observaciones: "",
   };
 
-  await guardarFichaCliente(
-    clienteId,
-    fichaInicial,
+
+  await setDoc(
+    doc(db, "fichas", clienteId),
+    {
+      ...fichaInicial,
+      clienteId,
+      createdAt: new Date().toISOString(),
+    },
   );
 
+
+  // 4. Marcar invitación como usada
+
   await updateDoc(
-    doc(db, "invitaciones", invitacion.id),
+    doc(
+      db,
+      "invitaciones",
+      invitacion.id
+    ),
     {
       estado: "usada",
       clienteId,
