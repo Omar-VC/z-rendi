@@ -1,5 +1,5 @@
 import type { BloqueSesion } from "./bloqueSesion";
-import type { GrupoMuscular } from "../../biblioteca/tipo-sesion/types/trainingBook";
+import type { GrupoMuscular } from "../../biblioteca/libros/types/trainingBook";
 
 export type EstadoSesionPendiente =
   | "pendiente"

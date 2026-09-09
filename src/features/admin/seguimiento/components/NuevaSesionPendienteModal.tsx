@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { useAuth } from "../../../../auth/useAuth";
 
-import { useTrainingBooks } from "../../biblioteca/tipo-sesion/hooks/useTrainingBooks";
+import { useTrainingBooks } from "../../biblioteca/libros/hooks/useTrainingBooks";
 import { useExercises } from "../../biblioteca/ejercicios/hooks/useExercises";
 
 import { crearSesionPendiente } from "../services/sesionesPendientes.service";

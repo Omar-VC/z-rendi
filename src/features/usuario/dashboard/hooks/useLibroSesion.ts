@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import type { TrainingBook } from "../../../admin/biblioteca/tipo-sesion/types/trainingBook";
-import { obtenerLibros } from "../../../admin/biblioteca/tipo-sesion/services/trainingBooksService";
+// Cambiar estas dos líneas:
+import type { TrainingBook } from "../../../admin/biblioteca/libros/types/trainingBook";
+import { obtenerLibros } from "../../../admin/biblioteca/libros/services/trainingBooksService";
 
 
 export function useLibroSesion(
