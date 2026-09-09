@@ -4,18 +4,16 @@ interface RegistrarAsistenciaButtonProps {
   onClick: () => void;
 }
 
-function RegistrarAsistenciaButton({
+export default function RegistrarAsistenciaButton({
   onClick,
 }: RegistrarAsistenciaButtonProps) {
   return (
     <Button
       variant="accent"
-      className="!min-h-0 !h-9 !px-2 !py-1 text-sm"
+      className="!min-h-0 !h-8 !px-3 text-xs font-semibold shadow-[0_0_10px_rgba(255,85,0,0.2)]"
       onClick={onClick}
     >
       Asistencia
     </Button>
   );
 }
-
-export default RegistrarAsistenciaButton;

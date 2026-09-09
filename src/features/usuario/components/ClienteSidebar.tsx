@@ -12,7 +12,7 @@ export default function ClienteSidebar({ onLogout, onNavigate }: Props) {
     <Sidebar>
       <Logo />
 
-      <nav className="space-y-2">
+      <nav className="space-y-2 mt-4">
         <SidebarItem
           label="Inicio"
           icon="🏠"
@@ -31,29 +31,30 @@ export default function ClienteSidebar({ onLogout, onNavigate }: Props) {
       <button
         onClick={onLogout}
         className="
-    mt-auto
-
-    w-full
-
-    px-4
-    py-3
-
-    rounded-xl
-
-    bg-white/10
-
-    border
-    border-white/10
-
-    text-white/80
-
-    hover:bg-accent
-    hover:text-white
-
-    transition-all
-  "
+          mt-auto
+          w-full
+          px-4
+          py-3
+          rounded-card
+          bg-surfaceSoft/60
+          border
+          border-border/60
+          text-text/80
+          hover:bg-primary/10
+          hover:border-primary/40
+          hover:text-primary
+          transition-all
+          duration-200
+          font-medium
+          text-sm
+          flex
+          items-center
+          justify-center
+          gap-2
+        "
       >
-        Salir
+        <span>🚪</span>
+        <span>Salir</span>
       </button>
     </Sidebar>
   );

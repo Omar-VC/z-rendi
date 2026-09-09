@@ -1,235 +1,102 @@
 export default {
-
-
   content: [
-
     "./index.html",
-
     "./src/**/*.{js,ts,jsx,tsx}",
-
   ],
 
-
-
   theme: {
-
     extend: {
-
-
       colors: {
-
+        /* =====================
+            BRAND
+        ====================== */
+        brandOrange: "var(--brand-orange)",
+        brandBlue: "var(--brand-blue)",
+        brandDark: "var(--brand-dark)",
 
         /* =====================
-           BRAND
+            APP
         ====================== */
-
-        brandOrange:
-          "var(--brand-orange)",
-
-
-        brandBlue:
-          "var(--brand-blue)",
-
-
-        brandDark:
-          "var(--brand-dark)",
-
-
+        background: "var(--background)",
+        surface: "var(--surface)",
+        surfaceHover: "var(--surface-hover)",
+        surfaceSoft: "var(--surface-soft)",
 
         /* =====================
-           APP
+            TEXT
         ====================== */
-
-        background:
-          "var(--background)",
-
-
-        surface:
-          "var(--surface)",
-
-
-        surfaceHover:
-          "var(--surface-hover)",
-
-
-        surfaceSoft:
-          "var(--surface-soft)",
-
-
+        text: "var(--text)",
+        muted: "var(--text-muted)",
 
         /* =====================
-           TEXT
+            ACTIONS
         ====================== */
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        accent: "var(--accent)",
 
-        text:
-          "var(--text)",
-
-
-        muted:
-          "var(--text-muted)",
-
-
+        buttonSecondaryBg: "var(--button-secondary-bg)",
+        buttonSecondaryText: "var(--button-secondary-text)",
+        buttonSecondaryBorder: "var(--button-secondary-border)",
 
         /* =====================
-           ACTIONS
+            STATUS
         ====================== */
+        success: "var(--success)",
+        warning: "var(--warning)",
+        danger: "var(--danger)",
+        info: "var(--info)",
 
-        primary:
-          "var(--primary)",
+        successBg: "var(--success-bg)",
+        warningBg: "var(--warning-bg)",
+        dangerBg: "var(--danger-bg)",
+        infoBg: "var(--info-bg)",
+        neutralBg: "var(--neutral-bg)",
 
+        successText: "var(--success-text)",
+        warningText: "var(--warning-text)",
+        dangerText: "var(--danger-text)",
+        infoText: "var(--info-text)",
+        neutralText: "var(--neutral-text)",
 
-        secondary:
-          "var(--secondary)",
+        successBorder: "var(--success-border)",
+        warningBorder: "var(--warning-border)",
+        dangerBorder: "var(--danger-border)",
+        infoBorder: "var(--info-border)",
+        neutralBorder: "var(--neutral-border)",
 
-
-        accent:
-          "var(--accent)",
-
-
-
-        buttonSecondaryBg:
-          "var(--button-secondary-bg)",
-
-
-        buttonSecondaryText:
-          "var(--button-secondary-text)",
-
-
-        buttonSecondaryBorder:
-          "var(--button-secondary-border)",
-
-
-
-        /* =====================
-           STATUS
-        ====================== */
-
-        success:
-          "var(--success)",
-
-
-        warning:
-          "var(--warning)",
-
-
-        danger:
-          "var(--danger)",
-
-
-        info:
-          "var(--info)",
-
-
-
-        successBg:
-          "var(--success-bg)",
-
-
-        warningBg:
-          "var(--warning-bg)",
-
-
-        dangerBg:
-          "var(--danger-bg)",
-
-
-        infoBg:
-          "var(--info-bg)",
-
-
-        neutralBg:
-          "var(--neutral-bg)",
-
-
-
-        successText:
-          "var(--success-text)",
-
-
-        warningText:
-          "var(--warning-text)",
-
-
-        dangerText:
-          "var(--danger-text)",
-
-
-        infoText:
-          "var(--info-text)",
-
-
-        neutralText:
-          "var(--neutral-text)",
-
-
-
-        successBorder:
-          "var(--success-border)",
-
-
-        warningBorder:
-          "var(--warning-border)",
-
-
-        dangerBorder:
-          "var(--danger-border)",
-
-
-        infoBorder:
-          "var(--info-border)",
-
-
-        neutralBorder:
-          "var(--neutral-border)",
-
-
-
-        border:
-          "var(--border)",
-
+        border: "var(--border)",
       },
-
-
 
       borderRadius: {
-
-
-        card:
-          "var(--radius-card)",
-
-
-        button:
-          "var(--radius-button)",
-
-
-        pill:
-          "var(--radius-pill)",
-
-
+        card: "var(--radius-card)",
+        button: "var(--radius-button)",
+        pill: "var(--radius-pill)",
       },
-
-
 
       boxShadow: {
-
-
-        card:
-          "var(--shadow-card)",
-
-
-        cardHover:
-          "var(--shadow-card-hover)",
-
-
+        card: "var(--shadow-card)",
+        cardHover: "var(--shadow-card-hover)",
       },
 
-
+      /* =====================
+          ANIMATIONS & KEYFRAMES
+      ====================== */
+      animation: {
+        'fire-glow': 'fireGlow 3s ease-in-out infinite',
+      },
+      keyframes: {
+        fireGlow: {
+          '0%, 100%': { 
+            filter: 'drop-shadow(0 0 15px rgba(249, 115, 22, 0.4)) brightness(1)' 
+          },
+          '50%': { 
+            filter: 'drop-shadow(0 0 30px rgba(249, 115, 22, 0.8)) brightness(1.15)' 
+          },
+        },
+      }
     },
-
   },
 
-
   plugins: [],
-
-
 };

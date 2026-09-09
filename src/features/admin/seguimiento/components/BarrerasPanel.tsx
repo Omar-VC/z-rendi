@@ -15,7 +15,6 @@ import {
   Card,
   Button,
   Badge,
-  SectionTitle,
 } from "../../../../shared/ui";
 
 type Props = {
@@ -25,7 +24,6 @@ type Props = {
 export default function BarrerasPanel({
   clienteId,
 }: Props) {
-
   const {
     barreras,
     loading,
@@ -33,366 +31,204 @@ export default function BarrerasPanel({
   } = useBarreras(clienteId);
 
   const [mostrarModal, setMostrarModal] = useState(false);
-
-  const [barreraSeleccionada, setBarreraSeleccionada] =
-    useState<Barrera | null>(null);
-
-  const [barreraNuevoObjetivo, setBarreraNuevoObjetivo] =
-    useState<Barrera | null>(null);
-
-  const [barreraAbierta, setBarreraAbierta] =
-    useState<string | null>(null);
+  const [barreraSeleccionada, setBarreraSeleccionada] = useState<Barrera | null>(null);
+  const [barreraNuevoObjetivo, setBarreraNuevoObjetivo] = useState<Barrera | null>(null);
+  const [barreraAbierta, setBarreraAbierta] = useState<string | null>(null);
 
   async function borrarBarrera(id: string) {
-
-    const confirmar =
-      window.confirm("¿Eliminar esta barrera?");
-
+    const confirmar = window.confirm("¿Eliminar esta barrera?");
     if (!confirmar) return;
 
     try {
-
       await eliminarBarrera(id);
-
       recargar();
-
     } catch (error) {
-
       console.error(error);
-
       alert("No se pudo eliminar la barrera.");
-
     }
   }
 
-  function estadoVariant(
-    estado: Barrera["estado"]
-  ) {
-
-    if (estado === "superada") {
-      return "success" as const;
-    }
-
-    return "warning" as const;
+  function estadoVariant(estado: Barrera["estado"]) {
+    return estado === "superada" ? ("success" as const) : ("warning" as const);
   }
 
   function alternarBarrera(id: string) {
-
-    setBarreraAbierta((actual) =>
-      actual === id ? null : id
-    );
-
+    setBarreraAbierta((actual) => (actual === id ? null : id));
   }
 
   return (
-    <Card>
-
-      {/* Encabezado */}
-
-      <div className="
-        flex
-        flex-col
-        gap-4
-        md:flex-row
-        md:items-center
-        md:justify-between
-      ">
-
-        <SectionTitle
-          title="Barreras de progreso"
-          description="Pruebas y objetivos de evolución del atleta."
-        />
+    <Card className="!p-4 bg-surface/70 border-border/60">
+      {/* CABECERA CON ACCIÓN */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-extrabold text-text">
+              Barreras de Progreso
+            </h3>
+            <span className="text-[10px] font-bold text-muted bg-surfaceSoft px-2 py-0.5 rounded-full border border-border/40">
+              {barreras.length}
+            </span>
+          </div>
+          <p className="text-xs text-muted font-medium mt-0.5">
+            Pruebas y objetivos de evolución técnica y física
+          </p>
+        </div>
 
         <Button
           variant="accent"
+          className="!min-h-0 h-8 !px-3 text-xs font-bold shadow-[0_0_12px_rgba(255,85,0,0.2)] shrink-0 self-start sm:self-auto"
           onClick={() => setMostrarModal(true)}
         >
-          Nueva prueba
+          + Nueva Prueba
         </Button>
-
       </div>
 
-
-      {/* Estado */}
-
+      {/* ESTADOS DE CARGA Y VACÍO */}
       {loading && (
-        <p className="mt-6 text-sm text-muted">
-          Cargando...
-        </p>
+        <div className="py-6 space-y-2 animate-pulse">
+          <div className="h-12 bg-surfaceSoft/50 rounded-lg border border-border/30" />
+        </div>
       )}
 
       {!loading && barreras.length === 0 && (
-        <p className="mt-6 text-sm text-muted">
-          No hay pruebas registradas.
+        <p className="py-6 text-center text-xs text-muted font-medium">
+          No hay pruebas registradas para este atleta.
         </p>
       )}
 
-
-      {/* Lista */}
-
+      {/* LISTADO DE BARRERAS */}
       {!loading && barreras.length > 0 && (
-
-        <div className="mt-5">
-
-          {barreras.map((barrera, index) => {
-
-            const abierta =
-              barreraAbierta === barrera.id;
-
-            const evaluaciones =
-              barrera.historial?.length ?? 0;
+        <div className="mt-3 divide-y divide-border/30">
+          {barreras.map((barrera) => {
+            const abierta = barreraAbierta === barrera.id;
+            const evaluaciones = barrera.historial?.length ?? 0;
 
             return (
-
-              <div
-                key={barrera.id}
-                className={`
-                  py-4
-                  ${
-                    index !== barreras.length - 1
-                      ? "border-b border-border"
-                      : ""
-                  }
-                `}
-              >
-
-                {/* Resumen */}
-
+              <div key={barrera.id} className="py-3">
+                {/* BOTÓN REPLEGABLE / HEADER DE LA BARRERA */}
                 <button
                   type="button"
-                  onClick={() =>
-                    alternarBarrera(barrera.id)
-                  }
-                  className="
-                    w-full
-                    text-left
-                  "
+                  onClick={() => alternarBarrera(barrera.id)}
+                  className="w-full text-left group focus:outline-none"
                 >
-
-                  <div className="
-                    flex
-                    flex-col
-                    gap-3
-                    md:flex-row
-                    md:items-center
-                    md:justify-between
-                  ">
-
-                    {/* Información */}
-
-                    <div className="min-w-0">
-
-                      <div className="
-                        flex
-                        flex-wrap
-                        items-center
-                        gap-2
-                      ">
-
-                        <p className="
-                          font-semibold
-                          text-text
-                        ">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    {/* INFORMACIÓN PRINCIPAL */}
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-text group-hover:text-primary transition-colors">
                           {barrera.nombre}
-                        </p>
+                        </span>
 
                         <Badge
-                          variant={estadoVariant(
-                            barrera.estado
-                          )}
+                          variant={estadoVariant(barrera.estado)}
+                          className="text-[10px] px-1.5 py-0 font-bold uppercase tracking-wider"
                         >
                           {barrera.estado}
                         </Badge>
-
                       </div>
 
-
-                      <div className="
-                        mt-1
-                        flex
-                        flex-wrap
-                        items-center
-                        gap-x-2
-                        gap-y-1
-                        text-sm
-                        text-muted
-                      ">
-
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted font-medium">
                         {barrera.categoria && (
                           <>
-                            <span>
+                            <span className="text-text/80 font-semibold">
                               {barrera.categoria}
                             </span>
-
-                            <span>·</span>
+                            <span className="text-border">·</span>
                           </>
                         )}
-
-                        <span>
-                          Objetivo: {barrera.objetivo}
-                        </span>
-
+                        <span>Objetivo: <strong className="text-text/90 font-semibold">{barrera.objetivo}</strong></span>
                       </div>
-
                     </div>
 
-
-                    {/* Resumen derecho */}
-
-                    <div className="
-                      flex
-                      items-center
-                      gap-4
-                      text-sm
-                      text-muted
-                    ">
-
-                      <span>
-                        {evaluaciones}{" "}
-                        {evaluaciones === 1
-                          ? "evaluación"
-                          : "evaluaciones"}
+                    {/* INDICADOR DERECHO */}
+                    <div className="flex items-center gap-3 shrink-0 text-xs text-muted self-end sm:self-center">
+                      <span className="text-[11px] font-mono bg-surfaceSoft px-2 py-0.5 rounded border border-border/30">
+                        {evaluaciones} {evaluaciones === 1 ? "evaluación" : "evaluaciones"}
                       </span>
 
-                      <span>
-                        {abierta ? "▲" : "▼"}
-                      </span>
-
+                      <div className="w-6 h-6 rounded-md bg-surfaceSoft border border-border/30 flex items-center justify-center text-[10px] group-hover:text-text transition-all">
+                        <span className={`transform transition-transform duration-200 ${abierta ? "rotate-180" : ""}`}>
+                          ▼
+                        </span>
+                      </div>
                     </div>
-
                   </div>
-
                 </button>
 
-
-                {/* Detalle */}
-
+                {/* DETALLE Y HISTORIAL CUANDO ESTÁ ABIERTO */}
                 {abierta && (
+                  <div className="mt-3 pt-3 border-t border-border/20 animate-fadeIn space-y-4">
+                    <HistorialBarrera historial={barrera.historial} />
 
-                  <div className="mt-4">
-
-                    <HistorialBarrera
-                      historial={barrera.historial}
-                    />
-
-
-                    {/* Acciones */}
-
-                    <div className="
-                      mt-5
-                      flex
-                      flex-wrap
-                      gap-2
-                    ">
-
+                    {/* BOTONES DE ACCIÓN */}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/20">
                       {barrera.estado === "pendiente" ? (
-
                         <Button
                           variant="success"
-                          onClick={() =>
-                            setBarreraSeleccionada(barrera)
-                          }
+                          className="!min-h-0 !h-7 !px-3 text-xs font-bold"
+                          onClick={() => setBarreraSeleccionada(barrera)}
                         >
                           Evaluar
                         </Button>
-
                       ) : (
-
                         <Button
                           variant="accent"
-                          onClick={() =>
-                            setBarreraNuevoObjetivo(barrera)
-                          }
+                          className="!min-h-0 !h-7 !px-3 text-xs font-bold"
+                          onClick={() => setBarreraNuevoObjetivo(barrera)}
                         >
                           Nuevo objetivo
                         </Button>
-
                       )}
 
                       <Button
                         variant="danger"
-                        onClick={() =>
-                          borrarBarrera(barrera.id)
-                        }
+                        className="!min-h-0 !h-7 !px-2.5 text-xs font-semibold opacity-70 hover:opacity-100"
+                        onClick={() => borrarBarrera(barrera.id)}
                       >
                         Eliminar
                       </Button>
-
                     </div>
-
                   </div>
-
                 )}
-
               </div>
-
             );
-
           })}
-
         </div>
-
       )}
 
-
-      {/* Modales */}
-
+      {/* MODALES */}
       {mostrarModal && (
-
         <NuevaBarreraModal
           clienteId={clienteId}
-          onClose={() =>
-            setMostrarModal(false)
-          }
+          onClose={() => setMostrarModal(false)}
           onGuardado={() => {
-
             recargar();
-
             setMostrarModal(false);
-
           }}
         />
-
       )}
-
 
       {barreraSeleccionada && (
-
         <EvaluarBarreraModal
           barrera={barreraSeleccionada}
-          onClose={() =>
-            setBarreraSeleccionada(null)
-          }
+          onClose={() => setBarreraSeleccionada(null)}
           onGuardado={() => {
-
             recargar();
-
             setBarreraSeleccionada(null);
-
           }}
         />
-
       )}
-
 
       {barreraNuevoObjetivo && (
-
         <NuevoObjetivoModal
           barrera={barreraNuevoObjetivo}
-          onClose={() =>
-            setBarreraNuevoObjetivo(null)
-          }
+          onClose={() => setBarreraNuevoObjetivo(null)}
           onGuardado={() => {
-
             recargar();
-
             setBarreraNuevoObjetivo(null);
-
           }}
         />
-
       )}
-
     </Card>
   );
 }

@@ -1,6 +1,6 @@
 import type { SesionEntrenamiento } from "../types/seguimiento";
 
-import { Badge } from "../../../../shared/ui";
+import { Badge, Card } from "../../../../shared/ui";
 
 import { obtenerEstadoCargaSemanal } from "../utils/cargaUtils";
 
@@ -19,7 +19,6 @@ export default function CargaResumen({ sesiones }: Props) {
   // -----------------------------
   // CARGA SEMANAL
   // -----------------------------
-
   const sesionesSemana = sesiones.filter((sesion) =>
     estaEnSemanaActual(sesion.fecha),
   );
@@ -41,7 +40,6 @@ export default function CargaResumen({ sesiones }: Props) {
   // -----------------------------
   // CARGA MENSUAL
   // -----------------------------
-
   const sesionesMes = sesiones.filter(
     (sesion) =>
       sesion.fecha.getMonth() === hoy.getMonth() &&
@@ -66,82 +64,79 @@ export default function CargaResumen({ sesiones }: Props) {
   });
 
   return (
-    <div className="rounded-xl border border-border bg-surface px-4 py-4">
-      <p className="text-sm font-semibold text-text">
-        Carga
-      </p>
-
-      <div className="mt-3 space-y-3 text-sm">
-
-        {/* SEMANAL */}
-
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-semibold text-text">
-              Semanal
-            </span>
-
-            <span className="text-muted">
-              {obtenerTextoSemanaActual()}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted">
-            <span>
-              {cargaSemanal} UA
-            </span>
-
-            <span>·</span>
-
-            <span>
-              {cantidadSesionesSemana} sesiones
-            </span>
-
-            <span>·</span>
-
-            <span>
-              promedio {promedioSemanal} UA
-            </span>
-
-            <Badge variant={estadoCarga.variant}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {/* TARJETA CARGA SEMANAL */}
+      <Card className="!p-4 bg-surface/70 border-border/60 relative overflow-hidden flex flex-col justify-between">
+        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl pointer-events-none" />
+        
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-muted">
+                Carga Semanal
+              </span>
+              <span className="text-[10px] font-bold text-muted/70 bg-surfaceSoft px-1.5 py-0.5 rounded">
+                {obtenerTextoSemanaActual()}
+              </span>
+            </div>
+            <Badge variant={estadoCarga.variant} className="text-[10px] px-2 py-0.5 font-bold">
               {estadoCarga.texto}
             </Badge>
           </div>
+
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-text tracking-tight">
+              {cargaSemanal}
+            </span>
+            <span className="text-xs font-black text-primary uppercase tracking-wider">
+              UA
+            </span>
+          </div>
         </div>
 
-        {/* MENSUAL */}
+        <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted font-medium">
+          <div>
+            Sesiones: <span className="font-extrabold text-text">{cantidadSesionesSemana}</span>
+          </div>
+          <div>
+            Promedio: <span className="font-extrabold text-text">{promedioSemanal} UA</span>
+          </div>
+        </div>
+      </Card>
 
-        <div className="flex flex-col gap-1 border-t border-border pt-3">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-semibold text-text">
-              Mensual
+      {/* TARJETA CARGA MENSUAL */}
+      <Card className="!p-4 bg-surface/70 border-border/60 relative overflow-hidden flex flex-col justify-between">
+        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl pointer-events-none" />
+
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-black uppercase tracking-wider text-muted">
+              Carga Mensual
             </span>
-
-            <span className="text-muted capitalize">
+            <span className="text-[10px] font-extrabold text-muted capitalize bg-surfaceSoft px-2 py-0.5 rounded">
               {nombreMes}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted">
-            <span>
-              {cargaMensual} UA
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-text tracking-tight">
+              {cargaMensual}
             </span>
-
-            <span>·</span>
-
-            <span>
-              {cantidadSesionesMes} sesiones
-            </span>
-
-            <span>·</span>
-
-            <span>
-              promedio {promedioMensual} UA
+            <span className="text-xs font-black text-primary uppercase tracking-wider">
+              UA
             </span>
           </div>
         </div>
 
-      </div>
+        <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted font-medium">
+          <div>
+            Sesiones: <span className="font-extrabold text-text">{cantidadSesionesMes}</span>
+          </div>
+          <div>
+            Promedio: <span className="font-extrabold text-text">{promedioMensual} UA</span>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

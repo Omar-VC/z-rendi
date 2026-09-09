@@ -1,14 +1,6 @@
 import { useState } from "react";
-
 import type { SesionPendiente } from "../../../admin/seguimiento/types/sesionPendiente";
-
-import {
-  Modal,
-  Input,
-  Textarea,
-  Button,
-  Label,
-} from "../../../../shared/ui";
+import { Modal, Textarea, Button, Label } from "../../../../shared/ui";
 
 type Props = {
   sesion: SesionPendiente;
@@ -25,39 +17,28 @@ export default function CompletarSesionModal({
   onClose,
   onGuardar,
 }: Props) {
-  const [rpe, setRpe] = useState("");
+  const [rpeSeleccionado, setRpeSeleccionado] = useState<number | null>(null);
   const [observaciones, setObservaciones] = useState("");
-
   const [guardando, setGuardando] = useState(false);
 
   const duracionTotal = sesion.bloques.reduce(
     (total, bloque) => total + bloque.duracion,
-    0,
+    0
   );
 
-  const rpeNumero = Number(rpe);
-
-  const carga =
-    duracionTotal > 0 && rpeNumero > 0
-      ? duracionTotal * rpeNumero
-      : 0;
+  const carga = (rpeSeleccionado || 0) * duracionTotal;
 
   async function handleGuardar() {
-    if (
-      !rpeNumero ||
-      rpeNumero < 1 ||
-      rpeNumero > 10
-    ) {
-      alert("El RPE debe estar entre 1 y 10.");
+    if (!rpeSeleccionado) {
+      alert("Por favor selecciona un nivel de RPE (1 al 10).");
       return;
     }
 
     try {
       setGuardando(true);
-
       await onGuardar({
         duracion: duracionTotal,
-        rpe: rpeNumero,
+        rpe: rpeSeleccionado,
         observaciones,
       });
     } catch (error) {
@@ -74,387 +55,179 @@ export default function CompletarSesionModal({
     month: "long",
   });
 
+  // Ayudante de color según nivel de RPE
+  const getRpeColor = (val: number) => {
+    if (val <= 4) return "border-success/40 text-success hover:bg-success/20";
+    if (val <= 7) return "border-warning/40 text-warning hover:bg-warning/20";
+    return "border-danger/40 text-danger hover:bg-danger/20";
+  };
+
+  const getRpeActiveBg = (val: number) => {
+    if (val <= 4) return "bg-success text-black font-extrabold shadow-[0_0_15px_rgba(16,185,129,0.4)]";
+    if (val <= 7) return "bg-warning text-black font-extrabold shadow-[0_0_15px_rgba(245,158,11,0.4)]";
+    return "bg-danger text-white font-extrabold shadow-[0_0_15px_rgba(239,68,68,0.4)]";
+  };
+
   return (
     <Modal
-      title="Sesión de entrenamiento"
+      title="Registro de Entrenamiento"
       onClose={onClose}
       footer={
-        <>
+        <div className="flex w-full items-center justify-end gap-3">
           <Button
             variant="secondary"
             onClick={onClose}
             disabled={guardando}
           >
-            Cerrar
+            Cancelar
           </Button>
 
           <Button
-            variant="accent"
+            variant="primary"
             onClick={handleGuardar}
-            disabled={guardando}
+            disabled={guardando || !rpeSeleccionado}
+            className="px-6 shadow-[0_0_20px_rgba(255,85,0,0.3)]"
           >
-            {guardando
-              ? "Guardando..."
-              : "Finalizar sesión"}
+            {guardando ? "Guardando..." : "Finalizar sesión"}
           </Button>
-        </>
+        </div>
       }
     >
       <div className="space-y-6">
-
         {/* INFORMACIÓN GENERAL */}
-
-        <div>
-          <p className="text-sm text-muted">
+        <div className="rounded-xl border border-border bg-surfaceSoft/30 p-4 space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             {fecha}
           </p>
-
-          <h2 className="
-            mt-1
-            text-2xl
-            font-bold
-            text-text
-          ">
+          <h2 className="text-xl font-extrabold text-text">
             {sesion.libroNombre}
           </h2>
-
-          <p className="
-            mt-3
-            text-sm
-            text-muted
-          ">
-            Objetivo
+          <p className="text-sm text-muted">
+            <span className="font-semibold text-text">Objetivo:</span> {sesion.objetivo}
           </p>
-
-          <p className="
-            mt-1
-            font-semibold
-            text-text
-          ">
-            {sesion.objetivo}
-          </p>
-
-          <div className="
-            mt-4
-            rounded-xl
-            border
-            border-border
-            bg-surface-soft
-            p-4
-          ">
-            <p className="text-sm text-muted">
-              Duración total
-            </p>
-
-            <p className="
-              mt-1
-              text-2xl
-              font-bold
-              text-text
-            ">
-              {duracionTotal} minutos
-            </p>
+          <div className="pt-2 flex items-center justify-between border-t border-border/50 text-xs text-muted">
+            <span>Duración calculada:</span>
+            <span className="text-sm font-bold text-text">{duracionTotal} min</span>
           </div>
         </div>
 
-
-        {/* BLOQUES */}
-
-        <div>
-          <h3 className="
-            text-xl
-            font-bold
-            text-text
-          ">
-            Entrenamiento
+        {/* DETALLE DE BLOQUES Y EJERCICIOS */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted">
+            Estructura de la Sesión
           </h3>
 
-          <div className="mt-4 space-y-4">
-
-            {sesion.bloques.map(
-              (bloque, bloqueIndex) => (
-                <div
-                  key={bloque.id}
-                  className="
-                    rounded-xl
-                    border
-                    border-border
-                    bg-surface-soft
-                    p-4
-                  "
-                >
-
-                  {/* BLOQUE */}
-
-                  <div className="
-                    flex
-                    items-start
-                    justify-between
-                    gap-3
-                  ">
-                    <div>
-
-                      <p className="
-                        text-xs
-                        uppercase
-                        tracking-wide
-                        text-muted
-                      ">
-                        Bloque {bloqueIndex + 1}
-                      </p>
-
-                      <p className="
-                        mt-1
-                        font-bold
-                        text-text
-                      ">
-                        {bloque.nombre}
-                      </p>
-
-                    </div>
-
-                    <span className="
-                      shrink-0
-                      rounded-lg
-                      border
-                      border-border
-                      bg-surface
-                      px-3
-                      py-1.5
-                      text-sm
-                      font-semibold
-                      text-text
-                    ">
-                      {bloque.duracion} min
-                    </span>
-                  </div>
-
-
-                  {/* EJERCICIOS */}
-
-                  <div className="mt-4 space-y-3">
-
-                    {bloque.ejercicios.map(
-                      (ejercicio, ejercicioIndex) => (
-                        <div
-                          key={`${bloque.id}-${ejercicio.ejercicioId}-${ejercicioIndex}`}
-                          className="
-                            rounded-lg
-                            border
-                            border-border
-                            bg-surface
-                            p-4
-                          "
-                        >
-
-                          <div className="
-                            flex
-                            items-start
-                            gap-3
-                          ">
-
-                            <span className="
-                              flex
-                              h-8
-                              w-8
-                              shrink-0
-                              items-center
-                              justify-center
-                              rounded-full
-                              bg-primary
-                              text-sm
-                              font-bold
-                              text-white
-                            ">
-                              {ejercicioIndex + 1}
-                            </span>
-
-                            <div className="min-w-0">
-
-                              <p className="
-                                font-semibold
-                                text-text
-                              ">
-                                {ejercicio.nombre}
-                              </p>
-
-                              {ejercicio.repeticiones && (
-                                <p className="
-                                  mt-2
-                                  text-sm
-                                  text-text
-                                ">
-                                  <span className="font-semibold">
-                                    Repeticiones:
-                                  </span>{" "}
-                                  {ejercicio.repeticiones}
-                                </p>
-                              )}
-
-                              {ejercicio.pausa && (
-                                <p className="
-                                  mt-1
-                                  text-sm
-                                  text-muted
-                                ">
-                                  <span className="font-semibold">
-                                    Pausa:
-                                  </span>{" "}
-                                  {ejercicio.pausa}
-                                </p>
-                              )}
-
-                              {ejercicio.indicaciones && (
-                                <div className="
-                                  mt-3
-                                  rounded-lg
-                                  border
-                                  border-border
-                                  bg-surface-soft
-                                  p-3
-                                ">
-                                  <p className="
-                                    text-xs
-                                    uppercase
-                                    tracking-wide
-                                    text-muted
-                                  ">
-                                    Indicaciones
-                                  </p>
-
-                                  <p className="
-                                    mt-1
-                                    text-sm
-                                    text-text
-                                    whitespace-pre-line
-                                  ">
-                                    {ejercicio.indicaciones}
-                                  </p>
-                                </div>
-                              )}
-
-                            </div>
-
-                          </div>
-
-                        </div>
-                      ),
-                    )}
-
-                  </div>
-
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+            {sesion.bloques.map((bloque, bloqueIndex) => (
+              <div
+                key={bloque.id}
+                className="rounded-xl border border-border bg-surface p-3.5 space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-primary">
+                    BLOQUE {bloqueIndex + 1}: {bloque.nombre}
+                  </span>
+                  <span className="text-xs font-semibold text-muted bg-surfaceSoft px-2.5 py-1 rounded-md">
+                    {bloque.duracion} min
+                  </span>
                 </div>
-              ),
-            )}
 
+                <div className="space-y-2">
+                  {bloque.ejercicios.map((ejercicio, ejIndex) => (
+                    <div
+                      key={`${bloque.id}-${ejercicio.ejercicioId}-${ejIndex}`}
+                      className="rounded-lg bg-surfaceSoft/40 p-2.5 border border-white/5 space-y-1"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                          {ejIndex + 1}
+                        </span>
+                        <p className="text-xs font-bold text-text">
+                          {ejercicio.nombre}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted pl-7">
+                        {ejercicio.repeticiones && (
+                          <span>Reps: <strong className="text-text">{ejercicio.repeticiones}</strong></span>
+                        )}
+                        {ejercicio.pausa && (
+                          <span>Pausa: <strong className="text-text">{ejercicio.pausa}</strong></span>
+                        )}
+                      </div>
+
+                      {ejercicio.indicaciones && (
+                        <p className="pl-7 text-[11px] text-muted italic">
+                          "{ejercicio.indicaciones}"
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* SELECTOR DE RPE TÁCTIL (1 a 10) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-bold text-text">Percepción de Esfuerzo (RPE)</Label>
+            {rpeSeleccionado && (
+              <span className="text-xs font-bold text-primary animate-fadeIn">
+                RPE {rpeSeleccionado} Seleccionado
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted">
+            1 = Muy fácil / Recuperativo · 10 = Esfuerzo Máximo
+          </p>
 
-        {/* INDICACIONES GENERALES */}
+          <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 pt-1">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+              const isSelected = rpeSeleccionado === num;
+              return (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setRpeSeleccionado(num)}
+                  className={`
+                    h-11 rounded-lg border text-sm font-bold transition-all duration-150 active:scale-95
+                    ${isSelected ? getRpeActiveBg(num) : getRpeColor(num)}
+                  `}
+                >
+                  {num}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-        {sesion.observacionesPreparador && (
+        {/* MÉTRICA DE CARGA GENERADA */}
+        <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-surface to-primary/10 p-4 flex items-center justify-between shadow-[0_0_20px_rgba(255,85,0,0.1)]">
           <div>
-            <h3 className="
-              text-lg
-              font-bold
-              text-text
-            ">
-              Indicaciones generales
-            </h3>
-
-            <p className="
-              mt-2
-              text-sm
-              text-text
-              whitespace-pre-line
-            ">
-              {sesion.observacionesPreparador}
+            <p className="text-xs font-bold uppercase tracking-wider text-muted">
+              Carga de Entrenamiento ($sRPE$)
+            </p>
+            <p className="text-[11px] text-muted">
+              {duracionTotal} min × RPE {rpeSeleccionado || 0}
             </p>
           </div>
-        )}
-
-
-        {/* RPE */}
-
-        <div>
-          <Label>
-            RPE
-          </Label>
-
-          <p className="
-            mb-2
-            text-sm
-            text-muted
-          ">
-            Indicá qué tan exigente fue la sesión.
-            <br />
-            1 = muy fácil · 10 = máximo esfuerzo
-          </p>
-
-          <Input
-            type="number"
-            min={1}
-            max={10}
-            placeholder="Ej: 7"
-            value={rpe}
-            onChange={(e) =>
-              setRpe(e.target.value)
-            }
-          />
-        </div>
-
-
-        {/* CARGA */}
-
-        <div className="
-          rounded-xl
-          border
-          border-border
-          bg-surface-soft
-          p-5
-        ">
-          <p className="
-            text-sm
-            text-muted
-          ">
-            Carga de entrenamiento
-          </p>
-
-          <p className="
-            mt-1
-            text-3xl
-            font-bold
-            text-accent
-          ">
-            {carga}
-          </p>
-
-          <p className="
-            text-xs
-            text-muted
-          ">
-            Duración programada × RPE
+          <p className="text-3xl font-black text-primary tracking-tight">
+            {carga} <span className="text-xs text-muted font-normal">UA</span>
           </p>
         </div>
 
-
-        {/* OBSERVACIONES DEL CLIENTE */}
-
-        <div>
-          <Label>
-            Observaciones
-          </Label>
-
+        {/* OBSERVACIONES DEL ATLETA */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-bold text-text">Observaciones / Feedback</Label>
           <Textarea
-            placeholder="¿Cómo te sentiste durante el entrenamiento?"
+            placeholder="¿Cómo te sentiste? ¿Molestias o buenas sensaciones?"
             value={observaciones}
-            onChange={(e) =>
-              setObservaciones(e.target.value)
-            }
+            onChange={(e) => setObservaciones(e.target.value)}
+            className="text-sm bg-surfaceSoft/40 border-border focus:border-primary/50"
           />
         </div>
-
       </div>
     </Modal>
   );

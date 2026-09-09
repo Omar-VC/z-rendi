@@ -10,14 +10,35 @@ import ClienteDashboard from "./features/usuario/dashboard/pages/ClienteDashboar
 import SesionClientePage from "./features/usuario/dashboard/pages/SesionClientePage";
 import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
 import RegistroPage from "./auth/pages/RegistroPage";
+import Logo from "./shared/components/sidebar/Logo";
+import SplashLogo from "./shared/components/sidebar/SplashLogo";
 
 function App() {
   const { user, usuario, loading } = useAuth();
 
-  if (loading) {
+ if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Cargando...
+      <div className="min-h-screen bg-background text-text relative flex items-center justify-center overflow-hidden selection:bg-primary/30 selection:text-primary">
+        {/* Luz ambiental sutil de fondo */}
+        <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
+
+        {/* Contenedor central con efecto de luz/fuego y el SplashLogo */}
+        <div className="relative z-10 flex flex-col items-center animate-fire-glow">
+          {/* Esfera trasera luminosa */}
+          <div className="absolute -inset-6 bg-gradient-to-t from-orange-600/30 to-amber-500/20 rounded-3xl blur-2xl animate-pulse pointer-events-none" />
+
+          {/* Logo de presentación */}
+          <div className="relative">
+            <SplashLogo />
+          </div>
+
+          {/* Puntos de carga inferiores */}
+          <div className="mt-10 flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-bounce" />
+          </div>
+        </div>
       </div>
     );
   }

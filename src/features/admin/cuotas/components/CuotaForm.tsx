@@ -53,7 +53,6 @@ export default function CuotaForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setGuardando(true);
 
     try {
@@ -67,7 +66,6 @@ export default function CuotaForm({
       };
 
       await crearCuota(nuevaCuota);
-
       onGuardado();
     } catch (error) {
       console.error("Error creando cuota", error);
@@ -77,36 +75,41 @@ export default function CuotaForm({
   };
 
   return (
-    <Card className="space-y-5">
+    <Card>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <Label>Mes</Label>
-
-          <Select name="mes" value={form.mes} onChange={handleChange}>
-            <option value="">Seleccionar mes</option>
-
-            {meses.map((mes) => (
-              <option key={mes} value={mes}>
-                {mes}
-              </option>
-            ))}
-          </Select>
+          <h2 className="text-xl font-bold text-text">Nueva cuota</h2>
+          <p className="text-sm text-muted mt-1">
+            Asigna un nuevo periodo de cobro para el cliente.
+          </p>
         </div>
 
-        <div>
-          <Label>Año</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Mes</Label>
+            <Select name="mes" value={form.mes} onChange={handleChange}>
+              <option value="">Seleccionar mes</option>
+              {meses.map((mes) => (
+                <option key={mes} value={mes}>
+                  {mes}
+                </option>
+              ))}
+            </Select>
+          </div>
 
-          <Input
-            name="anio"
-            type="number"
-            value={form.anio}
-            onChange={handleChange}
-          />
+          <div>
+            <Label>Año</Label>
+            <Input
+              name="anio"
+              type="number"
+              value={form.anio}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div>
           <Label>Monto</Label>
-
           <Input
             name="monto"
             type="number"
@@ -118,7 +121,6 @@ export default function CuotaForm({
 
         <div>
           <Label>Fecha de vencimiento</Label>
-
           <Input
             name="fechaVencimiento"
             type="date"
@@ -128,7 +130,7 @@ export default function CuotaForm({
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
-          <Button variant="secondary" onClick={onCancelar} type="button">
+          <Button variant="secondary" onClick={onCancelar} type="button" disabled={guardando}>
             Cancelar
           </Button>
 

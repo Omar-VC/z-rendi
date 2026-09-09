@@ -2,428 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* =========================
    Z-RENDI DESIGN SYSTEM
-   DARK PERFORMANCE
+   PRO DARK PERFORMANCE V2
 ========================= */
 
-
 :root {
-
-
   /* =====================
      BRAND IDENTITY
   ====================== */
-
-  --brand-orange: #FF6500;
-
-  --brand-blue: #1E3E62;
-
-  --brand-dark: #0B192C;
-
+  --brand-orange: #FF5500; /* Naranja atlético de alto impacto */
+  --brand-blue: #0F172A;   /* Slate súper sobrio */
+  --brand-dark: #090D16;   /* Fondo negro profundo estilo OLED */
   --brand-black: #000000;
 
-
-
   /* =====================
-     APP COLORS
+     APP COLORS (Surfaces & Backgrounds)
   ====================== */
-
-  --background:
-    #0B192C;
-
-
-  --surface:
-    #12263F;
-
-
-  --surface-soft:
-    #183452;
-
-
-  --surface-hover:
-    #1A3A5C;
-
-
+  --background: #090D16;       /* Fondo principal oscuro y elegante */
+  --surface: #111827;          /* Tarjetas y paneles principales */
+  --surface-soft: #1F2937;     /* Sub-paneles o secciones secundarias */
+  --surface-hover: #2B3748;    /* Estado hover suave */
 
   /* =====================
      TEXT
   ====================== */
-
-  --text:
-    #F8FAFC;
-
-
-  --text-muted:
-    #94A3B8;
-
-
+  --text: #F8FAFC;            /* Blanco brillante */
+  --text-muted: #94A3B8;      /* Gris metálico claro para lectura cómoda */
 
   /* =====================
-     BORDERS
+     BORDERS & ACCENTS
   ====================== */
-
-  --border:
-    rgba(255,255,255,0.10);
-
-
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(255, 85, 0, 0.5);
 
   /* =====================
      ACTION COLORS
   ====================== */
-
-  --primary:
-    #FF6500;
-
-
-  --secondary:
-    #1E3E62;
-
-
-  --accent:
-    #FF6500;
-
-
+  --primary: #FF5500;
+  --primary-hover: #E64D00;
+  --secondary: #1E293B;
+  --accent: #FF5500;
 
   /* =====================
      BUTTON SECONDARY
   ====================== */
-
-  --button-secondary-bg:
-    rgba(255,255,255,0.08);
-
-
-  --button-secondary-text:
-    #F8FAFC;
-
-
-  --button-secondary-border:
-    rgba(255,255,255,0.15);
-
-
+  --button-secondary-bg: rgba(255, 255, 255, 0.05);
+  --button-secondary-text: #F8FAFC;
+  --button-secondary-border: rgba(255, 255, 255, 0.12);
 
   /* =====================
-     STATUS COLORS
+     STATUS COLORS (Sports High-Contrast)
   ====================== */
-
-  --success:
-    #22C55E;
-
-
-  --warning:
-    #FACC15;
-
-
-  --danger:
-    #EF4444;
-
-
-  --info:
-    #38BDF8;
-
-
+  --success: #10B981;    /* Verde rendimiento */
+  --warning: #F59E0B;    /* Ámbar de alerta */
+  --danger: #EF4444;     /* Rojo barrera / sobrecarga */
+  --info: #06B6D4;       /* Cían tecnológico */
 
   /* =====================
-     STATUS BACKGROUND
+     STATUS BACKGROUNDS & TEXTS
   ====================== */
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --success-text: #34D399;
+  --success-border: rgba(16, 185, 129, 0.3);
 
-  --success-bg:
-    rgba(34,197,94,.15);
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --warning-text: #FBBF24;
+  --warning-border: rgba(245, 158, 11, 0.3);
 
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-text: #F87171;
+  --danger-border: rgba(239, 68, 68, 0.3);
 
-  --warning-bg:
-    rgba(250,204,21,.15);
+  --info-bg: rgba(6, 182, 212, 0.12);
+  --info-text: #38BDF8;
+  --info-border: rgba(6, 182, 212, 0.3);
 
-
-  --danger-bg:
-    rgba(239,68,68,.15);
-
-
-  --info-bg:
-    rgba(56,189,248,.15);
-
-
-  --neutral-bg:
-    rgba(148,163,184,.15);
-
-
+  --neutral-bg: rgba(148, 163, 184, 0.1);
+  --neutral-text: #CBD5E1;
+  --neutral-border: rgba(148, 163, 184, 0.25);
 
   /* =====================
-     STATUS TEXT
+     SHADOWS & GLOWS
   ====================== */
-
-  --success-text:
-    #86EFAC;
-
-
-  --warning-text:
-    #FDE68A;
-
-
-  --danger-text:
-    #FCA5A5;
-
-
-  --info-text:
-    #7DD3FC;
-
-
-  --neutral-text:
-    #CBD5E1;
-
-
-
-  /* =====================
-     STATUS BORDER
-  ====================== */
-
-  --success-border:
-    rgba(34,197,94,.35);
-
-
-  --warning-border:
-    rgba(250,204,21,.35);
-
-
-  --danger-border:
-    rgba(239,68,68,.35);
-
-
-  --info-border:
-    rgba(56,189,248,.35);
-
-
-  --neutral-border:
-    rgba(148,163,184,.35);
-
-
-
-  /* =====================
-     SHADOWS
-  ====================== */
-
-  --shadow-card:
-    0 8px 24px rgba(0,0,0,.25);
-
-
-  --shadow-card-hover:
-    0 12px 32px rgba(0,0,0,.35);
-
-
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --shadow-card-hover: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --glow-primary: 0 0 20px rgba(255, 85, 0, 0.25);
 
   /* =====================
      RADII
   ====================== */
-
-  --radius-card:
-    16px;
-
-
-  --radius-button:
-    12px;
-
-
-  --radius-pill:
-    999px;
-
-}
-
-
-
-/* =========================
-   BASE
-========================= */
-
-
-* {
-
-  box-sizing:
-    border-box;
-
-}
-
-
-
-html {
-
-  scroll-behavior:
-    smooth;
-
-}
-
-
-
-body {
-
-  @apply font-sans;
-
-  background:
-    var(--background);
-
-  color:
-    var(--text);
-
-  margin:
-    0;
-
-  min-height:
-    100vh;
-
-  -webkit-font-smoothing:
-    antialiased;
-
-  -moz-osx-font-smoothing:
-    grayscale;
-
-}
-
-
-
-/* =========================
-   TYPOGRAPHY
-========================= */
-
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-
-  @apply font-semibold;
-
-  color:
-    var(--text);
-
-}
-
-
-
-p {
-
-  line-height:
-    1.6;
-
-}
-
-
-
-/* =========================
-   CONTAINER
-========================= */
-
-
-.page-container {
-
-  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-
-}
-
-
-
-/* =========================
-   TABLES
-========================= */
-
-
-table {
-
-  width:
-    100%;
-
-  border-collapse:
-    collapse;
-
-}
-
-
-tr {
-
-  transition:
-    background-color .15s ease;
-
-}
-
-
-tr:hover {
-
-  background:
-    var(--surface-hover);
-
-}
-
-
-
-/* =========================
-   SCROLLBAR
-========================= */
-
-
-::-webkit-scrollbar {
-
-  width:
-    10px;
-
-}
-
-
-::-webkit-scrollbar-track {
-
-  background:
-    var(--background);
-
-}
-
-
-::-webkit-scrollbar-thumb {
-
-  background:
-    var(--surface-hover);
-
-  border-radius:
-    10px;
-
-}
-
-
-
-/* =========================
-   ANIMATIONS
-========================= */
-
-
-@keyframes fadeIn {
-
-  from {
-
-    opacity:
-      0;
-
-    transform:
-      translateY(8px);
-
-  }
-
-
-  to {
-
-    opacity:
-      1;
-
-    transform:
-      translateY(0);
-
-  }
-
-}
-
-
-
-.animate-fadeIn {
-
-  animation:
-    fadeIn .25s ease-out;
-
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-pill: 9999px;
 }

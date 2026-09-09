@@ -15,7 +15,7 @@ interface CuotaResumenProps {
   onVerRecibo: (cuota: Cuota) => void;
 }
 
-function CuotaResumen({
+export default function CuotaResumen({
   cuotas,
   onCrear,
   onRegistrarPago,
@@ -26,14 +26,14 @@ function CuotaResumen({
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
 
   const cuotasPendientes = cuotas.filter(
-    (cuota) => cuota.estado === "pendiente",
+    (cuota) => cuota.estado === "pendiente"
   );
 
   const cuotasPagadas = cuotas.filter((cuota) => cuota.estado === "pagada");
 
   async function handleEliminarCuota(cuota: Cuota) {
     const confirmar = window.confirm(
-      `¿Eliminar la cuota de ${cuota.mes} ${cuota.anio}? Esta acción no se puede deshacer.`,
+      `¿Eliminar la cuota de ${cuota.mes} ${cuota.anio}? Esta acción no se puede deshacer.`
     );
 
     if (!confirmar) return;
@@ -62,107 +62,111 @@ function CuotaResumen({
 
       <div className="space-y-4 mt-6">
         {/* CUOTAS PENDIENTES */}
+        {cuotasPendientes.length === 0 ? (
+          <div className="p-4 bg-surfaceSoft/40 border border-border/50 rounded-card text-center">
+            <p className="text-sm text-muted">No hay cuotas pendientes registradas.</p>
+          </div>
+        ) : (
+          cuotasPendientes.map((cuota) => (
+            <div
+              key={cuota.id}
+              className="rounded-card border border-border bg-surfaceSoft/20 p-5 transition-all hover:border-border/80"
+            >
+              <div className="flex flex-col md:flex-row md:justify-between gap-5">
+                <div>
+                  <h3 className="font-semibold text-lg capitalize text-text">
+                    {cuota.mes} {cuota.anio}
+                  </h3>
 
-        {cuotasPendientes.map((cuota) => (
-          <div
-            key={cuota.id}
-            className="
-        rounded-xl
-        border
-        border-border
-        bg-surface
-        p-5
-      "
-          >
-            <div className="flex flex-col md:flex-row md:justify-between gap-5">
-              <div>
-                <h3 className="font-semibold text-lg capitalize">
-                  {cuota.mes} {cuota.anio}
-                </h3>
+                  <p className="text-sm text-muted mt-1">
+                    Vencimiento: <span className="font-mono">{cuota.fechaVencimiento}</span>
+                  </p>
 
-                <p className="text-sm text-muted mt-2">
-                  Vencimiento: {cuota.fechaVencimiento}
-                </p>
-
-                <div className="mt-3">
-                  <Badge variant="warning">Pendiente</Badge>
+                  <div className="mt-3">
+                    <Badge variant="warning">Pendiente</Badge>
+                  </div>
                 </div>
-              </div>
 
-              <div className="md:text-right">
-                <p className="text-xl font-bold">${cuota.monto}</p>
+                <div className="md:text-right flex flex-col md:items-end justify-between">
+                  <p className="text-xl font-bold font-mono text-text">
+                    ${cuota.monto}
+                  </p>
 
-                <Button
-                  variant="accent"
-                  className="mt-4"
-                  onClick={() => onRegistrarPago(cuota)}
-                >
-                  Registrar pago
-                </Button>
-
-                <div className="flex md:justify-end gap-2 mt-4">
-                  <Button variant="secondary" onClick={() => onEditar(cuota)}>
-                    Editar
-                  </Button>
+                  <div className="flex flex-wrap md:justify-end gap-2 mt-4">
+                    <Button
+                      variant="accent"
+                      className="!h-9 !px-3 text-xs"
+                      onClick={() => onRegistrarPago(cuota)}
+                    >
+                      Registrar pago
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="!h-9 !px-3 text-xs"
+                      onClick={() => onEditar(cuota)}
+                    >
+                      Editar
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
 
         {/* HISTORIAL */}
-
         {cuotasPagadas.length > 0 && (
-          <div className="pt-2">
+          <div className="pt-4">
             <button
               type="button"
               onClick={() => setMostrarHistorial(!mostrarHistorial)}
               className="
-          w-full
-          flex
-          items-center
-          justify-between
-          py-3
-          text-sm
-          font-semibold
-          text-text
-          border-b
-          border-border
-        "
+                w-full
+                flex
+                items-center
+                justify-between
+                py-3
+                px-4
+                bg-surfaceSoft/30
+                rounded-card
+                text-sm
+                font-semibold
+                text-text
+                border
+                border-border/60
+                hover:bg-surfaceSoft/60
+                transition-all
+              "
             >
-              <span>Historial de cuotas</span>
-
-              <span>{mostrarHistorial ? "▲" : "▼"}</span>
+              <span>Historial de cuotas pagadas ({cuotasPagadas.length})</span>
+              <span className="text-muted">{mostrarHistorial ? "▲" : "▼"}</span>
             </button>
 
             {mostrarHistorial && (
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-border/60 mt-3 bg-surfaceSoft/10 rounded-card border border-border/40 px-4">
                 {cuotasPagadas.map((cuota) => (
                   <div
                     key={cuota.id}
-                    className="
-                py-4
-                text-sm
-                text-muted
-              "
+                    className="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm"
                   >
-                    <div className="flex flex-col gap-1">
+                    <div className="space-y-1">
                       <p className="font-semibold text-text capitalize">
                         {cuota.mes} {cuota.anio}
-                        {" · "}${cuota.monto}
+                        <span className="font-mono text-primary ml-2 font-bold">
+                          ${cuota.monto}
+                        </span>
                       </p>
-
-                      <p>
-                        Pagada · {cuota.fechaPago ?? "-"}
-                        {" · "}
-                        {cuota.metodoPago ?? "-"}
+                      <p className="text-xs text-muted">
+                        Pagada el <span className="font-mono">{cuota.fechaPago ?? "-"}</span>
+                        {" · Método: "}
+                        <span className="text-text font-medium">{cuota.metodoPago ?? "-"}</span>
                       </p>
                     </div>
 
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Button
                         variant="secondary"
-                        className="!h-8 !px-3 !py-1 text-xs"
+                        className="!h-8 !px-3 text-xs"
                         onClick={() => onVerRecibo(cuota)}
                       >
                         Recibo
@@ -175,7 +179,7 @@ function CuotaResumen({
 
                       <Button
                         variant="danger"
-                        className="!h-8 !px-3 !py-1 text-xs"
+                        className="!h-8 !px-3 text-xs"
                         onClick={() => handleEliminarCuota(cuota)}
                       >
                         Eliminar
@@ -191,5 +195,3 @@ function CuotaResumen({
     </Card>
   );
 }
-
-export default CuotaResumen;
