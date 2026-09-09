@@ -3,16 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <!-- Ícono del navegador -->
     <link rel="icon" type="image/png" href="/icon-192.png" />
-    <title>z-rendi</title>
+
+    <!-- Configuración PWA -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Configuración específica para iPhone/iOS -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Z-Rendi" />
+
+    <title>Z-Rendi</title>
   </head>
+
   <body>
     <!-- Pantalla de splash -->
-    <div id="splash" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-  <img src="/logo-500.png" alt="Z-Rendi Logo" width="200" />
-</div>
-
+    <div
+      id="splash"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      "
+    >
+      <img src="/logo-500.png" alt="Z-Rendi Logo" width="200" />
+    </div>
 
     <!-- App React oculta hasta que cargue -->
     <div id="root" style="display: none;"></div>

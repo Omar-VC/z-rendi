@@ -3,13 +3,7 @@ import { useState } from "react";
 import type { Cuota } from "../types";
 import { editarCuota } from "../services/cuotas.service";
 
-import {
-  Card,
-  Input,
-  Label,
-  Select,
-  Button,
-} from "../../../../shared/ui";
+import { Card, Input, Label, Select, Button } from "../../../../shared/ui";
 
 interface EditarCuotaFormProps {
   cuota: Cuota;
@@ -22,7 +16,6 @@ export default function EditarCuotaForm({
   onGuardado,
   onCancelar,
 }: EditarCuotaFormProps) {
-
   const [form, setForm] = useState({
     monto: cuota.monto.toString(),
     fechaVencimiento: cuota.fechaVencimiento,
@@ -33,63 +26,43 @@ export default function EditarCuotaForm({
 
   const [guardando, setGuardando] = useState(false);
 
-  const handleSubmit = async (
-    e: React.FormEvent,
-  ) => {
-
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setGuardando(true);
 
     try {
-
-      await editarCuota(cuota.id, {
+      const datos = {
         monto: Number(form.monto),
         fechaVencimiento: form.fechaVencimiento,
-        fechaPago: form.fechaPago || undefined,
         estado: form.estado,
-        metodoPago: form.metodoPago as
-          | "efectivo"
-          | "transferencia",
-      });
+        metodoPago: form.metodoPago as "efectivo" | "transferencia",
+        ...(form.estado === "pagada" && form.fechaPago
+          ? { fechaPago: form.fechaPago }
+          : {}),
+      };
+
+      await editarCuota(cuota.id, datos);
 
       onGuardado();
-
     } finally {
-
       setGuardando(false);
-
     }
-
   };
 
   return (
-
     <Card>
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5"
-      >
-
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-
-          <h2 className="text-xl font-semibold">
-            Editar cuota
-          </h2>
+          <h2 className="text-xl font-semibold">Editar cuota</h2>
 
           <p className="text-sm text-muted mt-1">
             {cuota.mes} {cuota.anio}
           </p>
-
         </div>
 
-
         <div>
-
-          <Label>
-            Monto
-          </Label>
+          <Label>Monto</Label>
 
           <Input
             type="number"
@@ -101,15 +74,10 @@ export default function EditarCuotaForm({
               })
             }
           />
-
         </div>
 
-
         <div>
-
-          <Label>
-            Fecha de vencimiento
-          </Label>
+          <Label>Fecha de vencimiento</Label>
 
           <Input
             type="date"
@@ -117,126 +85,75 @@ export default function EditarCuotaForm({
             onChange={(e) =>
               setForm({
                 ...form,
-                fechaVencimiento:
-                  e.target.value,
+                fechaVencimiento: e.target.value,
               })
             }
           />
-
         </div>
 
+        {form.estado === "pagada" && (
+          <div>
+            <Label>Fecha de pago</Label>
+
+            <Input
+              type="date"
+              value={form.fechaPago}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  fechaPago: e.target.value,
+                })
+              }
+            />
+          </div>
+        )}
 
         <div>
-
-          <Label>
-            Fecha de pago
-          </Label>
-
-          <Input
-            type="date"
-            value={form.fechaPago}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                fechaPago:
-                  e.target.value,
-              })
-            }
-          />
-
-        </div>
-
-
-        <div>
-
-          <Label>
-            Estado
-          </Label>
+          <Label>Estado</Label>
 
           <Select
             value={form.estado}
             onChange={(e) =>
               setForm({
                 ...form,
-                estado:
-                  e.target.value as
-                    | "pendiente"
-                    | "pagada",
+                estado: e.target.value as "pendiente" | "pagada",
               })
             }
           >
+            <option value="pendiente">Pendiente</option>
 
-            <option value="pendiente">
-              Pendiente
-            </option>
-
-            <option value="pagada">
-              Pagada
-            </option>
-
+            <option value="pagada">Pagada</option>
           </Select>
-
         </div>
 
-
         <div>
-
-          <Label>
-            Método de pago
-          </Label>
+          <Label>Método de pago</Label>
 
           <Select
             value={form.metodoPago}
             onChange={(e) =>
               setForm({
                 ...form,
-                metodoPago:
-                  e.target.value as
-                    | "efectivo"
-                    | "transferencia",
+                metodoPago: e.target.value as "efectivo" | "transferencia",
               })
             }
           >
+            <option value="efectivo">Efectivo</option>
 
-            <option value="efectivo">
-              Efectivo
-            </option>
-
-            <option value="transferencia">
-              Transferencia
-            </option>
-
+            <option value="transferencia">Transferencia</option>
           </Select>
-
         </div>
 
-
         <div className="flex justify-end gap-3 pt-2">
-
-          <Button
-            variant="secondary"
-            type="button"
-            onClick={onCancelar}
-          >
+          <Button variant="secondary" type="button" onClick={onCancelar}>
             Cancelar
           </Button>
 
-          <Button
-            variant="accent"
-            type="submit"
-            disabled={guardando}
-          >
-            {guardando
-              ? "Guardando..."
-              : "Guardar cambios"}
+          <Button variant="accent" type="submit" disabled={guardando}>
+            {guardando ? "Guardando..." : "Guardar cambios"}
           </Button>
-
         </div>
-
       </form>
-
     </Card>
-
   );
-
 }
