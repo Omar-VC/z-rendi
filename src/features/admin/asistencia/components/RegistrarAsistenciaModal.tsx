@@ -25,7 +25,7 @@ export default function RegistrarAsistenciaModal({
   const [fecha, setFecha] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [estado, setEstado] = useState<EstadoAsistencia | null>(null);
+  const [estado, setEstado] = useState<EstadoAsistencia>("presente");
   const [guardando, setGuardando] = useState(false);
 
   const handleGuardar = async () => {

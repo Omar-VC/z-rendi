@@ -244,15 +244,15 @@ export default function NuevaSesionPendienteModal({
         </div>
       }
     >
-      <div className="space-y-5 text-left">
+      <div className="space-y-6 text-left pb-2">
         {/* PARÁMETROS BÁSICOS: TIPO, FECHA Y OBJETIVO */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="space-y-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
             <Label className="text-xs font-bold text-text">Tipo de Sesión</Label>
             <Select
               value={libroId}
               disabled={guardando}
-              className="w-full bg-surfaceSoft border-border/50 text-xs font-medium focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg"
+              className="w-full bg-surfaceSoft border-border/50 text-xs font-medium focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg py-2 px-3 !h-auto"
               onChange={(e) => setLibroId(e.target.value)}
             >
               <option value="">— Seleccionar tipo —</option>
@@ -264,21 +264,21 @@ export default function NuevaSesionPendienteModal({
             </Select>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label className="text-xs font-bold text-text">Fecha Programada</Label>
             <Input
               type="date"
               value={fecha}
               disabled={guardando}
               onChange={(e) => setFecha(e.target.value)}
-              className="bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg"
+              className="bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg py-2 px-3 !h-auto"
             />
           </div>
         </div>
 
         {/* RESUMEN DEL TIPO DE SESIÓN */}
         {libroSeleccionado && (
-          <Card className="!p-3 bg-surfaceSoft/50 border-border/40 rounded-lg flex items-center justify-between gap-2 animate-fadeIn">
+          <Card className="!p-3.5 bg-surfaceSoft/50 border-border/40 rounded-xl flex items-center justify-between gap-3 animate-fadeIn">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
                 Configuración de Libreta
@@ -288,7 +288,7 @@ export default function NuevaSesionPendienteModal({
               </p>
             </div>
             {libroSeleccionado.categoria && (
-              <Badge variant="neutral" className="text-[10px] px-2 py-0.5 font-semibold">
+              <Badge variant="neutral" className="text-[10px] px-2.5 py-1 font-semibold">
                 {libroSeleccionado.categoria}
               </Badge>
             )}
@@ -296,32 +296,32 @@ export default function NuevaSesionPendienteModal({
         )}
 
         {/* OBJETIVO DE LA SESIÓN */}
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <Label className="text-xs font-bold text-text">Objetivo Principal</Label>
           <Input
             value={objetivo}
             disabled={guardando}
             onChange={(e) => setObjetivo(e.target.value)}
             placeholder="Ej: Trabajar hipertrofia en torso e intensificar la pausa reducida"
-            className="bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg"
+            className="bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg py-2 px-3 !h-auto"
           />
         </div>
 
         {/* SECCIÓN DE BLOQUES DE TRABAJO */}
-        <div className="space-y-3 pt-2 border-t border-border/40">
+        <div className="space-y-4 pt-3 border-t border-border/40">
           <div className="flex items-center justify-between gap-2">
             <div>
               <h4 className="text-xs font-extrabold text-text uppercase tracking-wider">
                 Estructura por Bloques
               </h4>
-              <p className="text-[11px] text-muted font-medium">
+              <p className="text-[11px] text-muted font-medium mt-0.5">
                 Suma acumulada: <strong className="text-text">{duracionTotal} min</strong>
               </p>
             </div>
 
             <Button
               variant="secondary"
-              className="!min-h-0 h-7 !px-2.5 text-xs font-bold shrink-0"
+              className="!min-h-0 h-8 !px-3 text-xs font-bold shrink-0 shadow-sm"
               onClick={agregarBloque}
               disabled={guardando}
             >
@@ -331,13 +331,13 @@ export default function NuevaSesionPendienteModal({
 
           {/* ESTADO VACÍO DE BLOQUES */}
           {bloques.length === 0 && (
-            <Card className="!p-6 bg-surfaceSoft/30 border-dashed border-border/60 text-center">
+            <Card className="!p-8 bg-surfaceSoft/30 border-dashed border-border/60 text-center rounded-xl">
               <p className="text-xs text-muted font-medium">
                 No has configurado ningún bloque de entrenamiento.
               </p>
               <Button
                 variant="accent"
-                className="!min-h-0 h-7 !px-3 text-xs font-bold mt-3 shadow-[0_0_10px_rgba(255,85,0,0.2)]"
+                className="!min-h-0 h-8 !px-4 text-xs font-bold mt-3 shadow-[0_0_10px_rgba(255,85,0,0.2)]"
                 onClick={agregarBloque}
               >
                 Agregar Primer Bloque
@@ -346,184 +346,187 @@ export default function NuevaSesionPendienteModal({
           )}
 
           {/* LISTA DE BLOQUES */}
-          {bloques.map((bloque, bloqueIndex) => (
-            <Card
-              key={bloque.id}
-              className="!p-3.5 bg-surfaceSoft/40 border-border/50 space-y-3 rounded-xl"
-            >
-              {/* CABECERA DE BLOQUE */}
-              <div className="flex items-center justify-between gap-2 pb-2 border-b border-border/30">
-                <div className="flex items-center gap-2">
-                  <Badge variant="neutral" className="text-[10px] font-mono px-1.5 py-0">
-                    #{bloqueIndex + 1}
-                  </Badge>
-                  <span className="text-xs font-bold text-text">
-                    {bloque.nombre || "Bloque sin nombre"}
-                  </span>
+          <div className="space-y-4">
+            {bloques.map((bloque, bloqueIndex) => (
+              <Card
+                key={bloque.id}
+                className="!p-4 bg-surfaceSoft/40 border-border/50 space-y-4 rounded-xl shadow-sm"
+              >
+                {/* CABECERA DE BLOQUE */}
+                <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-border/30">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" className="text-[10px] font-mono px-2 py-0.5">
+                      #{bloqueIndex + 1}
+                    </Badge>
+                    <span className="text-xs font-bold text-text">
+                      {bloque.nombre || "Bloque sin nombre"}
+                    </span>
+                  </div>
+
+                  <Button
+                    variant="danger"
+                    className="!min-h-0 h-7 !px-2.5 text-[11px] font-semibold opacity-80 hover:opacity-100"
+                    onClick={() => eliminarBloque(bloque.id)}
+                  >
+                    Eliminar Bloque
+                  </Button>
                 </div>
 
-                <Button
-                  variant="danger"
-                  className="!min-h-0 h-6 !px-2 text-[11px] font-semibold opacity-80 hover:opacity-100"
-                  onClick={() => eliminarBloque(bloque.id)}
-                >
-                  Eliminar
-                </Button>
-              </div>
+                {/* CAMPOS DEL BLOQUE */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2 space-y-1.5">
+                    <Label className="text-[11px] font-bold text-muted">Nombre del Bloque</Label>
+                    <Input
+                      value={bloque.nombre}
+                      onChange={(e) =>
+                        actualizarBloque(bloque.id, { nombre: e.target.value })
+                      }
+                      className="text-xs bg-surface border-border/50 rounded-lg py-2 px-3 !h-auto"
+                    />
+                  </div>
 
-              {/* CAMPOS DEL BLOQUE */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <div className="sm:col-span-2 space-y-1">
-                  <Label className="text-[11px] font-bold text-muted">Nombre del Bloque</Label>
-                  <Input
-                    value={bloque.nombre}
-                    onChange={(e) =>
-                      actualizarBloque(bloque.id, { nombre: e.target.value })
-                    }
-                    className="h-8 text-xs bg-surface border-border/50 rounded-md"
-                  />
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] font-bold text-muted">Duración (min)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={bloque.duracion || ""}
+                      placeholder="Ej: 15"
+                      onChange={(e) =>
+                        actualizarBloque(bloque.id, {
+                          duracion: Number(e.target.value),
+                        })
+                      }
+                      className="text-xs bg-surface border-border/50 rounded-lg font-mono py-2 px-3 !h-auto"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <Label className="text-[11px] font-bold text-muted">Duración (min)</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={bloque.duracion || ""}
-                    placeholder="Ej: 15"
-                    onChange={(e) =>
-                      actualizarBloque(bloque.id, {
-                        duracion: Number(e.target.value),
-                      })
-                    }
-                    className="h-8 text-xs bg-surface border-border/50 rounded-md font-mono"
-                  />
-                </div>
-              </div>
-
-              {/* LISTA Y SELECCIÓN DE EJERCICIOS */}
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center justify-between gap-2">
-                  <Label className="text-[11px] font-bold text-muted uppercase tracking-wider">
-                    Ejercicios del Bloque ({bloque.ejercicios.length})
-                  </Label>
-                </div>
-
-                <Select
-                  value=""
-                  className="w-full h-8 bg-surface border-border/50 text-xs rounded-md"
-                  onChange={(e) => {
-                    agregarEjercicio(bloque.id, e.target.value);
-                    e.target.value = "";
-                  }}
-                >
-                  <option value="">+ Seleccionar ejercicio para añadir...</option>
-                  {ejercicios.map((ejercicio) => (
-                    <option key={ejercicio.id} value={ejercicio.id}>
-                      {ejercicio.nombre}
-                    </option>
-                  ))}
-                </Select>
-
-                {bloque.ejercicios.length === 0 && (
-                  <p className="text-[11px] text-muted/80 italic py-1 text-center">
-                    Sin ejercicios asignados a este bloque.
-                  </p>
-                )}
-
-                {/* TARJETAS DE EJERCICIOS */}
-                <div className="space-y-2">
-                  {bloque.ejercicios.map((ejercicio, ejercicioIndex) => (
-                    <div
-                      key={ejercicio.ejercicioId}
-                      className="p-2.5 rounded-lg border border-border/40 bg-surface/70 space-y-2"
+                {/* LISTA Y SELECCIÓN DE EJERCICIOS */}
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] font-bold text-muted uppercase tracking-wider block">
+                      Ejercicios del Bloque ({bloque.ejercicios.length})
+                    </Label>
+                    <Select
+                      value=""
+                      className="w-full bg-surface border-border/50 text-xs rounded-lg font-medium py-2 px-3 !h-auto"
+                      onChange={(e) => {
+                        agregarEjercicio(bloque.id, e.target.value);
+                        e.target.value = "";
+                      }}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-mono text-muted font-bold">
-                            {ejercicioIndex + 1}.
-                          </span>
-                          <span className="text-xs font-bold text-text">
-                            {ejercicio.nombre}
-                          </span>
-                        </div>
+                      <option value="">+ Seleccionar ejercicio de la biblioteca...</option>
+                      {ejercicios.map((ejercicio) => (
+                        <option key={ejercicio.id} value={ejercicio.id}>
+                          {ejercicio.nombre}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
 
-                        <Button
-                          variant="secondary"
-                          className="!min-h-0 h-5 !px-1.5 text-[10px] font-medium text-muted hover:text-text"
-                          onClick={() =>
-                            eliminarEjercicio(bloque.id, ejercicio.ejercicioId)
-                          }
-                        >
-                          Quitar
-                        </Button>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-0.5">
-                          <Label className="text-[10px] font-medium text-muted">
-                            Repeticiones / Series
-                          </Label>
-                          <Input
-                            placeholder="Ej: 4 x 10"
-                            value={ejercicio.repeticiones ?? ""}
-                            onChange={(e) =>
-                              actualizarEjercicio(
-                                bloque.id,
-                                ejercicio.ejercicioId,
-                                { repeticiones: e.target.value },
-                              )
-                            }
-                            className="h-7 text-xs bg-surfaceSoft border-border/40 rounded"
-                          />
-                        </div>
-
-                        <div className="space-y-0.5">
-                          <Label className="text-[10px] font-medium text-muted">
-                            Pausa
-                          </Label>
-                          <Input
-                            placeholder="Ej: 90 seg"
-                            value={ejercicio.pausa ?? ""}
-                            onChange={(e) =>
-                              actualizarEjercicio(
-                                bloque.id,
-                                ejercicio.ejercicioId,
-                                { pausa: e.target.value },
-                              )
-                            }
-                            className="h-7 text-xs bg-surfaceSoft border-border/40 rounded"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-0.5">
-                        <Label className="text-[10px] font-medium text-muted">
-                          Indicaciones específicas
-                        </Label>
-                        <Textarea
-                          placeholder="Ej: Mantener ritmo constante en la fase excéntrica..."
-                          value={ejercicio.indicaciones ?? ""}
-                          onChange={(e) =>
-                            actualizarEjercicio(
-                              bloque.id,
-                              ejercicio.ejercicioId,
-                              { indicaciones: e.target.value },
-                            )
-                          }
-                          className="min-h-[42px] h-11 text-xs bg-surfaceSoft border-border/40 rounded p-1.5 resize-none"
-                        />
-                      </div>
+                  {bloque.ejercicios.length === 0 && (
+                    <div className="p-3 bg-surface/40 border border-border/30 rounded-lg text-center">
+                      <p className="text-[11px] text-muted/90 italic">
+                        Sin ejercicios asignados a este bloque todavía.
+                      </p>
                     </div>
-                  ))}
+                  )}
+
+                  {/* TARJETAS DE EJERCICIOS */}
+                  <div className="space-y-3">
+                    {bloque.ejercicios.map((ejercicio, ejercicioIndex) => (
+                      <div
+                        key={ejercicio.ejercicioId}
+                        className="p-3.5 rounded-xl border border-border/40 bg-surface/80 space-y-3 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-[11px] font-mono text-primary font-extrabold bg-primary/10 px-1.5 py-0.5 rounded">
+                              #{ejercicioIndex + 1}
+                            </span>
+                            <span className="text-xs font-bold text-text truncate">
+                              {ejercicio.nombre}
+                            </span>
+                          </div>
+
+                          <Button
+                            variant="secondary"
+                            className="!min-h-0 h-6 !px-2 text-[10px] font-semibold text-muted hover:text-danger hover:border-danger/40 transition-colors"
+                            onClick={() =>
+                              eliminarEjercicio(bloque.id, ejercicio.ejercicioId)
+                            }
+                          >
+                            Quitar
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-[10px] font-bold text-muted">
+                              Repeticiones / Series
+                            </Label>
+                            <Input
+                              placeholder="Ej: 4 x 10"
+                              value={ejercicio.repeticiones ?? ""}
+                              onChange={(e) =>
+                                actualizarEjercicio(
+                                  bloque.id,
+                                  ejercicio.ejercicioId,
+                                  { repeticiones: e.target.value },
+                                )
+                              }
+                              className="text-xs bg-surfaceSoft border-border/40 rounded-lg py-1.5 px-2.5 !h-auto"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-[10px] font-bold text-muted">
+                              Pausa
+                            </Label>
+                            <Input
+                              placeholder="Ej: 90 seg"
+                              value={ejercicio.pausa ?? ""}
+                              onChange={(e) =>
+                                actualizarEjercicio(
+                                  bloque.id,
+                                  ejercicio.ejercicioId,
+                                  { pausa: e.target.value },
+                                )
+                              }
+                              className="text-xs bg-surfaceSoft border-border/40 rounded-lg py-1.5 px-2.5 !h-auto"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-bold text-muted">
+                            Indicaciones específicas
+                          </Label>
+                          <Textarea
+                            placeholder="Ej: Mantener ritmo constante en la fase excéntrica..."
+                            value={ejercicio.indicaciones ?? ""}
+                            onChange={(e) =>
+                              actualizarEjercicio(
+                                bloque.id,
+                                ejercicio.ejercicioId,
+                                { indicaciones: e.target.value },
+                              )
+                            }
+                            className="min-h-[50px] text-xs bg-surfaceSoft border-border/40 rounded-lg p-2 resize-none"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* INDICACIONES GENERALES DE LA SESIÓN */}
-        <div className="space-y-1 pt-2 border-t border-border/40">
+        <div className="space-y-1.5 pt-3 border-t border-border/40">
           <Label className="text-xs font-bold text-text">
             Indicaciones Generales para el Atleta
           </Label>
@@ -531,7 +534,7 @@ export default function NuevaSesionPendienteModal({
             placeholder="Instrucciones globales, recomendaciones de hidratación o notas del preparador..."
             value={observaciones}
             onChange={(e) => setObservaciones(e.target.value)}
-            className="min-h-[70px] bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg"
+            className="min-h-[80px] bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg p-2.5 resize-none"
           />
         </div>
       </div>

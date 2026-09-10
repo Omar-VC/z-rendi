@@ -10,7 +10,7 @@ import ClienteDashboard from "./features/usuario/dashboard/pages/ClienteDashboar
 import SesionClientePage from "./features/usuario/dashboard/pages/SesionClientePage";
 import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
 import RegistroPage from "./auth/pages/RegistroPage";
-import Logo from "./shared/components/sidebar/Logo";
+
 import SplashLogo from "./shared/components/sidebar/SplashLogo";
 
 function App() {
