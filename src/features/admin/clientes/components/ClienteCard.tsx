@@ -53,8 +53,17 @@ function ClienteCard({
         className="flex items-center justify-between gap-4 cursor-pointer select-none"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-surfaceSoft border border-primary/30 flex items-center justify-center font-black text-primary text-xs shrink-0 shadow-[0_0_10px_rgba(255,85,0,0.1)]">
-            {iniciales}
+          {/* AVATAR TÁCTICO CON SOPORTE DE FOTO */}
+          <div className="w-9 h-9 rounded-xl bg-surfaceSoft border border-primary/30 flex items-center justify-center font-black text-primary text-xs shrink-0 shadow-[0_0_10px_rgba(255,85,0,0.1)] overflow-hidden">
+            {cliente.fotoUrl ? (
+              <img
+                src={cliente.fotoUrl}
+                alt={`${cliente.nombre} ${cliente.apellido}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>{iniciales}</span>
+            )}
           </div>
 
           <h3 className="text-sm font-bold text-text truncate">
@@ -62,7 +71,7 @@ function ClienteCard({
           </h3>
         </div>
 
-        {/* Flecha indicadora con animación fluida optimizada */}
+        {/* Flecha indicadora */}
         <div className="flex items-center gap-2 text-muted">
           <span className="text-xs opacity-60 hidden sm:inline">
             {expandido ? "Cerrar" : "Acciones"}
@@ -88,11 +97,11 @@ function ClienteCard({
         </div>
       </div>
 
-      {/* SECCIÓN DESPLEGABLE OPTIMIZADA PARA MÓVILES */}
+      {/* SECCIÓN DESPLEGABLE */}
       <div 
         className={`grid transition-all duration-200 ease-out transform-gpu overflow-hidden ${
           expandido 
-            ? "grid-rows-[1fr] opacity-150 mt-3 pt-3 border-t border-border/40 scale-y-100" 
+            ? "grid-rows-[1fr] opacity-100 mt-3 pt-3 border-t border-border/40 scale-y-100" 
             : "grid-rows-[0fr] opacity-0 mt-0 pt-0 border-t-0 scale-y-95 pointer-events-none"
         }`}
       >

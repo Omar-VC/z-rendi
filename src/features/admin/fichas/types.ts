@@ -29,6 +29,8 @@ export interface FichaCliente {
 
   observaciones?: string;
 
+  fotoUrl?: string; // 👈 Agregado para soportar la imagen de Cloudinary
+
   createdAt?: string;
   updatedAt?: string;
 }

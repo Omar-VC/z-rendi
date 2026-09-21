@@ -12,27 +12,44 @@ import type { Cliente } from "../types";
 import { getAuth } from "firebase/auth";
 
 const USUARIOS_COLLECTION = "usuarios";
+const FICHAS_COLLECTION = "fichas";
 
 export async function getClientes(): Promise<Cliente[]> {
   const snapshot = await getDocs(collection(db, USUARIOS_COLLECTION));
 
-  return snapshot.docs
-    .map((documento) => {
-      const data = documento.data();
+  const clientesPromesas = snapshot.docs.map(async (documento) => {
+    const data = documento.data();
 
-      return {
-        id: documento.id,
-        nombre: data.nombre,
-        apellido: data.apellido,
-        email: data.email,
-        estado: data.estado,
-        estadoCuenta: data.estadoCuenta ?? "activo",
-        rol: data.rol,
-        createdAt: data.CreatedAt,
-        frecuenciaSemanal: data.frecuenciaSemanal,
-      } as Cliente;
-    })
-    .filter((usuario) => usuario.rol === "cliente");
+    // Intentamos obtener la foto desde la ficha asociada
+    let fotoUrl: string | undefined = data.fotoUrl || data.photoURL;
+
+    if (!fotoUrl) {
+      try {
+        const fichaSnap = await getDoc(doc(db, FICHAS_COLLECTION, documento.id));
+        if (fichaSnap.exists()) {
+          fotoUrl = fichaSnap.data().fotoUrl;
+        }
+      } catch (error) {
+        console.error("Error al obtener la ficha para el cliente:", documento.id, error);
+      }
+    }
+
+    return {
+      id: documento.id,
+      nombre: data.nombre,
+      apellido: data.apellido,
+      email: data.email,
+      estado: data.estado,
+      estadoCuenta: data.estadoCuenta ?? "activo",
+      rol: data.rol,
+      createdAt: data.CreatedAt,
+      frecuenciaSemanal: data.frecuenciaSemanal,
+      fotoUrl, // 👈 Sincronizado
+    } as Cliente;
+  });
+
+  const usuarios = await Promise.all(clientesPromesas);
+  return usuarios.filter((usuario) => usuario.rol === "cliente");
 }
 
 export async function getClienteById(id: string): Promise<Cliente | null> {
@@ -44,6 +61,18 @@ export async function getClienteById(id: string): Promise<Cliente | null> {
   }
 
   const data = snapshot.data();
+  let fotoUrl: string | undefined = data.fotoUrl || data.photoURL;
+
+  if (!fotoUrl) {
+    try {
+      const fichaSnap = await getDoc(doc(db, FICHAS_COLLECTION, id));
+      if (fichaSnap.exists()) {
+        fotoUrl = fichaSnap.data().fotoUrl;
+      }
+    } catch (error) {
+      console.error("Error al obtener la ficha del cliente:", id, error);
+    }
+  }
 
   return {
     id: snapshot.id,
@@ -55,6 +84,7 @@ export async function getClienteById(id: string): Promise<Cliente | null> {
     rol: data.rol,
     createdAt: data.CreatedAt,
     frecuenciaSemanal: data.frecuenciaSemanal,
+    fotoUrl, // 👈 Sincronizado
   } as Cliente;
 }
 
@@ -97,12 +127,7 @@ export async function reactivarCliente(id: string): Promise<void> {
   });
 }
 
-
-
-
-
-
-//Frecuncia semanal
+// Frecuencia semanal
 export async function actualizarFrecuenciaSemanal(
   id: string,
   frecuenciaSemanal: number,

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuth } from "../../../../auth/useAuth";
 import { useFichaCliente } from "../../../admin/fichas/hooks/useFichaCliente";
 import FichaForm from "../../../admin/fichas/components/FichaForm";
+import AvatarUploadButton from "../../perfil/components/AvatarUploadButton";
 import { Card, Button, Badge, Loading } from "../../../../shared/ui";
 
 export default function MiFichaPage() {
@@ -45,7 +46,7 @@ export default function MiFichaPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Encabezado */}
+      {/* Encabezado Principal */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
@@ -64,6 +65,24 @@ export default function MiFichaPage() {
           Editar Ficha
         </Button>
       </div>
+
+      {/* Tarjeta de Avatar y Nombre (Nueva integración) */}
+      <Card className="bg-surfaceSoft/40 border border-border/50 p-4 flex items-center gap-4">
+        <AvatarUploadButton
+          fotoUrl={user?.photoURL || ficha.fotoUrl}
+          nombre={ficha.nombre}
+          size="lg"
+          onSuccess={() => recargar()}
+        />
+        <div>
+          <h2 className="text-lg font-black text-white">
+            {ficha.nombre} {ficha.apellido || ""}
+          </h2>
+          <p className="text-xs text-muted font-medium">
+            Haz clic o toca la imagen para actualizar tu foto de perfil.
+          </p>
+        </div>
+      </Card>
 
       {/* Grid de Contenedores Pro Dark */}
       <div className="grid gap-4 md:grid-cols-2">

@@ -15,4 +15,5 @@ export interface Cliente {
   createdAt: string;
 
   frecuenciaSemanal?: number;
+  fotoUrl?: string;
 }
