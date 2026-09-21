@@ -6,6 +6,7 @@ import ClienteLayoutV2 from "./layouts/ClienteLayoutV2";
 import ClientesPageV2 from "./features/admin/clientes/pages/ClientesPageV2";
 import ClienteDetailV2 from "./features/admin/clientes/pages/ClienteDetailV2";
 import BibliotecaPageV2 from "./features/admin/biblioteca/pages/BibliotecaPageV2";
+import InformesGeneralesPage from "./features/admin/seguimiento/pages/InformesGeneralesPage";
 import ClienteDashboard from "./features/usuario/dashboard/pages/ClienteDashboard";
 import SesionClientePage from "./features/usuario/dashboard/pages/SesionClientePage";
 import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
@@ -16,7 +17,7 @@ import SplashLogo from "./shared/components/sidebar/SplashLogo";
 function App() {
   const { user, usuario, loading } = useAuth();
 
- if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background text-text relative flex items-center justify-center overflow-hidden selection:bg-primary/30 selection:text-primary">
         {/* Luz ambiental sutil de fondo */}
@@ -76,6 +77,11 @@ function App() {
           <Route
             path="/biblioteca"
             element={<BibliotecaPageV2 />}
+          />
+
+          <Route
+            path="/informes"
+            element={<InformesGeneralesPage />}
           />
         </Route>
       )}

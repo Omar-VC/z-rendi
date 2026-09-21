@@ -29,6 +29,13 @@ export default function AdminSidebar({
           path="/biblioteca"
           onNavigate={onNavigate}
         />
+
+        <SidebarItem
+          label="Informes"
+          icon="📊"
+          path="/informes"
+          onNavigate={onNavigate}
+        />
       </nav>
 
       <button

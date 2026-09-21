@@ -1,12 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "../../../../auth/useAuth";
 import { useTrainingBooks } from "../../biblioteca/libros/hooks/useTrainingBooks";
 import { useExercises } from "../../biblioteca/ejercicios/hooks/useExercises";
-import { crearSesionPendiente } from "../services/sesionesPendientes.service";
+import {
+  crearSesionPendiente,
+  obtenerUltimasSesionesCliente,
+} from "../services/sesionesPendientes.service";
 
 import type { BloqueSesion } from "../types/bloqueSesion";
 import type { EjercicioSesion } from "../types/ejercicioSesion";
+import type { SesionPendiente } from "../types/sesionPendiente";
 
 import {
   Modal,
@@ -39,12 +43,27 @@ export default function NuevaSesionPendienteModal({
   const [bloques, setBloques] = useState<BloqueSesion[]>([]);
   const [guardando, setGuardando] = useState(false);
 
+  // Estado para contexto de sesiones previas
+  const [ultimasSesiones, setUltimasSesiones] = useState<SesionPendiente[]>([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(true);
+
   if (!user) return null;
 
   const preparadorId = user.uid;
 
   const { libros } = useTrainingBooks(preparadorId);
   const { ejercicios } = useExercises(preparadorId);
+
+  // Cargar historial reciente del cliente al abrir el modal
+  useEffect(() => {
+    async function cargarHistorial() {
+      setCargandoHistorial(true);
+      const sesiones = await obtenerUltimasSesionesCliente(clienteId, 3);
+      setUltimasSesiones(sesiones);
+      setCargandoHistorial(false);
+    }
+    cargarHistorial();
+  }, [clienteId]);
 
   const libroSeleccionado = libros.find((libro) => libro.id === libroId);
 
@@ -54,6 +73,39 @@ export default function NuevaSesionPendienteModal({
       0,
     );
   }, [bloques]);
+
+  // Extraer músculos fatigados recientemente (últimos 3 días)
+  const musculosFatigados = useMemo(() => {
+    const musculos = new Set<string>();
+    ultimasSesiones.forEach((sesion) => {
+      sesion.gruposMusculares?.forEach((g) => musculos.add(g));
+    });
+    return Array.from(musculos);
+  }, [ultimasSesiones]);
+
+  // Clonar la última sesión como plantilla
+  function clonarSesionAnterior(sesion: SesionPendiente) {
+    if (
+      bloques.length > 0 &&
+      !confirm("¿Deseas reemplazar el contenido actual con la sesión seleccionada?")
+    ) {
+      return;
+    }
+
+    if (sesion.libroId) {
+      setLibroId(sesion.libroId);
+    }
+    setObjetivo(`Continuación de: ${sesion.objetivo || sesion.libroNombre}`);
+    
+    // Clonar bloques asignando nuevos UUIDs
+    const bloquesClonados: BloqueSesion[] = (sesion.bloques || []).map((b) => ({
+      ...b,
+      id: crypto.randomUUID(),
+      ejercicios: b.ejercicios.map((ej) => ({ ...ej })),
+    }));
+
+    setBloques(bloquesClonados);
+  }
 
   function agregarBloque() {
     const nuevoBloque: BloqueSesion = {
@@ -245,6 +297,93 @@ export default function NuevaSesionPendienteModal({
       }
     >
       <div className="space-y-6 text-left pb-2">
+        {/* MÓDULO INTELIGENTE: HISTORIAL RECIENTE Y ANÁLISIS DE FATIGA */}
+        <Card className="!p-4 bg-surfaceSoft/60 border-primary/20 rounded-xl space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-wider text-primary">
+                🧠 Contexto de Carga Reciente
+              </span>
+            </div>
+            {musculosFatigados.length > 0 && (
+              <span className="text-[10px] text-muted font-medium">
+                Últimas 48-72 hs
+              </span>
+            )}
+          </div>
+
+          {cargandoHistorial ? (
+            <p className="text-xs text-muted animate-pulse">
+              Analizando historial de entrenamiento...
+            </p>
+          ) : ultimasSesiones.length === 0 ? (
+            <p className="text-xs text-muted italic">
+              Sin registros de sesiones anteriores para este cliente.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {/* Tarjetas de sesiones previas para vista rápida o clonar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {ultimasSesiones.map((sesion) => (
+                  <div
+                    key={sesion.id}
+                    className="p-2.5 rounded-lg bg-surface border border-border/40 hover:border-primary/50 transition-all text-left flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-muted">
+                        <span>
+                          {new Date(sesion.fecha).toLocaleDateString("es-AR", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          })}
+                        </span>
+                        {sesion.rpe && (
+                          <span className="text-accent font-bold">
+                            RPE {sesion.rpe}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs font-bold text-text truncate mt-0.5">
+                        {sesion.libroNombre}
+                      </p>
+                      <p className="text-[10px] text-muted/80 line-clamp-1 mt-0.5">
+                        {sesion.objetivo}
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="secondary"
+                      className="!min-h-0 h-6 text-[10px] font-bold mt-2 w-full border-border/50 hover:bg-primary/20 hover:text-primary transition-colors"
+                      onClick={() => clonarSesionAnterior(sesion)}
+                    >
+                      ⚡ Cargar como Base
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Resumen de Músculos Trabajados */}
+              {musculosFatigados.length > 0 && (
+                <div className="pt-2 border-t border-border/30 flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-bold uppercase text-muted">
+                    Estímulos Recientes:
+                  </span>
+                  {musculosFatigados.map((m) => (
+                    <Badge
+                      key={m}
+                      variant="neutral"
+                      className="text-[10px] font-mono capitalize px-2 py-0.5 bg-danger/10 text-danger border-danger/20"
+                    >
+                      🔥 {m}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+
         {/* PARÁMETROS BÁSICOS: TIPO, FECHA Y OBJETIVO */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -437,7 +576,7 @@ export default function NuevaSesionPendienteModal({
                   <div className="space-y-3">
                     {bloque.ejercicios.map((ejercicio, ejercicioIndex) => (
                       <div
-                        key={ejercicio.ejercicioId}
+                        key={`${bloque.id}-${ejercicio.ejercicioId}-${ejercicioIndex}`}
                         className="p-3.5 rounded-xl border border-border/40 bg-surface/80 space-y-3 shadow-2xs"
                       >
                         <div className="flex items-center justify-between gap-2">

@@ -3,16 +3,18 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   setDoc,
   onSnapshot,
   deleteDoc,
   query,
   where,
+  limit,
+  orderBy,
   type Unsubscribe,
 } from "firebase/firestore";
 
 import { db } from "../../../../firebase/firebase";
-
 import type { SesionPendiente } from "../types/sesionPendiente";
 
 const SESIONES_COLLECTION = "sesionesPendientes";
@@ -238,4 +240,47 @@ export function suscribirseSesionesPendientesCliente(
       onError?.(error);
     },
   );
+}
+
+
+export async function obtenerUltimasSesionesCliente(
+  clienteId: string,
+  limite: number = 5
+): Promise<SesionPendiente[]> {
+  try {
+    // Busca en la colección de sesiones completadas
+    const qCompletadas = query(
+      collection(db, "sesiones"),
+      where("clienteId", "==", clienteId),
+      orderBy("fecha", "desc"),
+      limit(limite)
+    );
+
+    const snapshot = await getDocs(qCompletadas);
+
+    return snapshot.docs.map((documento) => {
+      const data = documento.data();
+      return {
+        id: documento.id,
+        clienteId: data.clienteId,
+        preparadorId: data.preparadorId,
+        fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
+        estado: "completada",
+        libroId: data.libroId,
+        libroNombre: data.libroNombre,
+        gruposMusculares: data.gruposMusculares ?? [],
+        bloques: data.bloques ?? [],
+        objetivo: data.objetivo ?? "",
+        observacionesPreparador: data.observacionesPreparador,
+        duracion: data.duracion,
+        rpe: data.rpe,
+        carga: data.carga,
+        observacionesCliente: data.observacionesCliente,
+        createdAt: data.createdAt?.toDate?.() ?? new Date(data.createdAt),
+      };
+    });
+  } catch (error) {
+    console.error("Error al obtener últimas sesiones:", error);
+    return [];
+  }
 }
