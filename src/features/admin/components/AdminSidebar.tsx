@@ -23,6 +23,14 @@ export default function AdminSidebar({
           onNavigate={onNavigate}
         />
 
+        {/* ⚽ ITEM DE NAVEGACIÓN A PLANTELES */}
+        <SidebarItem
+          label="Equipos / Planteles"
+          icon="⚽"
+          path="/equipos"
+          onNavigate={onNavigate}
+        />
+
         <SidebarItem
           label="Biblioteca"
           icon="📚"

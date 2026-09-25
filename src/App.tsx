@@ -12,6 +12,10 @@ import SesionClientePage from "./features/usuario/dashboard/pages/SesionClienteP
 import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
 import RegistroPage from "./auth/pages/RegistroPage";
 
+// ⚽ NUEVAS IMPORTACIONES PARA PLANTELES
+import PlantelesSelectorPage from "./features/admin/planteles/pages/PlantelesSelectorPage";
+import PlantelDetallePage from "./features/admin/planteles/pages/PlantelDetallePage";
+
 import SplashLogo from "./shared/components/sidebar/SplashLogo";
 
 function App() {
@@ -47,77 +51,43 @@ function App() {
   return (
     <Routes>
       {/* LOGIN */}
-
-      <Route
-        path="/login"
-        element={<LoginPage />}
-      />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* REGISTRO */}
-
-      <Route
-        path="/registro"
-        element={<RegistroPage />}
-      />
+      <Route path="/registro" element={<RegistroPage />} />
 
       {/* ADMIN */}
-
       {user && usuario?.rol === "admin" && (
         <Route element={<AdminLayout />}>
-          <Route
-            path="/clientes"
-            element={<ClientesPageV2 />}
-          />
+          <Route path="/clientes" element={<ClientesPageV2 />} />
 
-          <Route
-            path="/clientes/:id"
-            element={<ClienteDetailV2 />}
-          />
+          <Route path="/clientes/:id" element={<ClienteDetailV2 />} />
 
-          <Route
-            path="/biblioteca"
-            element={<BibliotecaPageV2 />}
-          />
+          {/* ⚽ RUTAS DEL NUEVO MÓDULO DE PLANTELES */}
+          <Route path="/equipos" element={<PlantelesSelectorPage />} />
+          <Route path="/equipos/:equipoId" element={<PlantelDetallePage />} />
 
-          <Route
-            path="/informes"
-            element={<InformesGeneralesPage />}
-          />
+          <Route path="/biblioteca" element={<BibliotecaPageV2 />} />
+
+          <Route path="/informes" element={<InformesGeneralesPage />} />
         </Route>
       )}
 
       {/* CLIENTE */}
-
       {user && usuario?.rol === "cliente" && (
-        <Route
-          path="/cliente"
-          element={<ClienteLayoutV2 />}
-        >
+        <Route path="/cliente" element={<ClienteLayoutV2 />}>
           {/* Dashboard */}
-
-          <Route
-            index
-            element={<ClienteDashboard />}
-          />
+          <Route index element={<ClienteDashboard />} />
 
           {/* Sesión asignada */}
-
-          <Route
-            path="sesion/:id"
-            element={<SesionClientePage />}
-          />
+          <Route path="sesion/:id" element={<SesionClientePage />} />
 
           {/* Ficha */}
-
-          <Route
-            path="ficha"
-            element={<MiFichaPage />}
-          />
+          <Route path="ficha" element={<MiFichaPage />} />
         </Route>
       )}
 
       {/* FALLBACK */}
-
       <Route
         path="*"
         element={

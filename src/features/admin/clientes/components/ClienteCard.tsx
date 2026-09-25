@@ -23,6 +23,7 @@ function ClienteCard({
 
   const estaActivo = cliente.estadoCuenta === "activo";
   const iniciales = `${cliente.nombre?.[0] || ""}${cliente.apellido?.[0] || ""}`.toUpperCase() || "AT";
+  const clienteDinamico = cliente as any;
 
   async function manejarBaja() {
     const confirmar = window.confirm(
@@ -43,18 +44,20 @@ function ClienteCard({
   return (
     <Card 
       hover 
-      className={`!p-3 transition-all duration-200 transform-gpu ${
-        expandido ? "border-primary/50 shadow-[0_0_15px_rgba(255,85,0,0.15)] bg-surfaceHover/50" : ""
+      className={`!p-3 transition-all duration-200 transform-gpu border border-border/50 ${
+        expandido ? "border-primary/50 shadow-[0_0_15px_rgba(255,85,0,0.12)] bg-surfaceHover/40" : ""
       }`}
     >
-      {/* CABECERA MÍNIMA: Avatar, Nombre y Flecha desplegable */}
-      <div 
-        onClick={() => setExpandido(!expandido)}
-        className="flex items-center justify-between gap-4 cursor-pointer select-none"
-      >
-        <div className="flex items-center gap-3 min-w-0">
-          {/* AVATAR TÁCTICO CON SOPORTE DE FOTO */}
-          <div className="w-9 h-9 rounded-xl bg-surfaceSoft border border-primary/30 flex items-center justify-center font-black text-primary text-xs shrink-0 shadow-[0_0_10px_rgba(255,85,0,0.1)] overflow-hidden">
+      {/* FILA PRINCIPAL COMPACTA */}
+      <div className="flex items-center justify-between gap-3">
+        
+        {/* AVATAR + NOMBRE + METADATOS */}
+        <div 
+          onClick={() => navigate(`/clientes/${cliente.id}`)}
+          className="flex items-center gap-3 min-w-0 cursor-pointer group flex-1"
+        >
+          {/* Avatar */}
+          <div className="relative w-10 h-10 rounded-xl bg-surfaceSoft border border-primary/30 flex items-center justify-center font-black text-primary text-xs shrink-0 shadow-[0_0_10px_rgba(255,85,0,0.1)] overflow-hidden">
             {cliente.fotoUrl ? (
               <img
                 src={cliente.fotoUrl}
@@ -64,93 +67,117 @@ function ClienteCard({
             ) : (
               <span>{iniciales}</span>
             )}
+            
+            {/* Indicador de estado rápido (Verde si está activo) */}
+            <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-surface ${
+              estaActivo ? "bg-emerald-500" : "bg-muted"
+            }`} />
           </div>
 
-          <h3 className="text-sm font-bold text-text truncate">
-            {cliente.nombre} {cliente.apellido}
-          </h3>
-        </div>
-
-        {/* Flecha indicadora */}
-        <div className="flex items-center gap-2 text-muted">
-          <span className="text-xs opacity-60 hidden sm:inline">
-            {expandido ? "Cerrar" : "Acciones"}
-          </span>
-          <div className={`p-1 rounded-lg bg-surfaceSoft/60 border border-border/40 transition-transform duration-200 transform-gpu ${
-            expandido ? "rotate-180 bg-primary/10 text-primary border-primary/30" : ""
-          }`}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+          {/* Info Principal */}
+          <div className="min-w-0">
+            <h3 className="text-sm font-bold text-text truncate group-hover:text-primary transition-colors">
+              {cliente.nombre} {cliente.apellido}
+            </h3>
+            
+            <div className="flex items-center gap-2 mt-0.5 text-xs text-muted">
+              {clienteDinamico.deporte && (
+                <span className="bg-surfaceSoft px-1.5 py-0.5 rounded text-[10px] font-semibold text-text/70 uppercase">
+                  {clienteDinamico.deporte}
+                </span>
+              )}
+              {clienteDinamico.telefono && (
+                <span className="truncate opacity-75 hidden sm:inline">
+                  📞 {clienteDinamico.telefono}
+                </span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* SECCIÓN DESPLEGABLE */}
-      <div 
-        className={`grid transition-all duration-200 ease-out transform-gpu overflow-hidden ${
-          expandido 
-            ? "grid-rows-[1fr] opacity-100 mt-3 pt-3 border-t border-border/40 scale-y-100" 
-            : "grid-rows-[0fr] opacity-0 mt-0 pt-0 border-t-0 scale-y-95 pointer-events-none"
-        }`}
-      >
-        <div className="overflow-hidden flex items-center justify-end gap-2">
+        {/* ACCIONES RÁPIDAS */}
+        <div className="flex items-center gap-1.5 shrink-0">
           {estaActivo ? (
             <>
+              {/* Botón rápido Asistencia */}
               <Button
                 variant="accent"
                 className="!min-h-0 !h-8 !px-3 text-xs font-semibold shadow-[0_0_10px_rgba(255,85,0,0.2)]"
-                onClick={() => {
-                  setMostrandoAsistencia(true);
-                }}
+                onClick={() => setMostrandoAsistencia(true)}
               >
-                Asistencia
+                + Asistencia
               </Button>
 
+              {/* Botón rápido Perfil */}
               <Button
                 variant="secondary"
-                className="!min-h-0 !h-8 !px-3 text-xs font-semibold"
-                onClick={() => {
-                  navigate(`/clientes/${cliente.id}`);
-                }}
+                className="!min-h-0 !h-8 !px-2.5 text-xs font-semibold hidden sm:inline-flex"
+                onClick={() => navigate(`/clientes/${cliente.id}`)}
               >
                 Perfil
-              </Button>
-
-              <Button
-                variant="danger"
-                className="!min-h-0 !h-8 !px-2.5 text-xs font-semibold opacity-70 hover:opacity-100"
-                onClick={() => {
-                  manejarBaja();
-                }}
-              >
-                Baja
               </Button>
             </>
           ) : (
             <Button
               variant="success"
-              className="!min-h-0 !h-8 !px-4 text-xs font-semibold"
-              onClick={() => {
-                manejarReactivacion();
-              }}
+              className="!min-h-0 !h-8 !px-3 text-xs font-semibold"
+              onClick={manejarReactivacion}
             >
               Reactivar
             </Button>
           )}
+
+          {/* Menú de más opciones */}
+          <button
+            onClick={() => setExpandido(!expandido)}
+            className={`p-1.5 rounded-lg bg-surfaceSoft/80 border border-border/50 text-muted hover:text-text transition-all ${
+              expandido ? "rotate-180 bg-primary/10 text-primary border-primary/30" : ""
+            }`}
+            title="Más opciones"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
         </div>
       </div>
+
+      {/* SECCIÓN DESPLEGABLE */}
+      {expandido && (
+        <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between text-xs animate-fadeIn">
+          <span className="text-muted">
+            Estado: <strong className={estaActivo ? "text-emerald-400" : "text-amber-400"}>
+              {estaActivo ? "Activo" : "Dado de baja"}
+            </strong>
+          </span>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              className="!min-h-0 !h-7 !px-2.5 text-[11px] sm:hidden"
+              onClick={() => navigate(`/clientes/${cliente.id}`)}
+            >
+              Ver Perfil
+            </Button>
+
+            {estaActivo && (
+              <Button
+                variant="danger"
+                className="!min-h-0 !h-7 !px-2.5 text-[11px] opacity-80 hover:opacity-100"
+                onClick={manejarBaja}
+              >
+                Dar de Baja
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* MODAL DE ASISTENCIA */}
       {mostrandoAsistencia && (
