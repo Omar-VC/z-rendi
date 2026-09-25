@@ -9,16 +9,16 @@ function ClienteLayoutV2() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-text relative selection:bg-primary/30 selection:text-primary">
-      {/* Luz ambiental sutil para el fondo general */}
-      <div className="fixed top-0 left-64 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0" />
+    <div className="min-h-screen bg-background text-text relative selection:bg-primary/20 selection:text-primary">
+      {/* Luz ambiental sutil para el fondo general sin saturar */}
+      <div className="fixed top-0 left-64 w-96 h-96 bg-primary/5 rounded-full blur-[140px] pointer-events-none z-0" />
 
-      {/* Header fijo translúcido unificado de 80px */}
-      <header className="fixed top-0 left-0 right-0 z-40 h-20 bg-surface/80 backdrop-blur-md border-b border-border/60 px-6 flex items-center justify-between md:ml-64">
-        {/* Botón menú móvil */}
+      {/* Header fijo translúcido sin bordes ni líneas divisorias */}
+      <header className="fixed top-0 left-0 right-0 z-40 h-20 bg-background/80 backdrop-blur-md px-6 flex items-center justify-between md:ml-64">
+        {/* Botón menú móvil tactil y limpio */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2.5 rounded-card bg-surfaceSoft/40 border border-border/60 text-text hover:border-primary/40 hover:text-primary transition-all duration-200 md:hidden"
+          className="p-2.5 rounded-xl bg-surfaceSoft/60 text-text hover:text-primary active:scale-95 transition-all md:hidden"
           aria-label="Abrir menú"
         >
           <svg
@@ -37,10 +37,10 @@ function ClienteLayoutV2() {
           </svg>
         </button>
 
-        {/* Espaciador invisible para balancear en desktop */}
+        {/* Espaciador invisible para balance en desktop */}
         <div className="hidden md:block w-10" />
 
-        {/* Logo perfectamente centrado neutralizando su mb-10 interno */}
+        {/* Logo perfectamente centrado */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center [&_div]:mb-0 scale-90">
           <Logo />
         </div>
@@ -53,7 +53,7 @@ function ClienteLayoutV2() {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 md:hidden transition-opacity"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity"
         />
       )}
 
@@ -69,8 +69,8 @@ function ClienteLayoutV2() {
         />
       </aside>
 
-      {/* Contenido Principal con margen compensado por el header fijo */}
-      <main className="min-h-screen px-3 sm:px-6 lg:px-8 pt-28 md:pt-28 md:ml-64 overflow-x-hidden relative z-10">
+      {/* Contenido Principal con margen limpio y espaciado */}
+      <main className="min-h-screen px-4 sm:px-6 lg:px-8 pt-24 md:pt-24 md:ml-64 overflow-x-hidden relative z-10">
         <div className="mx-auto w-full max-w-7xl space-y-6 pb-12">
           <Outlet />
         </div>

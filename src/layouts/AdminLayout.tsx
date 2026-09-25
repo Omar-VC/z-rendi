@@ -9,16 +9,16 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-text relative selection:bg-primary/30 selection:text-primary">
-      {/* Luz ambiental sutil para el fondo general del admin (ajustada a lg) */}
-      <div className="fixed top-0 left-64 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0 hidden lg:block" />
+    <div className="min-h-screen bg-background text-text relative selection:bg-primary/20 selection:text-primary">
+      {/* Luz ambiental sutil para el fondo general del admin */}
+      <div className="fixed top-0 left-64 w-96 h-96 bg-primary/5 rounded-full blur-[140px] pointer-events-none z-0 hidden lg:block" />
 
-      {/* Header fijo translúcido de 80px */}
-      <header className="fixed top-0 left-0 right-0 z-40 h-20 bg-surface/80 backdrop-blur-md border-b border-border/60 px-6 flex items-center justify-between lg:ml-64">
+      {/* Header fijo translúcido sin bordes ni divisiones */}
+      <header className="fixed top-0 left-0 right-0 z-40 h-20 bg-background/80 backdrop-blur-md px-6 flex items-center justify-between lg:ml-64">
         {/* Botón menú móvil y tablets */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2.5 rounded-card bg-surfaceSoft/40 border border-border/60 text-text hover:border-primary/40 hover:text-primary transition-all duration-200 lg:hidden"
+          className="p-2.5 rounded-xl bg-surfaceSoft/60 text-text hover:text-primary active:scale-95 transition-all lg:hidden"
           aria-label="Abrir menú"
         >
           <svg
@@ -53,7 +53,7 @@ const AdminLayout = () => {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
         />
       )}
 
@@ -69,8 +69,8 @@ const AdminLayout = () => {
         />
       </aside>
 
-      {/* Contenido Principal con margen superior compensado por el header fijo */}
-      <main className="min-h-screen px-3 sm:px-6 lg:px-8 pt-28 lg:pt-28 lg:ml-64 overflow-x-hidden relative z-10">
+      {/* Contenido Principal con margen superior compensado y máxima amplitud */}
+      <main className="min-h-screen px-4 sm:px-6 lg:px-8 pt-24 lg:pt-24 lg:ml-64 overflow-x-hidden relative z-10">
         <div className="mx-auto w-full max-w-7xl space-y-6 pb-12">
           <Outlet />
         </div>

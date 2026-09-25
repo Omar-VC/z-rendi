@@ -58,9 +58,9 @@ function ClientesPageV2() {
   if (error) return <EmptyState title={error} />;
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn font-sans selection:bg-primary/20 selection:text-primary">
       {/* ENCABEZADO Y BOTÓN DE INVITACIÓN */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <SectionTitle
           title="Gestión de Atletas"
           description="Control centralizado de estado, rendimiento y membresías."
@@ -70,14 +70,14 @@ function ClientesPageV2() {
           variant="accent"
           onClick={invitarCliente}
           disabled={generandoInvitacion}
-          className="shadow-[0_0_15px_rgba(255,85,0,0.25)] shrink-0"
+          className="!h-9 !px-4 text-[11px] font-mono font-bold uppercase tracking-wider rounded-lg !bg-primary hover:!bg-primary/90 active:scale-95 transition-all shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)] shrink-0"
         >
-          {generandoInvitacion ? "Generando..." : "+ Invitar Atleta"}
+          {generandoInvitacion ? "[ Generando... ]" : "+ Invitar Atleta"}
         </Button>
       </div>
 
-      {/* BARRA DE BÚSQUEDA Y NAVEGACIÓN POR TABS */}
-      <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+      {/* BARRA DE BÚSQUEDA Y NAVEGACIÓN PLANO / MINIMALISTA */}
+      <div className="flex flex-col md:flex-row gap-6 items-stretch md:items-end justify-between">
         <div className="w-full md:max-w-md">
           <Input
             placeholder="Buscar por nombre o apellido..."
@@ -86,54 +86,77 @@ function ClientesPageV2() {
           />
         </div>
 
-        {/* Pestañas rápidas para filtrar sin scroll excesivo */}
-        <div className="flex items-center gap-1.5 p-1 bg-surfaceSoft/60 border border-border/60 rounded-xl self-start md:self-auto">
+        {/* SWITCH PLANO Y ULTRA-MINIMALISTA (SIN CONTENEDORES NI CAJAS) */}
+        <nav className="flex items-center gap-6 border-b border-white/5 pb-1 self-start md:self-auto">
+          {/* TAB ACTIVOS */}
           <button
             onClick={() => setTabActiva("activos")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            className={`relative pb-2 text-xs font-mono transition-all active:scale-95 ${
               tabActiva === "activos"
-                ? "bg-primary text-white shadow-[0_0_10px_rgba(255,85,0,0.3)]"
+                ? "text-primary font-bold"
                 : "text-muted hover:text-text"
             }`}
           >
-            Activos ({activos.length})
+            <div className="flex items-center gap-2">
+              <span>ACTIVOS</span>
+              <span className="text-[10px] opacity-70">[{activos.length}]</span>
+            </div>
+            {tabActiva === "activos" && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full" />
+            )}
           </button>
 
+          {/* TAB SOLICITUDES (SI EXISTEN) */}
           {pendientes.length > 0 && (
             <button
               onClick={() => setTabActiva("pendientes")}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+              className={`relative pb-2 text-xs font-mono transition-all active:scale-95 ${
                 tabActiva === "pendientes"
-                  ? "bg-primary text-white shadow-[0_0_10px_rgba(255,85,0,0.3)]"
-                  : "text-warning hover:text-warning/80"
+                  ? "text-warning font-bold"
+                  : "text-muted hover:text-text"
               }`}
             >
-              <span>Solicitudes</span>
-              <span className="w-2 h-2 rounded-full bg-warning animate-ping" />
-              ({pendientes.length})
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-warning" />
+                </span>
+                <span>SOLICITUDES</span>
+                <span className="text-[10px] opacity-70">[{pendientes.length}]</span>
+              </div>
+              {tabActiva === "pendientes" && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-warning rounded-full" />
+              )}
             </button>
           )}
 
+          {/* TAB BAJAS */}
           <button
             onClick={() => setTabActiva("inactivos")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            className={`relative pb-2 text-xs font-mono transition-all active:scale-95 ${
               tabActiva === "inactivos"
-                ? "bg-primary text-white shadow-[0_0_10px_rgba(255,85,0,0.3)]"
+                ? "text-text font-bold"
                 : "text-muted hover:text-text"
             }`}
           >
-            Bajas ({inactivos.length})
+            <div className="flex items-center gap-2">
+              <span>BAJAS</span>
+              <span className="text-[10px] opacity-70">[{inactivos.length}]</span>
+            </div>
+            {tabActiva === "inactivos" && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-text rounded-full" />
+            )}
           </button>
-        </div>
+        </nav>
       </div>
 
-      {/* LISTA: SOLICITUDES PENDIENTES */}
+      {/* CONTENIDO DE LISTAS */}
       {tabActiva === "pendientes" && (
         <section className="space-y-3">
           {pendientes.length === 0 ? (
             <EmptyState title="No hay solicitudes pendientes" />
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {pendientes.map((cliente) => (
                 <ClienteRequestCard
                   key={cliente.id}
@@ -147,19 +170,18 @@ function ClientesPageV2() {
         </section>
       )}
 
-      {/* LISTA: CLIENTES ACTIVOS (LAYOUT COMPACTO) */}
       {tabActiva === "activos" && (
         <section className="space-y-3">
           {clientesActivosFiltrados.length === 0 ? (
             <EmptyState
               title={
                 activos.length === 0
-                  ? "No hay clientes activos registrasdos"
+                  ? "No hay atletas activos registrados"
                   : "No se encontraron atletas con esa búsqueda"
               }
             />
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {clientesActivosFiltrados.map((cliente) => (
                 <ClienteCard
                   key={cliente.id}
@@ -172,13 +194,12 @@ function ClientesPageV2() {
         </section>
       )}
 
-      {/* LISTA: CLIENTES INACTIVOS / DADOS DE BAJA */}
       {tabActiva === "inactivos" && (
         <section className="space-y-3">
           {clientesInactivosFiltrados.length === 0 ? (
             <EmptyState title="No hay atletas en estado de baja" />
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {clientesInactivosFiltrados.map((cliente) => (
                 <ClienteCard
                   key={cliente.id}
