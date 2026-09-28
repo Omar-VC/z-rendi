@@ -4,20 +4,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import type { Cliente } from "../types";
 import { getClienteById } from "../services/clientes.service";
 import ClienteHeader from "../components/ClienteHeader";
-import FichaResumen from "../../fichas/components/FichaResumen";
-import FichaForm from "../../fichas/components/FichaForm";
-import { useFichaCliente } from "../../fichas/hooks/useFichaCliente";
-import CuotaResumen from "../../cuotas/components/CuotaResumen";
-import { useCuotasCliente } from "../../cuotas/hooks/useCuotasCliente";
-import CuotaForm from "../../cuotas/components/CuotaForm";
-import type { Cuota } from "../../cuotas/types";
-import RegistrarPagoForm from "../../cuotas/components/RegistrarPagoForm";
-import EditarCuotaForm from "../../cuotas/components/EditarCuotaForm";
-import ReciboPago from "../../cuotas/components/ReciboPago";
 import ClienteTrainingConfig from "../components/ClienteTrainingConfig";
+
+import TabCuotasSection from "../components/TabCuotasSection";
+import TabFichaSection from "../components/TabFichaSection";
+import TabAsistenciaSection from "../components/TabAsistenciaSection";
+
+import { useFichaCliente } from "../../fichas/hooks/useFichaCliente";
+import { useCuotasCliente } from "../../cuotas/hooks/useCuotasCliente";
 import { useAsistencia } from "../../asistencia/hooks/useAsistencia";
-import ResumenAsistencia from "../../asistencia/components/ResumenAsistencia";
-import HistorialAsistencia from "../../asistencia/components/HistorialAsistencia";
 import SeguimientoPanel from "../../seguimiento/components/SeguimientoPanel";
 import Button from "../../../../shared/ui/Button";
 
@@ -27,10 +22,12 @@ function ClienteDetailV2() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [cliente, setCliente] = useState<Cliente | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tabActiva, setTabActiva] = useState<TabOption>("seguimiento");
+
   const { ficha, recargar: recargarFicha } = useFichaCliente(id);
   const { cuotas, recargar: recargarCuotas } = useCuotasCliente(id);
-
-  const [cliente, setCliente] = useState<Cliente | null>(null);
   const {
     asistencias,
     presentes,
@@ -38,17 +35,6 @@ function ClienteDetailV2() {
     porcentaje,
     cargando: cargandoAsistencia,
   } = useAsistencia(cliente?.id, cliente?.frecuenciaSemanal);
-
-  const [loading, setLoading] = useState(true);
-  const [tabActiva, setTabActiva] = useState<TabOption>("seguimiento");
-
-  const [editandoFicha, setEditandoFicha] = useState(false);
-  const [creandoCuota, setCreandoCuota] = useState(false);
-  const [cuotaSeleccionada, setCuotaSeleccionada] = useState<Cuota | null>(
-    null,
-  );
-  const [cuotaEditando, setCuotaEditando] = useState<Cuota | null>(null);
-  const [cuotaRecibo, setCuotaRecibo] = useState<Cuota | null>(null);
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -64,18 +50,18 @@ function ClienteDetailV2() {
   if (loading) {
     return (
       <div className="p-6 space-y-4 animate-pulse">
-        <div className="h-8 w-32 bg-surfaceSoft rounded-lg" />
-        <div className="h-24 w-full bg-surfaceSoft rounded-xl" />
-        <div className="h-64 w-full bg-surfaceSoft rounded-xl" />
+        <div className="h-8 w-32 bg-surfaceSoft/50 rounded-lg" />
+        <div className="h-28 w-full bg-surfaceSoft/30 rounded-2xl" />
+        <div className="h-64 w-full bg-surfaceSoft/30 rounded-2xl" />
       </div>
     );
   }
 
   if (!cliente) {
     return (
-      <div className="p-8 text-center space-y-4 bg-surface border border-border/60 rounded-xl">
+      <div className="p-8 text-center space-y-4 bg-surfaceSoft/20 rounded-2xl">
         <p className="text-muted text-sm font-semibold">
-          Cliente no encontrado.
+          Atleta no encontrado.
         </p>
         <Button variant="outline" onClick={() => navigate("/admin/clientes")}>
           Volver al listado
@@ -85,30 +71,31 @@ function ClienteDetailV2() {
   }
 
   return (
-    <div className="space-y-6 pb-12 animate-fadeIn">
-      {/* BOTÓN VOLVER & CABECERA DE PERFIL */}
-      {/* NAVEGACIÓN SUPERIOR LIMPICITA */}
+    <div className="space-y-6 pb-12 animate-fadeIn font-sans selection:bg-primary/20 selection:text-primary">
+      {/* NAVEGACIÓN SUPERIOR & INDICADOR DE ESTADO */}
       <div className="flex items-center justify-between gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-xs font-extrabold text-muted hover:text-primary transition-colors py-1 px-2 rounded-lg hover:bg-surfaceSoft/50"
+          className="inline-flex items-center gap-2 text-xs font-mono font-bold text-muted hover:text-primary transition-all active:scale-95 py-1 px-2 rounded-lg hover:bg-surfaceSoft/30"
         >
-          <span>←</span> Volver a Atletas
+          <span>←</span> VOLVER A ATLETAS
         </button>
 
-        {/* Indicador sutil de atleta activo en lugar del ID técnico */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-surfaceSoft/30 px-3 py-1 rounded-full">
           <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          <span className="text-[11px] font-bold uppercase tracking-wider text-muted">
-            Atleta Registrado
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted">
+            ATLETA REGISTRADO
           </span>
         </div>
       </div>
 
-      <ClienteHeader cliente={cliente} />
+      {/* CABECERA DE ATLETA (BLOQUE CON GRADIENTE SUTIL SIN BORDES) */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-surfaceSoft/80 to-surfaceSoft/30 p-1 shadow-lg">
+        <ClienteHeader cliente={cliente} />
+      </div>
 
-      {/* CONFIGURACIÓN DE ENTRENAMIENTO */}
-      <div className="bg-surface/60 border border-border/50 rounded-xl p-4 backdrop-blur-sm">
+      {/* CONFIGURACIÓN DE FRECUENCIA DE ENTRENAMIENTO */}
+      <div className="rounded-2xl bg-surfaceSoft/30 p-4 backdrop-blur-md">
         <ClienteTrainingConfig
           clienteId={cliente.id}
           frecuenciaSemanal={cliente.frecuenciaSemanal}
@@ -118,165 +105,105 @@ function ClienteDetailV2() {
         />
       </div>
 
-      {/* BARRA DE NAVEGACIÓN POR PESTAÑAS (SLIDE TÁCTIL SIN SCROLLBAR) */}
-      <div className="flex items-center gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] pb-2 border-b border-border/60">
-        <style>{`
-    .scrollbar-none::-webkit-scrollbar {
-      display: none;
-    }
-  `}</style>
-
+      {/* NAVEGACIÓN ENTRE SECCIONES (SWITCH ULTRA-MINIMALISTA PLANO) */}
+      <nav className="flex items-center gap-6 border-b border-white/5 pb-2 overflow-x-auto scrollbar-none">
         <button
           onClick={() => setTabActiva("seguimiento")}
-          className={`snap-start px-4 py-2 text-xs font-extrabold rounded-lg transition-all shrink-0 select-none ${
+          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
             tabActiva === "seguimiento"
-              ? "bg-primary text-white shadow-[0_0_12px_rgba(255,85,0,0.3)]"
-              : "text-muted hover:text-text bg-surfaceSoft/40"
+              ? "text-primary font-bold"
+              : "text-muted hover:text-text"
           }`}
         >
-          📊 Seguimiento & Cargas
+          <span>SEGUIMIENTO & CARGAS</span>
+          {tabActiva === "seguimiento" && (
+            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+          )}
         </button>
 
         <button
           onClick={() => setTabActiva("asistencia")}
-          className={`snap-start px-4 py-2 text-xs font-extrabold rounded-lg transition-all shrink-0 select-none ${
+          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
             tabActiva === "asistencia"
-              ? "bg-primary text-white shadow-[0_0_12px_rgba(255,85,0,0.3)]"
-              : "text-muted hover:text-text bg-surfaceSoft/40"
+              ? "text-primary font-bold"
+              : "text-muted hover:text-text"
           }`}
         >
-          📅 Asistencia ({porcentaje}%)
+          <span>ASISTENCIA [{porcentaje}%]</span>
+          {tabActiva === "asistencia" && (
+            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+          )}
         </button>
 
         <button
           onClick={() => setTabActiva("cuotas")}
-          className={`snap-start px-4 py-2 text-xs font-extrabold rounded-lg transition-all shrink-0 select-none ${
+          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
             tabActiva === "cuotas"
-              ? "bg-primary text-white shadow-[0_0_12px_rgba(255,85,0,0.3)]"
-              : "text-muted hover:text-text bg-surfaceSoft/40"
+              ? "text-primary font-bold"
+              : "text-muted hover:text-text"
           }`}
         >
-          💳 Cuotas & Pagos
+          <span>CUOTAS & PAGOS</span>
+          {tabActiva === "cuotas" && (
+            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+          )}
         </button>
 
         <button
           onClick={() => setTabActiva("ficha")}
-          className={`snap-start px-4 py-2 text-xs font-extrabold rounded-lg transition-all shrink-0 select-none ${
+          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
             tabActiva === "ficha"
-              ? "bg-primary text-white shadow-[0_0_12px_rgba(255,85,0,0.3)]"
-              : "text-muted hover:text-text bg-surfaceSoft/40"
+              ? "text-primary font-bold"
+              : "text-muted hover:text-text"
           }`}
         >
-          📋 Ficha Médica
+          <span>FICHA MÉDICA</span>
+          {tabActiva === "ficha" && (
+            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+          )}
         </button>
-      </div>
+      </nav>
 
-      {/* CONTENIDO SEGÚN LA PESTAÑA SELECCIONADA */}
+      {/* CONTENIDO INTEGRADO (SIN CUADROS EXTERNOS) */}
       <div className="pt-2">
-        {/* PESTAÑA 1: SEGUIMIENTO */}
         {tabActiva === "seguimiento" && (
-          <section className="bg-surface/40 border border-border/60 rounded-xl p-5 space-y-4 backdrop-blur-sm">
-            <h2 className="text-base font-black text-text tracking-tight uppercase">
-              Control de Carga & Evolución
-            </h2>
+          <div className="animate-fadeIn">
             <SeguimientoPanel clienteId={id!} />
-          </section>
+          </div>
         )}
 
-        {/* PESTAÑA 2: ASISTENCIA */}
         {tabActiva === "asistencia" && (
-          <section className="bg-surface/40 border border-border/60 rounded-xl p-5 space-y-5 backdrop-blur-sm">
-            <h2 className="text-base font-black text-text tracking-tight uppercase">
-              Registro de Asistencia
-            </h2>
-
-            {cargandoAsistencia ? (
-              <p className="text-xs text-muted font-medium animate-pulse">
-                Cargando métricas de asistencia...
-              </p>
-            ) : (
-              <div className="space-y-6">
-                <ResumenAsistencia
-                  presentes={presentes}
-                  faltas={faltas}
-                  porcentaje={porcentaje}
-                  frecuenciaSemanal={cliente.frecuenciaSemanal}
-                />
-                <HistorialAsistencia asistencias={asistencias} />
-              </div>
-            )}
-          </section>
+          <div className="animate-fadeIn rounded-2xl bg-surfaceSoft/20 p-5 backdrop-blur-md">
+            <TabAsistenciaSection
+              cargando={cargandoAsistencia}
+              presentes={presentes}
+              faltas={faltas}
+              porcentaje={porcentaje}
+              frecuenciaSemanal={cliente.frecuenciaSemanal}
+              asistencias={asistencias}
+            />
+          </div>
         )}
 
-        {/* PESTAÑA 3: CUOTAS */}
         {tabActiva === "cuotas" && (
-          <section className="bg-surface/40 border border-border/60 rounded-xl p-5 backdrop-blur-sm">
-            {creandoCuota && id ? (
-              <CuotaForm
-                clienteId={id}
-                onGuardado={async () => {
-                  await recargarCuotas();
-                  setCreandoCuota(false);
-                }}
-                onCancelar={() => setCreandoCuota(false)}
-              />
-            ) : cuotaSeleccionada ? (
-              <RegistrarPagoForm
-                cuota={cuotaSeleccionada}
-                onGuardado={async () => {
-                  await recargarCuotas();
-                  setCuotaSeleccionada(null);
-                }}
-                onCancelar={() => setCuotaSeleccionada(null)}
-              />
-            ) : cuotaEditando ? (
-              <EditarCuotaForm
-                cuota={cuotaEditando}
-                onGuardado={async () => {
-                  await recargarCuotas();
-                  setCuotaEditando(null);
-                }}
-                onCancelar={() => setCuotaEditando(null)}
-              />
-            ) : cuotaRecibo ? (
-              <ReciboPago
-                cuota={cuotaRecibo}
-                clienteNombre={`${cliente.nombre} ${cliente.apellido}`}
-                onCerrar={() => setCuotaRecibo(null)}
-              />
-            ) : (
-              <CuotaResumen
-                cuotas={cuotas}
-                onCrear={() => setCreandoCuota(true)}
-                onRegistrarPago={(cuota) => setCuotaSeleccionada(cuota)}
-                onEditar={(cuota) => setCuotaEditando(cuota)}
-                onVerRecibo={(cuota) => setCuotaRecibo(cuota)}
-                onRevertido={async () => await recargarCuotas()}
-              />
-            )}
-          </section>
+          <div className="animate-fadeIn rounded-2xl bg-surfaceSoft/20 p-5 backdrop-blur-md">
+            <TabCuotasSection
+              clienteId={id!}
+              clienteNombre={`${cliente.nombre} ${cliente.apellido || ""}`}
+              cuotas={cuotas}
+              onRecargarCuotas={recargarCuotas}
+            />
+          </div>
         )}
 
-        {/* PESTAÑA 4: FICHA */}
         {tabActiva === "ficha" && (
-          <section className="bg-surface/40 border border-border/60 rounded-xl p-5 backdrop-blur-sm">
-            {editandoFicha && id ? (
-              <FichaForm
-                clienteId={id}
-                ficha={ficha}
-                onGuardado={async () => {
-                  await recargarFicha();
-                  setEditandoFicha(false);
-                }}
-                onCancelar={() => setEditandoFicha(false)}
-              />
-            ) : (
-              <FichaResumen
-                ficha={ficha}
-                onEditar={() => setEditandoFicha(true)}
-              />
-            )}
-          </section>
+          <div className="animate-fadeIn rounded-2xl bg-surfaceSoft/20 p-5 backdrop-blur-md">
+            <TabFichaSection
+              clienteId={id!}
+              ficha={ficha}
+              onRecargarFicha={recargarFicha}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -64,14 +64,7 @@ export async function obtenerSesionesCliente(
   });
 }
 
-export async function crearSesion(sesion: Omit<SesionEntrenamiento, "id">) {
-  await addDoc(collection(db, COLLECTION), {
-    ...sesion,
-    fecha: Timestamp.fromDate(sesion.fecha),
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  });
-}
+
 
 
 export async function eliminarSesion(

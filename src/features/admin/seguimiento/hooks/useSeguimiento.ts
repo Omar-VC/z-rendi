@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { SesionEntrenamiento } from "../types/seguimiento";
-
-import {
-  obtenerSesionesCliente,
-  crearSesion,
-} from "../services/seguimientoService";
+import { obtenerSesionesCliente } from "../services/seguimientoService";
 
 export function useSeguimiento(clienteId?: string) {
   const [sesiones, setSesiones] = useState<SesionEntrenamiento[]>([]);
@@ -20,22 +16,13 @@ export function useSeguimiento(clienteId?: string) {
 
     try {
       setLoading(true);
-
       const data = await obtenerSesionesCliente(clienteId);
-
       setSesiones(data);
     } catch (error) {
       console.error("Error cargando sesiones:", error);
     } finally {
       setLoading(false);
     }
-  }
-
-  async function agregarSesion(
-    sesion: Omit<SesionEntrenamiento, "id">,
-  ) {
-    await crearSesion(sesion);
-    await cargarSesiones();
   }
 
   useEffect(() => {
@@ -46,6 +33,5 @@ export function useSeguimiento(clienteId?: string) {
     sesiones,
     loading,
     recargar: cargarSesiones,
-    agregarSesion,
   };
 }

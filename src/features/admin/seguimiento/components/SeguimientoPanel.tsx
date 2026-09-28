@@ -1,9 +1,6 @@
-import { useState } from "react";
-
 import { useAuth } from "../../../../auth/useAuth";
 import { useSeguimiento } from "../hooks/useSeguimiento";
 
-import NuevaSesionModal from "./NuevaSesionModal";
 import UltimaSesionCard from "./UltimaSesionCard";
 import RegistroSesiones from "./RegistroSesiones";
 import BarrerasPanel from "./BarrerasPanel";
@@ -12,15 +9,12 @@ import SesionesPendientesPanel from "./SesionesPendientesPanel";
 
 import { eliminarSesion } from "../services/seguimientoService";
 
-import { Button } from "../../../../shared/ui";
-
 type Props = {
   clienteId: string;
 };
 
 export default function SeguimientoPanel({ clienteId }: Props) {
   const { user } = useAuth();
-  const [mostrarModal, setMostrarModal] = useState(false);
   const { sesiones, loading, recargar } = useSeguimiento(clienteId);
 
   if (!user) return null;
@@ -29,24 +23,14 @@ export default function SeguimientoPanel({ clienteId }: Props) {
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* CABECERA & ACCIÓN PRINCIPAL */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/40">
-        <div>
-          <h2 className="text-lg font-black text-text uppercase tracking-tight">
-            Seguimiento Deportivo
-          </h2>
-          <p className="text-xs text-muted font-medium mt-0.5">
-            Control de evolución, sesiones de entrenamiento y barreras del atleta.
-          </p>
-        </div>
-
-        <Button
-          variant="accent"
-          className="!min-h-0 h-9 !px-4 text-xs font-bold shadow-[0_0_12px_rgba(255,85,0,0.25)] shrink-0 self-start sm:self-auto"
-          onClick={() => setMostrarModal(true)}
-        >
-          + Nueva Sesión
-        </Button>
+      {/* CABECERA DE SEGUIMIENTO (SIN EL BOTÓN DE NUEVA SESIÓN PRESENCIAL) */}
+      <div className="pb-2 border-b border-border/40">
+        <h2 className="text-lg font-black text-text uppercase tracking-tight">
+          Seguimiento Deportivo
+        </h2>
+        <p className="text-xs text-muted font-medium mt-0.5">
+          Control de evolución, sesiones de entrenamiento y barreras del atleta.
+        </p>
       </div>
 
       {/* CONTENIDO Y ESTADOS DE CARGA */}
@@ -58,7 +42,7 @@ export default function SeguimientoPanel({ clienteId }: Props) {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* PANEL DE SESIONES PENDIENTES */}
+          {/* PANEL DE SESIONES PENDIENTES (ACÁ ESTÁ TU BOTÓN "ASIGNAR SESIÓN") */}
           <SesionesPendientesPanel
             clienteId={clienteId}
             preparadorId={preparadorId}
@@ -82,18 +66,6 @@ export default function SeguimientoPanel({ clienteId }: Props) {
           {/* PANEL DE BARRERAS Y LIMITANTES */}
           <BarrerasPanel clienteId={clienteId} />
         </div>
-      )}
-
-      {/* MODAL DE NUEVA SESIÓN */}
-      {mostrarModal && (
-        <NuevaSesionModal
-          clienteId={clienteId}
-          onClose={() => setMostrarModal(false)}
-          onGuardado={() => {
-            recargar();
-            setMostrarModal(false);
-          }}
-        />
       )}
     </div>
   );
