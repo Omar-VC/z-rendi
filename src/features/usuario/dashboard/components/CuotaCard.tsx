@@ -2,6 +2,7 @@ import Card from "../../../../shared/ui/Card";
 import Badge from "../../../../shared/ui/Badge";
 import { useAuth } from "../../../../auth/useAuth";
 import { useCuotasCliente } from "../../../admin/cuotas/hooks/useCuotasCliente";
+import { CreditCard, Calendar, CheckCircle2, AlertTriangle, Wallet } from "lucide-react";
 
 export default function CuotaCard() {
   const { user } = useAuth();
@@ -10,8 +11,11 @@ export default function CuotaCard() {
   // Skeleton de carga
   if (loading) {
     return (
-      <Card className="animate-pulse space-y-4">
-        <div className="h-6 w-1/3 bg-surfaceSoft rounded-md" />
+      <Card className="animate-pulse space-y-4 p-5">
+        <div className="flex items-center justify-between">
+          <div className="h-6 w-1/3 bg-surfaceSoft rounded-md" />
+          <div className="h-6 w-16 bg-surfaceSoft rounded-full" />
+        </div>
         <div className="h-10 w-1/2 bg-surfaceSoft/60 rounded-lg" />
         <div className="h-16 w-full bg-surfaceSoft/40 rounded-xl" />
       </Card>
@@ -31,68 +35,105 @@ export default function CuotaCard() {
     : "$ 0";
 
   return (
-    <Card hover className="relative overflow-hidden">
-      {/* Luz ambiental difusa */}
+    <Card hover className="relative overflow-hidden p-5 bg-surface/95 backdrop-blur-md border border-white/10 shadow-xl">
+      {/* Luz ambiental difusa dinámicamente coloreada */}
       <div
-        className={`absolute -bottom-10 -right-10 w-28 h-28 rounded-full blur-2xl pointer-events-none ${
-          pagada ? "bg-success/10" : "bg-warning/10"
+        className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full blur-3xl pointer-events-none transition-colors duration-500 ${
+          pagada ? "bg-success/15" : "bg-warning/15"
         }`}
       />
 
-      {/* ENCABEZADO */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20 text-primary font-bold text-xs">
-            💳
-          </span>
-          <h3 className="text-lg font-bold text-text tracking-tight">
-            Estado de Cuota
-          </h3>
+      {/* Ícono decorativo de agua en la esquina superior derecha */}
+      <div className="absolute top-0 right-0 w-36 h-36 pointer-events-none overflow-hidden opacity-5">
+        <CreditCard className="absolute -top-4 -right-4 w-32 h-32 text-text -rotate-12" />
+      </div>
+
+      <div className="relative z-10 space-y-4">
+        {/* ENCABEZADO */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`p-2 rounded-xl border ${
+                pagada
+                  ? "bg-success/10 border-success/20 text-success shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+                  : "bg-warning/10 border-warning/20 text-warning shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+              }`}
+            >
+              <Wallet className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-text tracking-tight">
+              Estado de Cuota
+            </h3>
+          </div>
+
+          <Badge variant={pagada ? "success" : "warning"}>
+            {pagada ? "Al día" : "Pendiente"}
+          </Badge>
         </div>
 
-        <Badge variant={pagada ? "success" : "warning"}>
-          {pagada ? "Al día" : "Pendiente"}
-        </Badge>
-      </div>
-
-      {/* MONTO */}
-      <div className="mt-5">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-          Monto Período
-        </span>
-        <p
-          className={`mt-1 text-3xl font-black tracking-tight ${
-            pagada ? "text-text" : "text-warning"
-          }`}
-        >
-          {montoFormateado}
-        </p>
-      </div>
-
-      {/* DETALLE DE VENCIMIENTO */}
-      <div className="mt-4 p-3.5 rounded-xl border border-border/60 bg-surfaceSoft/30 flex items-center justify-between">
+        {/* MONTO */}
         <div>
-          <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
-            Próximo Vencimiento
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
+            Monto Período
           </span>
-          <p className="mt-0.5 text-sm font-extrabold text-text">
-            {cuota?.fechaVencimiento ?? "-"}
+          <p
+            className={`mt-0.5 text-3xl font-black tracking-tight ${
+              pagada ? "text-text" : "text-warning"
+            }`}
+          >
+            {montoFormateado}
           </p>
         </div>
 
-        {!pagada && (
-          <span className="flex h-2 w-2 rounded-full bg-warning animate-ping" />
-        )}
-      </div>
+        {/* DETALLE DE VENCIMIENTO */}
+        <div
+          className={`p-3.5 rounded-xl border transition-colors flex items-center justify-between ${
+            pagada
+              ? "border-white/10 bg-surfaceSoft/30"
+              : "border-warning/30 bg-warning/5"
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            <Calendar className={`w-4 h-4 ${pagada ? "text-muted" : "text-warning"}`} />
+            <div>
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
+                Próximo Vencimiento
+              </span>
+              <p className="text-sm font-extrabold text-text">
+                {cuota?.fechaVencimiento ?? "-"}
+              </p>
+            </div>
+          </div>
 
-      {/* FOOTER INFORMATIVO */}
-      <div className="mt-4 p-2.5 rounded-xl border border-white/5 bg-surfaceSoft/20 flex items-center gap-2">
-        <span className="text-xs">{pagada ? "✅" : "⚠️"}</span>
-        <p className="text-xs font-semibold text-muted">
-          {pagada
-            ? "Tu membresía se encuentra activa y al día."
-            : "Recordá regularizar el pago antes de la fecha límite."}
-        </p>
+          {!pagada && (
+            <div className="flex items-center gap-1.5 bg-warning/10 border border-warning/20 px-2.5 py-1 rounded-md">
+              <span className="w-2 h-2 rounded-full bg-warning animate-ping" />
+              <span className="text-[10px] font-bold text-warning uppercase tracking-wide">
+                Atención
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* FOOTER INFORMATIVO */}
+        <div
+          className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs font-semibold ${
+            pagada
+              ? "border-success/20 bg-success/5 text-success/90"
+              : "border-warning/20 bg-warning/5 text-warning/90"
+          }`}
+        >
+          {pagada ? (
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 shrink-0 text-warning" />
+          )}
+          <p className="leading-snug">
+            {pagada
+              ? "Tu membresía se encuentra activa y al día."
+              : "Recordá regularizar el pago antes de la fecha límite."}
+          </p>
+        </div>
       </div>
     </Card>
   );

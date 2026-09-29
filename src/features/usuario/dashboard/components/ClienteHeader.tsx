@@ -2,6 +2,7 @@
 import { useAuth } from "../../../../auth/useAuth";
 import { useFichaCliente } from "../../../admin/fichas/hooks/useFichaCliente";
 import AvatarUploadButton from "../../perfil/components/AvatarUploadButton";
+import { Scale, Ruler, } from "lucide-react";
 
 export default function ClienteHeader() {
   const { user } = useAuth();
@@ -92,22 +93,34 @@ export default function ClienteHeader() {
         )}
       </div>
 
-      {/* MÉTRICAS ANTROPOMÉTRICAS RÁPIDAS */}
+      {/* MÉTRICAS ANTROPOMÉTRICAS RÁPIDAS CON ÍCONOS INTERACTIVOS */}
       <div className="grid grid-cols-2 gap-3 pt-1">
-        <div className="p-3.5 rounded-xl border border-border/60 bg-surface/80 backdrop-blur-sm text-left">
-          <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
-            Peso Corporal
-          </span>
-          <p className="mt-0.5 text-lg font-black text-text tracking-tight">
+        {/* TARJETA PESO */}
+        <div className="group relative p-3.5 rounded-card border border-white/10 bg-surface/95 backdrop-blur-md text-left transition-all duration-200 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5 cursor-pointer">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted group-hover:text-text transition-colors">
+              Peso Corporal
+            </span>
+            <div className="p-1.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+              <Scale className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-xl font-black text-text tracking-tight group-hover:text-primary transition-colors">
             {ficha?.peso ? `${ficha.peso} kg` : "-"}
           </p>
         </div>
 
-        <div className="p-3.5 rounded-xl border border-border/60 bg-surface/80 backdrop-blur-sm text-left">
-          <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
-            Estatura
-          </span>
-          <p className="mt-0.5 text-lg font-black text-text tracking-tight">
+        {/* TARJETA ESTATURA */}
+        <div className="group relative p-3.5 rounded-card border border-white/10 bg-surface/95 backdrop-blur-md text-left transition-all duration-200 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5 cursor-pointer">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted group-hover:text-text transition-colors">
+              Estatura
+            </span>
+            <div className="p-1.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+              <Ruler className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-xl font-black text-text tracking-tight group-hover:text-primary transition-colors">
             {ficha?.altura ? `${ficha.altura} cm` : "-"}
           </p>
         </div>
