@@ -23,15 +23,27 @@ export default function Modal({
     xl: "max-w-5xl",
   };
 
-  // Bloquear el scroll del body cuando el modal esté abierto
+  // Manejar bloqueo de scroll y tecla Escape
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
 
-  // Renderizar usando createPortal para asegurarnos de que se monte en el body
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  if (typeof window === "undefined") return null;
+
   return createPortal(
     <div
       className="
@@ -49,6 +61,9 @@ export default function Modal({
         animate-fadeIn
       "
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
       <div
         className={`
@@ -83,6 +98,7 @@ export default function Modal({
           "
         >
           <h2
+            id="modal-title"
             className="
               text-xl
               md:text-2xl
@@ -95,6 +111,7 @@ export default function Modal({
 
           <button
             onClick={onClose}
+            aria-label="Cerrar modal"
             className="
               text-muted
               hover:text-accent
@@ -103,6 +120,7 @@ export default function Modal({
               p-1
               rounded-lg
               hover:bg-surfaceSoft
+              cursor-pointer
             "
           >
             ✕
