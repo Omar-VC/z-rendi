@@ -7,10 +7,7 @@ interface Props {
   onNavigate?: () => void;
 }
 
-export default function AdminSidebar({
-  onLogout,
-  onNavigate,
-}: Props) {
+export default function AdminSidebar({ onLogout, onNavigate }: Props) {
   return (
     <Sidebar>
       <Logo />
@@ -42,6 +39,13 @@ export default function AdminSidebar({
           label="Informes"
           icon="📊"
           path="/informes"
+          onNavigate={onNavigate}
+        />
+
+        <SidebarItem
+          label="Relevamientos"
+          icon="📋"
+          path="/relevamientos"
           onNavigate={onNavigate}
         />
       </nav>

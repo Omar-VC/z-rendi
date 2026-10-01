@@ -11,6 +11,8 @@ import ClienteDashboard from "./features/usuario/dashboard/pages/ClienteDashboar
 import SesionClientePage from "./features/usuario/dashboard/pages/SesionClientePage";
 import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
 import RegistroPage from "./auth/pages/RegistroPage";
+import RelevamientosPage from "./features/admin/relevamientos/pages/RelevamientosPage";
+import RelevamientoDetallePage from "./features/admin/relevamientos/pages/RelevamientoDetallePage";
 
 // ⚽ NUEVAS IMPORTACIONES PARA PLANTELES
 import PlantelesSelectorPage from "./features/admin/planteles/pages/PlantelesSelectorPage";
@@ -70,6 +72,11 @@ function App() {
           <Route path="/biblioteca" element={<BibliotecaPageV2 />} />
 
           <Route path="/informes" element={<InformesGeneralesPage />} />
+          <Route path="/relevamientos" element={<RelevamientosPage />} />
+          <Route
+            path="/relevamientos/:id"
+            element={<RelevamientoDetallePage />}
+          />
         </Route>
       )}
 
