@@ -11,6 +11,7 @@ import {
 import type { BloqueSesion } from "../types/bloqueSesion";
 import type { EjercicioSesion } from "../types/ejercicioSesion";
 import type { SesionPendiente } from "../types/sesionPendiente";
+import FichaDecision from "./FichaDecision";
 
 import {
   Modal,
@@ -297,6 +298,7 @@ export default function NuevaSesionPendienteModal({
       }
     >
       <div className="space-y-6 text-left pb-2">
+        <FichaDecision clienteId={clienteId} bloques={bloques} />
         {/* MÓDULO INTELIGENTE: HISTORIAL RECIENTE Y ANÁLISIS DE FATIGA */}
         <Card className="!p-4 bg-surfaceSoft/60 border-primary/20 rounded-xl space-y-3">
           <div className="flex items-center justify-between">
