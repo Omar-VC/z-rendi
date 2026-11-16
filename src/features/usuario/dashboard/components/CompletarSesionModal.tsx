@@ -281,14 +281,14 @@ export default function CompletarSesionModal({
             </span>
           </div>
 
-          <div className="space-y-3 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+          <div className="space-y-4">
             {sesion.bloques.map((bloque, bloqueIndex) => (
               <div
                 key={bloque.id}
                 className="rounded-xl border border-white/10 bg-surface p-4 space-y-3 shadow-md"
               >
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs font-black text-primary tracking-wide uppercase flex items-center gap-2">
+                  <span className="text-sm font-black text-primary tracking-wide uppercase flex items-center gap-2">
                     <span className="flex h-5 w-5 items-center justify-center rounded-md bg-primary/20 text-[10px] font-bold text-primary">
                       {bloqueIndex + 1}
                     </span>
@@ -310,12 +310,12 @@ export default function CompletarSesionModal({
                         key={k}
                         className="rounded-lg bg-surfaceSoft/50 p-3 border border-white/5 space-y-2 transition-colors hover:border-primary/20"
                       >
-                        <p className="text-xs font-bold text-text flex items-center gap-2">
+                        <p className="text-base font-bold text-text flex items-center gap-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                           {ejercicio.nombre}
                         </p>
 
-                        <div className="flex flex-wrap gap-2 text-xs pt-1">
+                        <div className="flex flex-wrap gap-2 text-sm pt-1">
                           {ejercicio.repeticiones && (
                             <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface border border-white/10 text-text font-medium">
                               <Flame className="w-3.5 h-3.5 text-primary" />
@@ -343,7 +343,7 @@ export default function CompletarSesionModal({
 
                         {/* SERIES REALIZADAS */}
                         <div className="space-y-1.5 pt-2">
-                          <div className="grid grid-cols-[1.5rem_1fr_1fr_2rem] gap-2 text-[10px] font-bold text-muted">
+                          <div className="grid grid-cols-[1.75rem_1fr_1fr_2.75rem] gap-2 text-xs font-bold text-muted">
                             <span>#</span>
                             <span>Reps</span>
                             <span>Peso (kg)</span>
@@ -370,7 +370,7 @@ export default function CompletarSesionModal({
                                     reps: e.target.value,
                                   })
                                 }
-                                className="text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
+                                className="text-base bg-surfaceSoft border border-border rounded px-3 py-2.5"
                               />
                               <Input
                                 type="number"
@@ -382,7 +382,7 @@ export default function CompletarSesionModal({
                                     peso: e.target.value,
                                   })
                                 }
-                                className="text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
+                                className="text-base bg-surfaceSoft border border-border rounded px-3 py-2.5"
                               />
                               <input
                                 type="checkbox"
@@ -392,7 +392,7 @@ export default function CompletarSesionModal({
                                     hecha: e.target.checked,
                                   })
                                 }
-                                className="h-5 w-5 justify-self-center accent-primary"
+                                className="h-7 w-7 justify-self-center accent-primary"
                               />
                             </div>
                           ))}
@@ -400,14 +400,14 @@ export default function CompletarSesionModal({
                           <button
                             type="button"
                             onClick={() => agregarFila(k)}
-                            className="text-[11px] text-primary font-bold hover:text-primary/80 pt-1"
+                            className="text-sm py-2 text-primary font-bold hover:text-primary/80 pt-1"
                           >
                             + Agregar serie
                           </button>
                         </div>
 
                         {ejercicio.indicaciones && (
-                          <div className="flex items-start gap-1.5 pt-1 text-[11px] text-warning/90 italic">
+                          <div className="flex items-start gap-1.5 pt-1 text-sm text-warning/90 italic">
                             <Info className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
                             <span>"{ejercicio.indicaciones}"</span>
                           </div>

@@ -13,6 +13,7 @@ import MiFichaPage from "./features/usuario/ficha/pages/MiFichaPage";
 import RegistroPage from "./auth/pages/RegistroPage";
 import RelevamientosPage from "./features/admin/relevamientos/pages/RelevamientosPage";
 import RelevamientoDetallePage from "./features/admin/relevamientos/pages/RelevamientoDetallePage";
+import HoyPage from "./features/admin/hoy/pages/HoyPage";
 
 // ⚽ NUEVAS IMPORTACIONES PARA PLANTELES
 import PlantelesSelectorPage from "./features/admin/planteles/pages/PlantelesSelectorPage";
@@ -61,6 +62,7 @@ function App() {
       {/* ADMIN */}
       {user && usuario?.rol === "admin" && (
         <Route element={<AdminLayout />}>
+          <Route path="/hoy" element={<HoyPage />} />
           <Route path="/clientes" element={<ClientesPageV2 />} />
 
           <Route path="/clientes/:id" element={<ClienteDetailV2 />} />
@@ -102,7 +104,7 @@ function App() {
             to={
               user
                 ? usuario?.rol === "admin"
-                  ? "/clientes"
+                  ? "/hoy"
                   : "/cliente"
                 : "/login"
             }

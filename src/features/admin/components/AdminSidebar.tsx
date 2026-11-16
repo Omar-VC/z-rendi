@@ -11,8 +11,13 @@ export default function AdminSidebar({ onLogout, onNavigate }: Props) {
   return (
     <Sidebar>
       <Logo />
-
       <nav className="space-y-2 mt-4">
+        <SidebarItem
+          label="Hoy"
+          icon="📅"
+          path="/hoy"
+          onNavigate={onNavigate}
+        />
         <SidebarItem
           label="Clientes"
           icon="👥"
