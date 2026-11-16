@@ -10,7 +10,10 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../../../firebase/firebase";
-import type { EjercicioRealizado, RegistroEjercicio } from "../types/registroEjercicio";
+import type {
+  EjercicioRealizado,
+  RegistroEjercicio,
+} from "../types/registroEjercicio";
 
 const REGISTROS_COLLECTION = "registrosEjercicio";
 
@@ -122,7 +125,10 @@ export async function obtenerUltimosRegistros(
 
   const registros = await Promise.all(
     unicos.map((id) =>
-      obtenerUltimoRegistroEjercicio(clienteId, id).catch(() => null),
+      obtenerUltimoRegistroEjercicio(clienteId, id).catch((e) => {
+        console.error("Error leyendo último registro:", id, e);
+        return null;
+      }),
     ),
   );
 

@@ -94,8 +94,10 @@ export default function CompletarSesionModal({
       b.ejercicios.map((e) => e.ejercicioId),
     );
 
+    console.log("PRECARGA -> clienteId:", clienteId, "ids:", ids);
     obtenerUltimosRegistros(clienteId, ids)
       .then((ultimos) => {
+        console.log("PRECARGA -> resultado:", ultimos);
         if (!activo) return;
         setFilas((prev) => {
           const next = { ...prev };
@@ -114,9 +116,7 @@ export default function CompletarSesionModal({
           return next;
         });
       })
-      .catch(() => {
-        /* sin historial no pasa nada */
-      });
+      .catch((e) => console.error("Error precargando pesos:", e));
 
     return () => {
       activo = false;
@@ -164,7 +164,10 @@ export default function CompletarSesionModal({
               peso: Number(f.peso.replace(",", ".")),
             }))
             .filter(
-              (s) => Number.isFinite(s.reps) && Number.isFinite(s.peso) && s.reps > 0,
+              (s) =>
+                Number.isFinite(s.reps) &&
+                Number.isFinite(s.peso) &&
+                s.reps > 0,
             );
 
           if (series.length === 0) return;
