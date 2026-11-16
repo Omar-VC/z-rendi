@@ -90,6 +90,8 @@ export default function ClienteDashboard() {
       {sesionSeleccionada && (
         <CompletarSesionModal
           sesion={sesionSeleccionada}
+          clienteId={user?.uid ?? ""}
+          preparadorId={sesionSeleccionada.preparadorId}
           onClose={() => setSesionSeleccionada(null)}
           onGuardar={async (datos) => {
             const carga = datos.duracion * datos.rpe;
@@ -99,6 +101,8 @@ export default function ClienteDashboard() {
               rpe: datos.rpe,
               carga,
               observacionesCliente: datos.observaciones,
+              ejerciciosRealizados: datos.ejerciciosRealizados,
+              duracionPlanificada: datos.duracionPlanificada,
             });
 
             setSesionSeleccionada(null);

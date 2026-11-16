@@ -4,7 +4,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  setDoc,
   onSnapshot,
   deleteDoc,
   query,
@@ -12,10 +11,16 @@ import {
   limit,
   orderBy,
   type Unsubscribe,
+  writeBatch,
 } from "firebase/firestore";
 
 import { db } from "../../../../firebase/firebase";
 import type { SesionPendiente } from "../types/sesionPendiente";
+import type { EjercicioRealizado } from "../types/registroEjercicio";
+import {
+  crearRegistrosEjercicio,
+  normalizarEjerciciosRealizados,
+} from "./registrosEjercicio.service";
 
 const SESIONES_COLLECTION = "sesionesPendientes";
 
@@ -134,52 +139,87 @@ export async function completarSesionPendiente(
     rpe: number;
     carga: number;
     observacionesCliente?: string;
+    ejerciciosRealizados?: EjercicioRealizado[];
+    duracionPlanificada?: number;
   },
 ): Promise<void> {
-  const referencia = doc(db, SESIONES_COLLECTION, id);
+  const referenciaPendiente = doc(db, SESIONES_COLLECTION, id);
 
-  const snapshot = await getDoc(referencia);
+  const snapshot = await getDoc(referenciaPendiente);
 
   if (!snapshot.exists()) {
     throw new Error("La sesión pendiente no existe.");
   }
 
   const data = snapshot.data();
+  const fecha = data.fecha?.toDate?.() ?? new Date(data.fecha);
 
-  await setDoc(doc(db, "sesiones", id), {
+  const bloques: Array<{
+    duracion?: number;
+    ejercicios?: Array<{ ejercicioId: string }>;
+  }> = Array.isArray(data.bloques) ? data.bloques : [];
+
+  const duracionPlanificada =
+    datos.duracionPlanificada ??
+    bloques.reduce((acc, b) => acc + (b.duracion || 0), 0);
+
+  const ejerciciosRealizados = normalizarEjerciciosRealizados(
+    datos.ejerciciosRealizados ?? [],
+  );
+
+  const batch = writeBatch(db);
+
+  // 1. Doc en sesiones con el MISMO ID de la pendiente (lo exige la regla de create)
+  batch.set(doc(db, "sesiones", id), {
+    id,
     clienteId: data.clienteId,
     preparadorId: data.preparadorId,
 
-    fecha: data.fecha,
+    fecha,
+    mes: fecha.getMonth() + 1,
+    anio: fecha.getFullYear(),
 
-    mes: data.fecha?.toDate
-      ? data.fecha.toDate().getMonth() + 1
-      : new Date(data.fecha).getMonth() + 1,
-
-    anio: data.fecha?.toDate
-      ? data.fecha.toDate().getFullYear()
-      : new Date(data.fecha).getFullYear(),
-
-    libroId: data.libroId,
-    libroNombre: data.libroNombre,
-
+    libroId: data.libroId ?? "",
+    libroNombre: data.libroNombre ?? "",
     gruposMusculares: data.gruposMusculares ?? [],
-    bloques: data.bloques ?? [],
 
-    objetivo: data.objetivo,
-
+    // Snapshot de lo asignado (lo usa la clonación de sesiones)
+    bloques,
+    objetivo: data.objetivo ?? "",
     observacionesPreparador: data.observacionesPreparador ?? "",
+    ejercicios: bloques.flatMap((b) =>
+      (b.ejercicios ?? []).map((e) => e.ejercicioId),
+    ),
 
+    // Lo que el atleta informó
     duracion: datos.duracion,
     rpe: datos.rpe,
     carga: datos.carga,
-
+    observaciones:
+      datos.observacionesCliente || data.observacionesPreparador || "",
     observacionesCliente: datos.observacionesCliente ?? "",
+
+    // Lo que realmente hizo
+    bloquesRealizados: ejerciciosRealizados,
+    sesionPendienteId: id,
+    duracionPlanificada,
 
     createdAt: new Date(),
   });
 
-  await deleteDoc(referencia);
+  // 2. Registros por ejercicio (solo series válidas)
+  crearRegistrosEjercicio(
+    batch,
+    id,
+    data.clienteId,
+    data.preparadorId,
+    ejerciciosRealizados,
+  );
+
+  // 3. Borrar la pendiente
+  batch.delete(referenciaPendiente);
+
+  await batch.commit();
 }
 
 export async function eliminarSesionPendiente(id: string): Promise<void> {

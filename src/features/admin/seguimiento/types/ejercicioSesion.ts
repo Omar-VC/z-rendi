@@ -5,4 +5,8 @@ export interface EjercicioSesion {
   repeticiones?: string;
   pausa?: string;
   indicaciones?: string;
+
+  seriesObjetivo?: number;
+  repsObjetivo?: number;
+  pesoSugerido?: number;
 }

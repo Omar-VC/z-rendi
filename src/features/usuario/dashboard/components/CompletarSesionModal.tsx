@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { SesionPendiente } from "../../../admin/seguimiento/types/sesionPendiente";
-import { Modal, Textarea, Button, Label } from "../../../../shared/ui";
+import type { EjercicioRealizado, SerieRealizada } from "../../../admin/seguimiento/types/registroEjercicio";
+import { Modal, Textarea, Button, Label, Input } from "../../../../shared/ui";
 import {
   Clock,
   Flame,
@@ -11,13 +12,18 @@ import {
   Info,
 } from "lucide-react";
 
+
 type Props = {
   sesion: SesionPendiente;
+  clienteId: string;
+  preparadorId: string;
   onClose: () => void;
   onGuardar: (datos: {
     duracion: number;
     rpe: number;
     observaciones: string;
+    duracionPlanificada?: number;
+    ejerciciosRealizados?: EjercicioRealizado[];
   }) => Promise<void>;
 };
 
@@ -29,13 +35,21 @@ export default function CompletarSesionModal({
   const [rpeSeleccionado, setRpeSeleccionado] = useState<number | null>(null);
   const [observaciones, setObservaciones] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [duracionEditada, setDuracionEditada] = useState<number | null>(null);
 
-  const duracionTotal = sesion.bloques.reduce(
+  const duracionPlanificada = sesion.bloques.reduce(
     (total, bloque) => total + bloque.duracion,
     0
   );
 
-  const carga = (rpeSeleccionado || 0) * duracionTotal;
+  const duracionParaCalculo = duracionEditada ?? duracionPlanificada;
+
+  const carga = (rpeSeleccionado || 0) * duracionParaCalculo;
+
+  // Estado de series por ejercicio: clave = ejercicioId
+  const [seriesPorEjercicio, setSeriesPorEjercicio] = useState<
+    Record<string, SerieRealizada[]>
+  >({});
 
   async function handleGuardar() {
     if (!rpeSeleccionado) {
@@ -45,10 +59,29 @@ export default function CompletarSesionModal({
 
     try {
       setGuardando(true);
+      const ejerciciosRealizados: EjercicioRealizado[] = [];
+      for (const bloque of sesion.bloques) {
+        for (const ejercicio of bloque.ejercicios) {
+          const series = seriesPorEjercicio[ejercicio.ejercicioId] ?? [];
+          const seriesValidas = series.filter(
+            (s) => typeof s.reps === "number" && s.reps >= 0 && typeof s.peso === "number" && s.peso >= 0
+          );
+          if (seriesValidas.length === 0) continue;
+          ejerciciosRealizados.push({
+            ejercicioId: ejercicio.ejercicioId,
+            nombre: ejercicio.nombre,
+            series: seriesValidas,
+            observaciones: ejercicio.indicaciones,
+          });
+        }
+      }
+
       await onGuardar({
-        duracion: duracionTotal,
+        duracion: duracionParaCalculo,
         rpe: rpeSeleccionado,
         observaciones,
+        duracionPlanificada,
+        ejerciciosRealizados,
       });
     } catch (error) {
       console.error(error);
@@ -113,7 +146,13 @@ export default function CompletarSesionModal({
             </p>
             <span className="inline-flex items-center gap-1 text-xs font-bold text-text bg-surfaceSoft px-2.5 py-1 rounded-md border border-white/5">
               <Clock className="w-3.5 h-3.5 text-primary" />
-              {duracionTotal} min
+              <Input
+                type="number"
+                value={duracionEditada ?? duracionPlanificada}
+                onChange={(e) => setDuracionEditada(parseInt(e.target.value) || null)}
+                className="w-12 text-xs bg-transparent border-none focus:ring-0 text-text"
+              />
+              min
             </span>
           </div>
 
@@ -171,12 +210,12 @@ export default function CompletarSesionModal({
                         </p>
                       </div>
 
-                      {/* DATOS DE REPETICIONES Y PAUSA EN CÁPSULAS DESTACADAS */}
+                      {/* CARGA DE SERIES REALES (reps y peso) */}
                       <div className="flex flex-wrap gap-2 text-xs pt-1">
                         {ejercicio.repeticiones && (
                           <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface border border-white/10 text-text font-medium">
                             <Flame className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-muted text-[11px]">Reps:</span>
+                            <span className="text-muted text-[11px]">Reps plan:</span>
                             <strong className="text-primary font-bold">
                               {ejercicio.repeticiones}
                             </strong>
@@ -192,6 +231,72 @@ export default function CompletarSesionModal({
                             </strong>
                           </div>
                         )}
+                      </div>
+
+                      {/* INPUTS DE SERIES REALES */}
+                      <div className="space-y-1 pt-2">
+                        <label className="text-[10px] font-bold text-muted block mb-1">Series realizadas</label>
+                        <div className="space-y-1">
+                          {(seriesPorEjercicio[ejercicio.ejercicioId] || []).map((serie, idx) => (
+                            <div key={idx} className="flex gap-2 items-center">
+                              <Input
+                                type="number"
+                                placeholder="Reps"
+                                value={serie.reps}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value) || 0;
+                                  setSeriesPorEjercicio((prev) => {
+                                    const next = [...(prev[ejercicio.ejercicioId] || [])];
+                                    next[idx] = { ...next[idx], reps: val };
+                                    return { ...prev, [ejercicio.ejercicioId]: next };
+                                  });
+                                }}
+                                className="w-16 text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
+                              />
+                              <Input
+                                type="number"
+                                placeholder="Peso"
+                                value={serie.peso}
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value) || 0;
+                                  setSeriesPorEjercicio((prev) => {
+                                    const next = [...(prev[ejercicio.ejercicioId] || [])];
+                                    next[idx] = { ...next[idx], peso: val };
+                                    return { ...prev, [ejercicio.ejercicioId]: next };
+                                  });
+                                }}
+                                className="w-20 text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
+                              />
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => {
+                                  setSeriesPorEjercicio((prev) => {
+                                    const next = [...(prev[ejercicio.ejercicioId] || [])];
+                                    next.splice(idx, 1);
+                                    return { ...prev, [ejercicio.ejercicioId]: next };
+                                  });
+                                }}
+                                className="h-8 w-8 rounded p-0 text-[10px]"
+                              >
+                                ×
+                              </Button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSeriesPorEjercicio((prev) => {
+                                const next = [...(prev[ejercicio.ejercicioId] || [])];
+                                next.push({ reps: 0, peso: 0 });
+                                return { ...prev, [ejercicio.ejercicioId]: next };
+                              });
+                            }}
+                            className="text-[10px] text-primary font-bold hover:text-primary/80"
+                          >
+                            + Agregar serie
+                          </button>
+                        </div>
                       </div>
 
                       {/* INDICACIONES DEL COACH */}
@@ -253,7 +358,7 @@ export default function CompletarSesionModal({
               Carga de Entrenamiento (sRPE)
             </p>
             <p className="text-[11px] text-muted">
-              {duracionTotal} min × RPE {rpeSeleccionado || 0}
+              {duracionParaCalculo} min × RPE {rpeSeleccionado || 0}
             </p>
           </div>
           <p className="text-3xl font-black text-primary tracking-tight">
