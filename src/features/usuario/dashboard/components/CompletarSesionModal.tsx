@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SesionPendiente } from "../../../admin/seguimiento/types/sesionPendiente";
-import type { EjercicioRealizado, SerieRealizada } from "../../../admin/seguimiento/types/registroEjercicio";
+import type { EjercicioRealizado } from "../../../admin/seguimiento/types/registroEjercicio";
+import type { EjercicioSesion } from "../../../admin/seguimiento/types/ejercicioSesion";
+import { obtenerUltimosRegistros } from "../../../admin/seguimiento/services/registrosEjercicio.service";
 import { Modal, Textarea, Button, Label, Input } from "../../../../shared/ui";
 import {
   Clock,
@@ -11,7 +13,6 @@ import {
   CheckCircle2,
   Info,
 } from "lucide-react";
-
 
 type Props = {
   sesion: SesionPendiente;
@@ -27,8 +28,38 @@ type Props = {
   }) => Promise<void>;
 };
 
+type FilaSerie = { reps: string; peso: string; hecha: boolean };
+
+// Interpreta textos como "4 x 10", "3x8-10", "4×12". Si no puede, devuelve null.
+function parsearPrescripcion(
+  texto?: string,
+): { series: number; reps: number } | null {
+  if (!texto) return null;
+  const m = texto.match(/(\d+)\s*[x×]\s*(\d+)/i);
+  if (!m) return null;
+  return { series: Number(m[1]), reps: Number(m[2]) };
+}
+
+const clave = (bloqueId: string, indice: number) => `${bloqueId}-${indice}`;
+
+function filasIniciales(ejercicio: EjercicioSesion): FilaSerie[] {
+  const parseado = parsearPrescripcion(ejercicio.repeticiones);
+  const cantidad = Math.min(
+    ejercicio.seriesObjetivo ?? parseado?.series ?? 1,
+    10,
+  );
+  const reps = ejercicio.repsObjetivo ?? parseado?.reps;
+
+  return Array.from({ length: Math.max(cantidad, 1) }, () => ({
+    reps: reps ? String(reps) : "",
+    peso: ejercicio.pesoSugerido != null ? String(ejercicio.pesoSugerido) : "",
+    hecha: true,
+  }));
+}
+
 export default function CompletarSesionModal({
   sesion,
+  clienteId,
   onClose,
   onGuardar,
 }: Props) {
@@ -39,17 +70,80 @@ export default function CompletarSesionModal({
 
   const duracionPlanificada = sesion.bloques.reduce(
     (total, bloque) => total + bloque.duracion,
-    0
+    0,
   );
-
   const duracionParaCalculo = duracionEditada ?? duracionPlanificada;
-
   const carga = (rpeSeleccionado || 0) * duracionParaCalculo;
 
-  // Estado de series por ejercicio: clave = ejercicioId
-  const [seriesPorEjercicio, setSeriesPorEjercicio] = useState<
-    Record<string, SerieRealizada[]>
-  >({});
+  // Filas de series por ejercicio. Clave = bloque + posición (evita mezclar
+  // el mismo ejercicio repetido en dos bloques).
+  const [filas, setFilas] = useState<Record<string, FilaSerie[]>>(() => {
+    const inicial: Record<string, FilaSerie[]> = {};
+    sesion.bloques.forEach((bloque) =>
+      bloque.ejercicios.forEach((ejercicio, i) => {
+        inicial[clave(bloque.id, i)] = filasIniciales(ejercicio);
+      }),
+    );
+    return inicial;
+  });
+
+  // Precarga el último peso usado en cada ejercicio (solo donde el peso está vacío)
+  useEffect(() => {
+    let activo = true;
+    const ids = sesion.bloques.flatMap((b) =>
+      b.ejercicios.map((e) => e.ejercicioId),
+    );
+
+    obtenerUltimosRegistros(clienteId, ids)
+      .then((ultimos) => {
+        if (!activo) return;
+        setFilas((prev) => {
+          const next = { ...prev };
+          sesion.bloques.forEach((bloque) =>
+            bloque.ejercicios.forEach((ejercicio, i) => {
+              const ultimo = ultimos[ejercicio.ejercicioId];
+              if (!ultimo) return;
+              const k = clave(bloque.id, i);
+              next[k] = (next[k] ?? []).map((fila) =>
+                fila.peso === ""
+                  ? { ...fila, peso: String(ultimo.mejorPeso) }
+                  : fila,
+              );
+            }),
+          );
+          return next;
+        });
+      })
+      .catch(() => {
+        /* sin historial no pasa nada */
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [clienteId, sesion.id]);
+
+  function actualizarFila(k: string, idx: number, cambios: Partial<FilaSerie>) {
+    setFilas((prev) => {
+      const next = [...(prev[k] ?? [])];
+      next[idx] = { ...next[idx], ...cambios };
+      return { ...prev, [k]: next };
+    });
+  }
+
+  function agregarFila(k: string) {
+    setFilas((prev) => {
+      const actuales = prev[k] ?? [];
+      const ultima = actuales[actuales.length - 1];
+      return {
+        ...prev,
+        [k]: [
+          ...actuales,
+          { reps: ultima?.reps ?? "", peso: ultima?.peso ?? "", hecha: true },
+        ],
+      };
+    });
+  }
 
   async function handleGuardar() {
     if (!rpeSeleccionado) {
@@ -60,20 +154,27 @@ export default function CompletarSesionModal({
     try {
       setGuardando(true);
       const ejerciciosRealizados: EjercicioRealizado[] = [];
+
       for (const bloque of sesion.bloques) {
-        for (const ejercicio of bloque.ejercicios) {
-          const series = seriesPorEjercicio[ejercicio.ejercicioId] ?? [];
-          const seriesValidas = series.filter(
-            (s) => typeof s.reps === "number" && s.reps >= 0 && typeof s.peso === "number" && s.peso >= 0
-          );
-          if (seriesValidas.length === 0) continue;
+        bloque.ejercicios.forEach((ejercicio, i) => {
+          const series = (filas[clave(bloque.id, i)] ?? [])
+            .filter((f) => f.hecha && f.peso.trim() !== "")
+            .map((f) => ({
+              reps: Number(f.reps),
+              peso: Number(f.peso.replace(",", ".")),
+            }))
+            .filter(
+              (s) => Number.isFinite(s.reps) && Number.isFinite(s.peso) && s.reps > 0,
+            );
+
+          if (series.length === 0) return;
+
           ejerciciosRealizados.push({
             ejercicioId: ejercicio.ejercicioId,
             nombre: ejercicio.nombre,
-            series: seriesValidas,
-            observaciones: ejercicio.indicaciones,
+            series,
           });
-        }
+        });
       }
 
       await onGuardar({
@@ -117,11 +218,7 @@ export default function CompletarSesionModal({
       onClose={onClose}
       footer={
         <div className="flex w-full items-center justify-end gap-3">
-          <Button
-            variant="secondary"
-            onClick={onClose}
-            disabled={guardando}
-          >
+          <Button variant="secondary" onClick={onClose} disabled={guardando}>
             Cancelar
           </Button>
 
@@ -140,7 +237,7 @@ export default function CompletarSesionModal({
         {/* INFORMACIÓN GENERAL */}
         <div className="rounded-xl border border-white/10 bg-surface/90 p-4 space-y-2.5">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wider text-primary  flex items-center gap-1.5">
+            <p className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               {fecha}
             </p>
@@ -148,8 +245,11 @@ export default function CompletarSesionModal({
               <Clock className="w-3.5 h-3.5 text-primary" />
               <Input
                 type="number"
+                inputMode="numeric"
                 value={duracionEditada ?? duracionPlanificada}
-                onChange={(e) => setDuracionEditada(parseInt(e.target.value) || null)}
+                onChange={(e) =>
+                  setDuracionEditada(parseInt(e.target.value) || null)
+                }
                 className="w-12 text-xs bg-transparent border-none focus:ring-0 text-text"
               />
               min
@@ -198,123 +298,127 @@ export default function CompletarSesionModal({
                 </div>
 
                 <div className="space-y-2.5">
-                  {bloque.ejercicios.map((ejercicio, ejIndex) => (
-                    <div
-                      key={`${bloque.id}-${ejercicio.ejercicioId}-${ejIndex}`}
-                      className="rounded-lg bg-surfaceSoft/50 p-3 border border-white/5 space-y-2 transition-colors hover:border-primary/20"
-                    >
-                      <div className="flex items-start justify-between gap-2">
+                  {bloque.ejercicios.map((ejercicio, ejIndex) => {
+                    const k = clave(bloque.id, ejIndex);
+                    const filasEj = filas[k] ?? [];
+
+                    return (
+                      <div
+                        key={k}
+                        className="rounded-lg bg-surfaceSoft/50 p-3 border border-white/5 space-y-2 transition-colors hover:border-primary/20"
+                      >
                         <p className="text-xs font-bold text-text flex items-center gap-2">
                           <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                           {ejercicio.nombre}
                         </p>
-                      </div>
 
-                      {/* CARGA DE SERIES REALES (reps y peso) */}
-                      <div className="flex flex-wrap gap-2 text-xs pt-1">
-                        {ejercicio.repeticiones && (
-                          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface border border-white/10 text-text font-medium">
-                            <Flame className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-muted text-[11px]">Reps plan:</span>
-                            <strong className="text-primary font-bold">
-                              {ejercicio.repeticiones}
-                            </strong>
+                        <div className="flex flex-wrap gap-2 text-xs pt-1">
+                          {ejercicio.repeticiones && (
+                            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface border border-white/10 text-text font-medium">
+                              <Flame className="w-3.5 h-3.5 text-primary" />
+                              <span className="text-muted text-[11px]">
+                                Plan:
+                              </span>
+                              <strong className="text-primary font-bold">
+                                {ejercicio.repeticiones}
+                              </strong>
+                            </div>
+                          )}
+
+                          {ejercicio.pausa && (
+                            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface border border-white/10 text-text font-medium">
+                              <Timer className="w-3.5 h-3.5 text-warning" />
+                              <span className="text-muted text-[11px]">
+                                Pausa:
+                              </span>
+                              <strong className="text-text font-bold">
+                                {ejercicio.pausa}
+                              </strong>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* SERIES REALIZADAS */}
+                        <div className="space-y-1.5 pt-2">
+                          <div className="grid grid-cols-[1.5rem_1fr_1fr_2rem] gap-2 text-[10px] font-bold text-muted">
+                            <span>#</span>
+                            <span>Reps</span>
+                            <span>Peso (kg)</span>
+                            <span className="text-center">Hecha</span>
                           </div>
-                        )}
 
-                        {ejercicio.pausa && (
-                          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface border border-white/10 text-text font-medium">
-                            <Timer className="w-3.5 h-3.5 text-warning" />
-                            <span className="text-muted text-[11px]">Pausa:</span>
-                            <strong className="text-text font-bold">
-                              {ejercicio.pausa}
-                            </strong>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* INPUTS DE SERIES REALES */}
-                      <div className="space-y-1 pt-2">
-                        <label className="text-[10px] font-bold text-muted block mb-1">Series realizadas</label>
-                        <div className="space-y-1">
-                          {(seriesPorEjercicio[ejercicio.ejercicioId] || []).map((serie, idx) => (
-                            <div key={idx} className="flex gap-2 items-center">
+                          {filasEj.map((fila, idx) => (
+                            <div
+                              key={idx}
+                              className={`grid grid-cols-[1.5rem_1fr_1fr_2rem] gap-2 items-center ${
+                                fila.hecha ? "" : "opacity-40"
+                              }`}
+                            >
+                              <span className="text-xs font-bold text-muted">
+                                {idx + 1}
+                              </span>
                               <Input
                                 type="number"
+                                inputMode="numeric"
                                 placeholder="Reps"
-                                value={serie.reps}
-                                onChange={(e) => {
-                                  const val = parseInt(e.target.value) || 0;
-                                  setSeriesPorEjercicio((prev) => {
-                                    const next = [...(prev[ejercicio.ejercicioId] || [])];
-                                    next[idx] = { ...next[idx], reps: val };
-                                    return { ...prev, [ejercicio.ejercicioId]: next };
-                                  });
-                                }}
-                                className="w-16 text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
+                                value={fila.reps}
+                                onChange={(e) =>
+                                  actualizarFila(k, idx, {
+                                    reps: e.target.value,
+                                  })
+                                }
+                                className="text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
                               />
                               <Input
                                 type="number"
+                                inputMode="decimal"
                                 placeholder="Peso"
-                                value={serie.peso}
-                                onChange={(e) => {
-                                  const val = parseFloat(e.target.value) || 0;
-                                  setSeriesPorEjercicio((prev) => {
-                                    const next = [...(prev[ejercicio.ejercicioId] || [])];
-                                    next[idx] = { ...next[idx], peso: val };
-                                    return { ...prev, [ejercicio.ejercicioId]: next };
-                                  });
-                                }}
-                                className="w-20 text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
+                                value={fila.peso}
+                                onChange={(e) =>
+                                  actualizarFila(k, idx, {
+                                    peso: e.target.value,
+                                  })
+                                }
+                                className="text-xs bg-surfaceSoft border border-border rounded px-2 py-1.5"
                               />
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => {
-                                  setSeriesPorEjercicio((prev) => {
-                                    const next = [...(prev[ejercicio.ejercicioId] || [])];
-                                    next.splice(idx, 1);
-                                    return { ...prev, [ejercicio.ejercicioId]: next };
-                                  });
-                                }}
-                                className="h-8 w-8 rounded p-0 text-[10px]"
-                              >
-                                ×
-                              </Button>
+                              <input
+                                type="checkbox"
+                                checked={fila.hecha}
+                                onChange={(e) =>
+                                  actualizarFila(k, idx, {
+                                    hecha: e.target.checked,
+                                  })
+                                }
+                                className="h-5 w-5 justify-self-center accent-primary"
+                              />
                             </div>
                           ))}
+
                           <button
                             type="button"
-                            onClick={() => {
-                              setSeriesPorEjercicio((prev) => {
-                                const next = [...(prev[ejercicio.ejercicioId] || [])];
-                                next.push({ reps: 0, peso: 0 });
-                                return { ...prev, [ejercicio.ejercicioId]: next };
-                              });
-                            }}
-                            className="text-[10px] text-primary font-bold hover:text-primary/80"
+                            onClick={() => agregarFila(k)}
+                            className="text-[11px] text-primary font-bold hover:text-primary/80 pt-1"
                           >
                             + Agregar serie
                           </button>
                         </div>
-                      </div>
 
-                      {/* INDICACIONES DEL COACH */}
-                      {ejercicio.indicaciones && (
-                        <div className="flex items-start gap-1.5 pt-1 text-[11px] text-warning/90 italic">
-                          <Info className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
-                          <span>"{ejercicio.indicaciones}"</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        {ejercicio.indicaciones && (
+                          <div className="flex items-start gap-1.5 pt-1 text-[11px] text-warning/90 italic">
+                            <Info className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
+                            <span>"{ejercicio.indicaciones}"</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* SELECTOR DE RPE TÁCTIL (1 a 10) */}
+        {/* SELECTOR DE RPE */}
         <div className="space-y-2.5 pt-2 border-t border-white/10">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-bold text-text flex items-center gap-1.5">
@@ -351,7 +455,7 @@ export default function CompletarSesionModal({
           </div>
         </div>
 
-        {/* MÉTRICA DE CARGA GENERADA */}
+        {/* CARGA */}
         <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-surface via-surface to-primary/10 p-4 flex items-center justify-between shadow-[0_0_20px_rgba(255,85,0,0.1)]">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted">
@@ -366,7 +470,7 @@ export default function CompletarSesionModal({
           </p>
         </div>
 
-        {/* OBSERVACIONES DEL ATLETA */}
+        {/* OBSERVACIONES */}
         <div className="space-y-1.5">
           <Label className="text-xs font-bold text-text flex items-center gap-1.5">
             <MessageSquare className="w-3.5 h-3.5 text-primary" />
