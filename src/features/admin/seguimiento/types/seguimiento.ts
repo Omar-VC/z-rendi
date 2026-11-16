@@ -1,4 +1,5 @@
 import type { EjercicioRealizado } from "./registroEjercicio";
+import type { BloqueSesion } from "./bloqueSesion";
 
 export interface SesionEntrenamiento {
   id: string;
@@ -27,8 +28,13 @@ export interface SesionEntrenamiento {
   createdAt?: Date;
   updatedAt?: Date;
 
-  // Nuevo: snapshot de lo realmente realizado por el atleta
+  // Snapshot de lo realmente realizado por el atleta
   bloquesRealizados?: EjercicioRealizado[];
   sesionPendienteId?: string;
   duracionPlanificada?: number;
+
+  // Snapshot de lo asignado por el preparador
+  bloques?: BloqueSesion[];
+  objetivo?: string;
+  observacionesPreparador?: string;
 }
