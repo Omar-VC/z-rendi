@@ -13,9 +13,7 @@ import {
   MOTIVOS_NO,
 } from "../../../checkins/utils";
 import { suscribirseCheckinsDelDia } from "../../../checkins/checkins.service";
-
-
-
+import EnviarAvisoModal from "../../../avisos/components/EnviarAvisoModal";
 
 export default function HoyPage() {
   const { user } = useAuth();
@@ -24,10 +22,10 @@ export default function HoyPage() {
   const [fecha] = useState(fechaHoyISO());
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [clienteAsignar, setClienteAsignar] = useState<string | null>(null);
-
-  
-
-  
+  const [avisoPara, setAvisoPara] = useState<{
+    id: string;
+    nombre: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -98,6 +96,13 @@ export default function HoyPage() {
               Ver ficha
             </Link>
             <Button
+              variant="secondary"
+              className="!min-h-0 h-8 !px-3 text-xs font-bold"
+              onClick={() => setAvisoPara({ id, nombre })}
+            >
+              Aviso
+            </Button>
+            <Button
               variant="accent"
               className="!min-h-0 h-8 !px-3 text-xs font-bold"
               onClick={() => setClienteAsignar(id)}
@@ -120,7 +125,9 @@ export default function HoyPage() {
         </div>
 
         {checkin.comentario && (
-          <p className="text-[11px] text-muted italic">"{checkin.comentario}"</p>
+          <p className="text-[11px] text-muted italic">
+            "{checkin.comentario}"
+          </p>
         )}
       </Card>
     );
@@ -169,9 +176,7 @@ export default function HoyPage() {
           <section className="space-y-3">
             <Titulo texto="No confirmaron" n={grupos.sinConfirmar.length} />
             {grupos.sinConfirmar.length === 0 ? (
-              <p className="text-xs text-muted italic">
-                Todos respondieron.
-              </p>
+              <p className="text-xs text-muted italic">Todos respondieron.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {grupos.sinConfirmar.map((a) => (
@@ -202,7 +207,10 @@ export default function HoyPage() {
                       }
                     >
                       {" "}
-                      · {a.checkin.motivoNo ? MOTIVOS_NO[a.checkin.motivoNo] : "—"}
+                      ·{" "}
+                      {a.checkin.motivoNo
+                        ? MOTIVOS_NO[a.checkin.motivoNo]
+                        : "—"}
                     </span>
                   </p>
                 ))}
@@ -217,6 +225,14 @@ export default function HoyPage() {
           clienteId={clienteAsignar}
           onClose={() => setClienteAsignar(null)}
           onGuardado={() => setClienteAsignar(null)}
+        />
+      )}
+
+      {avisoPara && (
+        <EnviarAvisoModal
+          clienteId={avisoPara.id}
+          nombre={avisoPara.nombre}
+          onClose={() => setAvisoPara(null)}
         />
       )}
     </div>

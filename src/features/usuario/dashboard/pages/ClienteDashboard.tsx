@@ -17,6 +17,7 @@ import CompletarSesionModal from "../components/CompletarSesionModal";
 
 import { completarSesionPendiente } from "../../../admin/seguimiento/services/sesionesPendientes.service";
 import CheckinCard from "../components/CheckinCard";
+import AvisosCard from "../components/AvisosCard";
  
 
 
@@ -35,6 +36,7 @@ export default function ClienteDashboard() {
     <div className="space-y-8 animate-fadeIn pb-12">
       {/* ENCABEZADO PRINCIPAL */}
       <ClienteHeader />
+      <AvisosCard />
       <CheckinCard />
 
       {/* HERO SECTION: SESIÓN DE HOY */}
