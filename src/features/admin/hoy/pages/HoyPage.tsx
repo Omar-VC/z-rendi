@@ -14,6 +14,7 @@ import {
 } from "../../../checkins/utils";
 import { suscribirseCheckinsDelDia } from "../../../checkins/checkins.service";
 
+
 export default function HoyPage() {
   const { user } = useAuth();
   const { activos, loading } = useClientes();
@@ -21,6 +22,8 @@ export default function HoyPage() {
   const [fecha] = useState(fechaHoyISO());
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [clienteAsignar, setClienteAsignar] = useState<string | null>(null);
+
+  
 
   useEffect(() => {
     if (!user) return;
