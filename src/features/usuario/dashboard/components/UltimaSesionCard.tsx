@@ -42,10 +42,22 @@ export default function UltimaSesionCard() {
     );
   }
 
-  const ejercicios = ultimaSesion.ejercicios ?? [];
-  const rpeCalculado = ultimaSesion.duracion > 0 
-    ? Math.round(ultimaSesion.carga / ultimaSesion.duracion) 
-    : null;
+  // Nombres: primero lo realizado, si no lo asignado. Las sesiones viejas
+  // solo tienen IDs, así que para esas se muestra la cantidad.
+  const nombresRealizados = (ultimaSesion.bloquesRealizados ?? []).map(
+    (e) => e.nombre,
+  );
+  const nombresAsignados = (ultimaSesion.bloques ?? []).flatMap((b) =>
+    b.ejercicios.map((e) => e.nombre),
+  );
+  const ejercicios =
+    nombresRealizados.length > 0 ? nombresRealizados : nombresAsignados;
+  const cantidadSinNombres =
+    ejercicios.length === 0 ? (ultimaSesion.ejercicios ?? []).length : 0;
+  const rpeCalculado =
+    ultimaSesion.duracion > 0
+      ? Math.round(ultimaSesion.carga / ultimaSesion.duracion)
+      : null;
 
   return (
     <Card hover className="relative overflow-hidden">
@@ -104,6 +116,12 @@ export default function UltimaSesionCard() {
         </div>
       )}
 
+      {cantidadSinNombres > 0 && (
+        <p className="mt-4 text-xs text-muted">
+          {cantidadSinNombres} ejercicios ejecutados
+        </p>
+      )}
+
       {/* MÉTRICAS DE DESEMPEÑO */}
       <div className="mt-5 grid grid-cols-2 gap-3">
         {/* DURACIÓN Y RPE ESTIMADO */}
@@ -113,7 +131,8 @@ export default function UltimaSesionCard() {
           </span>
           <div className="mt-1 flex items-baseline justify-between">
             <span className="text-lg font-black text-text">
-              {ultimaSesion.duracion} <span className="text-xs font-normal text-muted">min</span>
+              {ultimaSesion.duracion}{" "}
+              <span className="text-xs font-normal text-muted">min</span>
             </span>
             {rpeCalculado && (
               <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-surface border border-white/10 text-primary">
@@ -129,7 +148,8 @@ export default function UltimaSesionCard() {
             Carga ($sRPE$)
           </span>
           <span className="mt-1 text-lg font-black text-primary">
-            {ultimaSesion.carga} <span className="text-xs font-normal text-muted">UA</span>
+            {ultimaSesion.carga}{" "}
+            <span className="text-xs font-normal text-muted">UA</span>
           </span>
         </div>
       </div>

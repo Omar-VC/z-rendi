@@ -98,6 +98,8 @@ export function suscribirseUltimaSesionCliente(
         libroId: data.libroId,
         libroNombre: data.libroNombre,
         ejercicios: data.ejercicios ?? [],
+        bloques: data.bloques ?? [],
+        bloquesRealizados: data.bloquesRealizados ?? [],
         duracion: data.duracion,
         rpe: data.rpe,
         carga: data.carga,
