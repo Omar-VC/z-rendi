@@ -48,9 +48,7 @@ export default function NuevaSesionPendienteModal({
   const [ultimasSesiones, setUltimasSesiones] = useState<SesionPendiente[]>([]);
   const [cargandoHistorial, setCargandoHistorial] = useState(true);
 
-  if (!user) return null;
-
-  const preparadorId = user.uid;
+  const preparadorId = user?.uid ?? "";
 
   const { libros } = useTrainingBooks(preparadorId);
   const { ejercicios } = useExercises(preparadorId);
@@ -75,6 +73,37 @@ export default function NuevaSesionPendienteModal({
     );
   }, [bloques]);
 
+  // Grupos que trabaja el tipo de sesión elegido
+  const gruposSesion = libroSeleccionado?.gruposMusculares ?? [];
+
+  // ejercicioId -> grupo muscular
+  const gruposPorEjercicio = useMemo(
+    () => new Map(ejercicios.map((e) => [e.id, e.grupoMuscular])),
+    [ejercicios],
+  );
+
+  // Grupos que ya tienen al menos un ejercicio en los bloques
+  const gruposCubiertos = useMemo(() => {
+    const set = new Set<string>();
+    bloques.forEach((b) =>
+      b.ejercicios.forEach((ej) => {
+        const g = gruposPorEjercicio.get(ej.ejercicioId);
+        if (g) set.add(g);
+      }),
+    );
+    return set;
+  }, [bloques, gruposPorEjercicio]);
+
+  const gruposFaltantes = gruposSesion.filter((g) => !gruposCubiertos.has(g));
+
+  // Ejercicios del tipo de sesión primero, el resto aparte
+  const ejerciciosDelTipo = ejercicios.filter((e) =>
+    gruposSesion.includes(e.grupoMuscular),
+  );
+  const ejerciciosOtros = ejercicios.filter(
+    (e) => !gruposSesion.includes(e.grupoMuscular),
+  );
+
   // Extraer músculos fatigados recientemente (últimos 3 días)
   const musculosFatigados = useMemo(() => {
     const musculos = new Set<string>();
@@ -88,7 +117,9 @@ export default function NuevaSesionPendienteModal({
   function clonarSesionAnterior(sesion: SesionPendiente) {
     if (
       bloques.length > 0 &&
-      !confirm("¿Deseas reemplazar el contenido actual con la sesión seleccionada?")
+      !confirm(
+        "¿Deseas reemplazar el contenido actual con la sesión seleccionada?",
+      )
     ) {
       return;
     }
@@ -97,7 +128,7 @@ export default function NuevaSesionPendienteModal({
       setLibroId(sesion.libroId);
     }
     setObjetivo(`Continuación de: ${sesion.objetivo || sesion.libroNombre}`);
-    
+
     // Clonar bloques asignando nuevos UUIDs
     const bloquesClonados: BloqueSesion[] = (sesion.bloques || []).map((b) => ({
       ...b,
@@ -213,7 +244,9 @@ export default function NuevaSesionPendienteModal({
     );
 
     if (bloqueSinDuracion) {
-      alert(`El bloque "${bloqueSinDuracion.nombre}" debe tener una duración mayor a 0.`);
+      alert(
+        `El bloque "${bloqueSinDuracion.nombre}" debe tener una duración mayor a 0.`,
+      );
       return;
     }
 
@@ -262,6 +295,8 @@ export default function NuevaSesionPendienteModal({
     }
   }
 
+  if (!user) return null;
+
   return (
     <Modal
       title="Planificar Nueva Sesión"
@@ -269,7 +304,9 @@ export default function NuevaSesionPendienteModal({
       footer={
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted font-medium">Estimado total:</span>
+            <span className="text-xs text-muted font-medium">
+              Estimado total:
+            </span>
             <span className="text-sm font-extrabold text-accent font-mono">
               {duracionTotal} min
             </span>
@@ -389,7 +426,9 @@ export default function NuevaSesionPendienteModal({
         {/* PARÁMETROS BÁSICOS: TIPO, FECHA Y OBJETIVO */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-bold text-text">Tipo de Sesión</Label>
+            <Label className="text-xs font-bold text-text">
+              Tipo de Sesión
+            </Label>
             <Select
               value={libroId}
               disabled={guardando}
@@ -406,7 +445,9 @@ export default function NuevaSesionPendienteModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-bold text-text">Fecha Programada</Label>
+            <Label className="text-xs font-bold text-text">
+              Fecha Programada
+            </Label>
             <Input
               type="date"
               value={fecha}
@@ -429,16 +470,60 @@ export default function NuevaSesionPendienteModal({
               </p>
             </div>
             {libroSeleccionado.categoria && (
-              <Badge variant="neutral" className="text-[10px] px-2.5 py-1 font-semibold">
+              <Badge
+                variant="neutral"
+                className="text-[10px] px-2.5 py-1 font-semibold"
+              >
                 {libroSeleccionado.categoria}
               </Badge>
             )}
           </Card>
         )}
 
+        {libroSeleccionado && gruposSesion.length > 0 && (
+          <Card className="!p-3.5 bg-surfaceSoft/50 border-border/40 rounded-xl space-y-2 animate-fadeIn">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
+              {libroSeleccionado.nombre} trabaja
+            </p>
+
+            <div className="flex flex-wrap gap-1.5">
+              {gruposSesion.map((g) => {
+                const cubierto = gruposCubiertos.has(g);
+                return (
+                  <span
+                    key={g}
+                    className={`px-2.5 py-1 rounded-lg border text-xs font-bold ${
+                      cubierto
+                        ? "bg-success/10 border-success/30 text-success"
+                        : "bg-surface border-border/50 text-text"
+                    }`}
+                  >
+                    {cubierto ? "✓ " : ""}
+                    {g}
+                  </span>
+                );
+              })}
+            </div>
+
+            {bloques.length > 0 && (
+              <p
+                className={`text-[11px] ${
+                  gruposFaltantes.length === 0 ? "text-success" : "text-warning"
+                }`}
+              >
+                {gruposFaltantes.length === 0
+                  ? "Todos los grupos están cubiertos."
+                  : `Faltan ejercicios para: ${gruposFaltantes.join(", ")}.`}
+              </p>
+            )}
+          </Card>
+        )}
+
         {/* OBJETIVO DE LA SESIÓN */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-text">Objetivo Principal</Label>
+          <Label className="text-xs font-bold text-text">
+            Objetivo Principal
+          </Label>
           <Input
             value={objetivo}
             disabled={guardando}
@@ -456,7 +541,8 @@ export default function NuevaSesionPendienteModal({
                 Estructura por Bloques
               </h4>
               <p className="text-[11px] text-muted font-medium mt-0.5">
-                Suma acumulada: <strong className="text-text">{duracionTotal} min</strong>
+                Suma acumulada:{" "}
+                <strong className="text-text">{duracionTotal} min</strong>
               </p>
             </div>
 
@@ -496,7 +582,10 @@ export default function NuevaSesionPendienteModal({
                 {/* CABECERA DE BLOQUE */}
                 <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-border/30">
                   <div className="flex items-center gap-2">
-                    <Badge variant="neutral" className="text-[10px] font-mono px-2 py-0.5">
+                    <Badge
+                      variant="neutral"
+                      className="text-[10px] font-mono px-2 py-0.5"
+                    >
                       #{bloqueIndex + 1}
                     </Badge>
                     <span className="text-xs font-bold text-text">
@@ -516,7 +605,9 @@ export default function NuevaSesionPendienteModal({
                 {/* CAMPOS DEL BLOQUE */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="sm:col-span-2 space-y-1.5">
-                    <Label className="text-[11px] font-bold text-muted">Nombre del Bloque</Label>
+                    <Label className="text-[11px] font-bold text-muted">
+                      Nombre del Bloque
+                    </Label>
                     <Input
                       value={bloque.nombre}
                       onChange={(e) =>
@@ -527,7 +618,9 @@ export default function NuevaSesionPendienteModal({
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[11px] font-bold text-muted">Duración (min)</Label>
+                    <Label className="text-[11px] font-bold text-muted">
+                      Duración (min)
+                    </Label>
                     <Input
                       type="number"
                       min={1}
@@ -557,12 +650,34 @@ export default function NuevaSesionPendienteModal({
                         e.target.value = "";
                       }}
                     >
-                      <option value="">+ Seleccionar ejercicio de la biblioteca...</option>
-                      {ejercicios.map((ejercicio) => (
-                        <option key={ejercicio.id} value={ejercicio.id}>
-                          {ejercicio.nombre}
-                        </option>
-                      ))}
+                      <option value="">
+                        + Seleccionar ejercicio de la biblioteca...
+                      </option>
+
+                      {gruposSesion.length > 0 ? (
+                        <>
+                          <optgroup label={`De ${libroSeleccionado?.nombre}`}>
+                            {ejerciciosDelTipo.map((ejercicio) => (
+                              <option key={ejercicio.id} value={ejercicio.id}>
+                                {ejercicio.nombre} · {ejercicio.grupoMuscular}
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Otros ejercicios">
+                            {ejerciciosOtros.map((ejercicio) => (
+                              <option key={ejercicio.id} value={ejercicio.id}>
+                                {ejercicio.nombre} · {ejercicio.grupoMuscular}
+                              </option>
+                            ))}
+                          </optgroup>
+                        </>
+                      ) : (
+                        ejercicios.map((ejercicio) => (
+                          <option key={ejercicio.id} value={ejercicio.id}>
+                            {ejercicio.nombre} · {ejercicio.grupoMuscular}
+                          </option>
+                        ))
+                      )}
                     </Select>
                   </div>
 
@@ -595,7 +710,10 @@ export default function NuevaSesionPendienteModal({
                             variant="secondary"
                             className="!min-h-0 h-6 !px-2 text-[10px] font-semibold text-muted hover:text-danger hover:border-danger/40 transition-colors"
                             onClick={() =>
-                              eliminarEjercicio(bloque.id, ejercicio.ejercicioId)
+                              eliminarEjercicio(
+                                bloque.id,
+                                ejercicio.ejercicioId,
+                              )
                             }
                           >
                             Quitar

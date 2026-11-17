@@ -17,7 +17,14 @@ import { db } from "../../../../firebase/firebase";
 
 import type { SesionEntrenamiento } from "../types/seguimiento";
 
+
 const COLLECTION = "sesiones";
+
+
+// Más reciente primero: por día y, si empatan, por hora de finalización
+const porRecientes = (a: SesionEntrenamiento, b: SesionEntrenamiento) =>
+  b.fecha.getTime() - a.fecha.getTime() ||
+  (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0);
 
 
 export async function obtenerSesionesCliente(
@@ -27,7 +34,6 @@ export async function obtenerSesionesCliente(
 ): Promise<SesionEntrenamiento[]> {
   const hoy = new Date();
 
-  // Por defecto: mes actual. No depende de los campos mes/anio.
   const inicio = desde ?? new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const fin = hasta ?? new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
 
@@ -41,7 +47,7 @@ export async function obtenerSesionesCliente(
 
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => {
+  const lista = snapshot.docs.map((doc) => {
     const data = doc.data();
 
     return {
@@ -53,6 +59,8 @@ export async function obtenerSesionesCliente(
       observaciones: data.observacionesCliente ?? data.observaciones ?? "",
     } as SesionEntrenamiento;
   });
+
+  return lista.sort(porRecientes);
 }
 
 
@@ -74,7 +82,7 @@ export function suscribirseUltimaSesionCliente(
     collection(db, COLLECTION),
     where("clienteId", "==", clienteId),
     orderBy("fecha", "desc"),
-    limit(1),
+    limit(10),
   );
 
   return onSnapshot(
@@ -85,28 +93,31 @@ export function suscribirseUltimaSesionCliente(
         return;
       }
 
-      const documento = snapshot.docs[0];
-      const data = documento.data();
+      const lista = snapshot.docs.map((documento) => {
+        const data = documento.data();
 
-      onChange({
-        id: documento.id,
-        clienteId: data.clienteId,
-        preparadorId: data.preparadorId,
-        fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
-        mes: data.mes,
-        anio: data.anio,
-        libroId: data.libroId,
-        libroNombre: data.libroNombre,
-        ejercicios: data.ejercicios ?? [],
-        bloques: data.bloques ?? [],
-        bloquesRealizados: data.bloquesRealizados ?? [],
-        duracion: data.duracion,
-        rpe: data.rpe,
-        carga: data.carga,
-        observaciones: data.observacionesCliente ?? data.observaciones ?? "",
-        createdAt: data.createdAt?.toDate?.() ?? undefined,
-        updatedAt: data.updatedAt?.toDate?.() ?? undefined,
-      } as SesionEntrenamiento);
+        return {
+          id: documento.id,
+          clienteId: data.clienteId,
+          preparadorId: data.preparadorId,
+          fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
+          mes: data.mes,
+          anio: data.anio,
+          libroId: data.libroId,
+          libroNombre: data.libroNombre,
+          ejercicios: data.ejercicios ?? [],
+          bloques: data.bloques ?? [],
+          bloquesRealizados: data.bloquesRealizados ?? [],
+          duracion: data.duracion,
+          rpe: data.rpe,
+          carga: data.carga,
+          observaciones: data.observacionesCliente ?? data.observaciones ?? "",
+          createdAt: data.createdAt?.toDate?.() ?? undefined,
+          updatedAt: data.updatedAt?.toDate?.() ?? undefined,
+        } as SesionEntrenamiento;
+      });
+
+      onChange(lista.sort(porRecientes)[0]);
     },
     (error) => {
       console.error("Error cargando última sesión:", error);

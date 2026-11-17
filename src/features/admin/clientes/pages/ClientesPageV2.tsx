@@ -55,7 +55,7 @@ function ClientesPageV2() {
   }
 
   if (loading) return <Loading />;
-  if (error) return <EmptyState title={error} />;
+  
 
   return (
     <div className="space-y-8 animate-fadeIn font-sans selection:bg-primary/20 selection:text-primary">
@@ -75,6 +75,8 @@ function ClientesPageV2() {
           {generandoInvitacion ? "[ Generando... ]" : "+ Invitar Atleta"}
         </Button>
       </div>
+
+      {error && <EmptyState title={error} />}
 
       {/* BARRA DE BÚSQUEDA Y NAVEGACIÓN PLANO / MINIMALISTA */}
       <div className="flex flex-col md:flex-row gap-6 items-stretch md:items-end justify-between">

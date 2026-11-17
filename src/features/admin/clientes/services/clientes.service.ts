@@ -4,10 +4,13 @@ import {
   doc,
   getDoc,
   getDocs,
+  query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 
-import { db } from "../../../../firebase/firebase";
+import { auth, db } from "../../../../firebase/firebase";
+
 import type { Cliente } from "../types";
 import { getAuth } from "firebase/auth";
 
@@ -15,9 +18,20 @@ const USUARIOS_COLLECTION = "usuarios";
 const FICHAS_COLLECTION = "fichas";
 
 export async function getClientes(): Promise<Cliente[]> {
-  const snapshot = await getDocs(collection(db, USUARIOS_COLLECTION));
+  await auth.authStateReady();
+  const uid = auth.currentUser?.uid;
+
+  if (!uid) return [];
+
+  const snapshot = await getDocs(
+    query(
+      collection(db, USUARIOS_COLLECTION),
+      where("preparadorId", "==", uid),
+    ),
+  );
 
   const clientesPromesas = snapshot.docs.map(async (documento) => {
+    // ...el resto queda exactamente igual
     const data = documento.data();
 
     // Intentamos obtener la foto desde la ficha asociada
