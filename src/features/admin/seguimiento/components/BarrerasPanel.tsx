@@ -5,6 +5,7 @@ import { useBarreras } from "../hooks/useBarreras";
 import NuevaBarreraModal from "./NuevaBarreraModal";
 import EvaluarBarreraModal from "./EvaluarBarreraModal";
 import NuevoObjetivoModal from "./NuevoObjetivoModal";
+import ConfigurarBarreraFuerzaModal from "./ConfigurarBarreraFuerzaModal";
 import HistorialBarrera from "./HistorialBarrera";
 
 import type { Barrera } from "../types/barrera";
@@ -33,6 +34,7 @@ export default function BarrerasPanel({
   const [mostrarModal, setMostrarModal] = useState(false);
   const [barreraSeleccionada, setBarreraSeleccionada] = useState<Barrera | null>(null);
   const [barreraNuevoObjetivo, setBarreraNuevoObjetivo] = useState<Barrera | null>(null);
+  const [barreraFuerzaPorConfigurar, setBarreraFuerzaPorConfigurar] = useState<Barrera | null>(null);
   const [barreraAbierta, setBarreraAbierta] = useState<string | null>(null);
 
   async function borrarBarrera(id: string) {
@@ -116,7 +118,7 @@ export default function BarrerasPanel({
                     <div className="min-w-0 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-bold text-text group-hover:text-primary transition-colors">
-                          {barrera.nombre}
+                          {barrera.ejercicioNombre || barrera.nombre}
                         </span>
 
                         <Badge
@@ -135,6 +137,9 @@ export default function BarrerasPanel({
                             </span>
                             <span className="text-border">·</span>
                           </>
+                        )}
+                        {barrera.ejercicioId && (
+                          <Badge variant="info" className="text-[9px] px-1.5 py-0 uppercase">Auto +10%</Badge>
                         )}
                         <span>Objetivo: <strong className="text-text/90 font-semibold">{barrera.objetivo}</strong></span>
                       </div>
@@ -162,7 +167,21 @@ export default function BarrerasPanel({
 
                     {/* BOTONES DE ACCIÓN */}
                     <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/20">
-                      {barrera.estado === "pendiente" ? (
+                      {barrera.ejercicioId ? (
+                        <span className="text-[11px] text-muted">
+                          {barrera.estado === "pendiente"
+                            ? "Se actualizará al alcanzar la marca"
+                            : "Siguiente objetivo generado automáticamente"}
+                        </span>
+                      ) : barrera.estado === "pendiente" && barrera.categoria === "Fuerza" ? (
+                        <Button
+                          variant="accent"
+                          className="!min-h-0 !h-7 !px-3 text-xs font-bold"
+                          onClick={() => setBarreraFuerzaPorConfigurar(barrera)}
+                        >
+                          Activar automatización
+                        </Button>
+                      ) : barrera.estado === "pendiente" ? (
                         <Button
                           variant="success"
                           className="!min-h-0 !h-7 !px-3 text-xs font-bold"
@@ -226,6 +245,17 @@ export default function BarrerasPanel({
           onGuardado={() => {
             recargar();
             setBarreraNuevoObjetivo(null);
+          }}
+        />
+      )}
+
+      {barreraFuerzaPorConfigurar && (
+        <ConfigurarBarreraFuerzaModal
+          barrera={barreraFuerzaPorConfigurar}
+          onClose={() => setBarreraFuerzaPorConfigurar(null)}
+          onGuardado={() => {
+            recargar();
+            setBarreraFuerzaPorConfigurar(null);
           }}
         />
       )}

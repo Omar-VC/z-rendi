@@ -1,3 +1,5 @@
+import type { Timestamp } from "firebase/firestore";
+
 export type EstadoBarrera =
   | "pendiente"
   | "superada";
@@ -12,6 +14,12 @@ export interface Barrera {
 
   // Referencia a biblioteca de pruebas
   pruebaId?: string;
+
+  // Meta cuantitativa para automatizar barreras de fuerza.
+  ejercicioId?: string;
+  ejercicioNombre?: string;
+  pesoObjetivo?: number;
+  repeticionesObjetivo?: number;
 
   nombre: string;
 
@@ -31,8 +39,8 @@ export interface Barrera {
 
   historial?: HistorialBarrera[];
 
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
 
 }
 

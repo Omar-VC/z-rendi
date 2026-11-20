@@ -1,5 +1,10 @@
+import { useEffect } from "react";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+
 import { useAuth } from "../../../../auth/useAuth";
+import { db } from "../../../../firebase/firebase";
 import { useSeguimiento } from "../hooks/useSeguimiento";
+import { procesarBarrerasFuerzaDeSesion } from "../services/barrerasService";
 
 import UltimaSesionCard from "./UltimaSesionCard";
 import RegistroSesiones from "./RegistroSesiones";
@@ -15,7 +20,44 @@ type Props = {
 
 export default function SeguimientoPanel({ clienteId }: Props) {
   const { user } = useAuth();
+  const preparadorIdActual = user?.uid;
   const { sesiones, loading, recargar } = useSeguimiento(clienteId);
+
+  useEffect(() => {
+    if (!preparadorIdActual || !clienteId) return;
+
+    const q = query(
+      collection(db, "sesiones"),
+      where("clienteId", "==", clienteId),
+      where("barrerasFuerzaProcesadas", "==", false),
+    );
+    const enProceso = new Set<string>();
+    let cola = Promise.resolve();
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      snapshot.docs.forEach((sesionDoc) => {
+        if (enProceso.has(sesionDoc.id)) return;
+        enProceso.add(sesionDoc.id);
+        const data = sesionDoc.data();
+        cola = cola
+          .then(() => procesarBarrerasFuerzaDeSesion(sesionDoc.id, {
+            clienteId: data.clienteId,
+            preparadorId: data.preparadorId,
+            barrerasFuerzaProcesadas: data.barrerasFuerzaProcesadas,
+            fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
+            bloquesRealizados: data.bloquesRealizados ?? [],
+          }))
+          .catch((error) => {
+            console.error("No se pudieron procesar las barreras de fuerza:", error);
+          })
+          .finally(() => enProceso.delete(sesionDoc.id));
+      });
+    }, (error) => {
+      console.error("No se pudieron escuchar sesiones pendientes de evaluar:", error);
+    });
+
+    return unsubscribe;
+  }, [clienteId, preparadorIdActual]);
 
   if (!user) return null;
 

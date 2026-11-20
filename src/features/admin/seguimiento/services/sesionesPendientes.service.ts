@@ -203,6 +203,7 @@ export async function completarSesionPendiente(
     bloquesRealizados: ejerciciosRealizados,
     sesionPendienteId: id,
     duracionPlanificada,
+    barrerasFuerzaProcesadas: false,
 
     createdAt: new Date(),
   });

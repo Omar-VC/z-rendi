@@ -57,6 +57,16 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "clienteId", "order": "ASCENDING" },
+        { "fieldPath": "barrerasFuerzaProcesadas", "order": "ASCENDING" },
+        { "fieldPath": "__name__", "order": "ASCENDING" }
+      ],
+      "density": "SPARSE_ALL"
+    },
+    {
+      "collectionGroup": "sesiones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "clienteId", "order": "ASCENDING" },
         { "fieldPath": "fecha", "order": "DESCENDING" },
         { "fieldPath": "__name__", "order": "DESCENDING" }
       ],

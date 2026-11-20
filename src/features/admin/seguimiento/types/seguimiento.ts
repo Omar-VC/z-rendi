@@ -32,6 +32,7 @@ export interface SesionEntrenamiento {
   bloquesRealizados?: EjercicioRealizado[];
   sesionPendienteId?: string;
   duracionPlanificada?: number;
+  barrerasFuerzaProcesadas?: boolean;
 
   // Snapshot de lo asignado por el preparador
   bloques?: BloqueSesion[];

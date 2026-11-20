@@ -3,8 +3,11 @@ import { useState } from "react";
 import { useAuth } from "../../../../auth/useAuth";
 import { crearBarrera } from "../services/barrerasService";
 import { usePhysicalTests } from "../../biblioteca/pruebas/hooks/usePhysicalTests";
+import { useExercises } from "../../biblioteca/ejercicios/hooks/useExercises";
 
 import type { PhysicalTest } from "../../biblioteca/pruebas/types/physicalTest";
+import type { Exercise } from "../../biblioteca/ejercicios/types/exercise";
+import type { Barrera } from "../types/barrera";
 
 import {
   Modal,
@@ -32,25 +35,39 @@ export default function NuevaBarreraModal({
   const [pruebaId, setPruebaId] = useState("");
   const [pruebaSeleccionada, setPruebaSeleccionada] = useState<PhysicalTest | null>(null);
   const [objetivo, setObjetivo] = useState("");
+  const [ejercicioId, setEjercicioId] = useState("");
+  const [ejercicioSeleccionado, setEjercicioSeleccionado] = useState<Exercise | null>(null);
+  const [pesoObjetivo, setPesoObjetivo] = useState("");
+  const [repeticionesObjetivo, setRepeticionesObjetivo] = useState("");
   const [guardando, setGuardando] = useState(false);
 
-  if (!user) return null;
-
-  const preparadorId = user.uid;
+  const preparadorId = user?.uid ?? "";
 
   const { pruebas, loading: cargandoPruebas } = usePhysicalTests({
     preparadorId,
   });
+  const { ejercicios, loading: cargandoEjercicios } = useExercises(preparadorId);
+  const esFuerza = pruebaSeleccionada?.categoria === "Fuerza";
+
+  if (!user) return null;
 
   async function guardarBarrera() {
-    if (!pruebaSeleccionada || !objetivo.trim()) {
-      alert("Selecciona una prueba física e ingresa una meta u objetivo válido.");
+    const peso = Number(pesoObjetivo);
+    const repeticiones = Number(repeticionesObjetivo);
+    if (
+      !pruebaSeleccionada ||
+      (esFuerza && (!ejercicioSeleccionado || !Number.isFinite(peso) || peso <= 0 || !Number.isInteger(repeticiones) || repeticiones <= 0)) ||
+      (!esFuerza && !objetivo.trim())
+    ) {
+      alert(esFuerza
+        ? "Selecciona un ejercicio e ingresa el peso y las repeticiones objetivo."
+        : "Selecciona una prueba física e ingresa una meta u objetivo válido.");
       return;
     }
 
     try {
       setGuardando(true);
-      await crearBarrera({
+      const datosBarrera: Omit<Barrera, "id"> = {
         clienteId,
         preparadorId,
         pruebaId: pruebaSeleccionada.id,
@@ -58,10 +75,21 @@ export default function NuevaBarreraModal({
         categoria: pruebaSeleccionada.categoria,
         subcategoria: pruebaSeleccionada.subcategoria,
         unidad: pruebaSeleccionada.unidad,
-        objetivo: objetivo.trim(),
+        objetivo: esFuerza
+          ? `${peso} kg × ${repeticiones} repeticiones`
+          : objetivo.trim(),
         estado: "pendiente",
         resultado: "",
-      });
+      };
+      await crearBarrera(esFuerza
+        ? {
+            ...datosBarrera,
+            ejercicioId: ejercicioSeleccionado!.id,
+            ejercicioNombre: ejercicioSeleccionado!.nombre,
+            pesoObjetivo: peso,
+            repeticionesObjetivo: repeticiones,
+          }
+        : datosBarrera);
 
       onGuardado();
     } catch (error) {
@@ -115,6 +143,8 @@ export default function NuevaBarreraModal({
 
               setPruebaId(selectedId);
               setPruebaSeleccionada(prueba ?? null);
+              setEjercicioId("");
+              setEjercicioSeleccionado(null);
             }}
           >
             <option value="">
@@ -162,8 +192,42 @@ export default function NuevaBarreraModal({
           </Card>
         )}
 
-        {/* CAMPO DE OBJETIVO / META */}
-        <div className="space-y-1.5">
+        {esFuerza && (
+          <>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-text">Ejercicio asociado</Label>
+              <Select
+                value={ejercicioId}
+                disabled={cargandoEjercicios || guardando}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setEjercicioId(id);
+                  setEjercicioSeleccionado(ejercicios.find((ejercicio) => ejercicio.id === id) ?? null);
+                }}
+                className="w-full bg-surfaceSoft border-border/50 text-xs font-medium rounded-lg"
+              >
+                <option value="">{cargandoEjercicios ? "Cargando ejercicios..." : "— Seleccionar ejercicio —"}</option>
+                {ejercicios.map((ejercicio) => (
+                  <option key={ejercicio.id} value={ejercicio.id}>{ejercicio.nombre}</option>
+                ))}
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-text">Peso objetivo (kg)</Label>
+                <Input type="number" min="0.5" step="0.5" value={pesoObjetivo} onChange={(e) => setPesoObjetivo(e.target.value)} disabled={guardando} placeholder="Ej: 70" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-text">Repeticiones mínimas</Label>
+                <Input type="number" min="1" step="1" value={repeticionesObjetivo} onChange={(e) => setRepeticionesObjetivo(e.target.value)} disabled={guardando} placeholder="Ej: 2" />
+              </div>
+            </div>
+            <p className="text-[11px] text-muted">Al alcanzar la meta, se registrará como superada y se creará otra con un objetivo 10% mayor.</p>
+          </>
+        )}
+
+        {/* CAMPO DE OBJETIVO / META para pruebas manuales */}
+        {!esFuerza && <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-bold text-text">
               Objetivo / Marca a Alcanzar
@@ -186,7 +250,7 @@ export default function NuevaBarreraModal({
             }
             className="bg-surfaceSoft border-border/50 text-xs focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-lg"
           />
-        </div>
+        </div>}
       </div>
     </Modal>
   );
