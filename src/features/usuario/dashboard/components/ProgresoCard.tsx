@@ -2,7 +2,49 @@ import Card from "../../../../shared/ui/Card";
 import Badge from "../../../../shared/ui/Badge";
 import { useAuth } from "../../../../auth/useAuth";
 import { useBarreras } from "../../../admin/seguimiento/hooks/useBarreras";
+import type { Barrera } from "../../../admin/seguimiento/types/barrera";
 import { TrendingUp, ArrowRight, Activity, Award } from "lucide-react";
+
+type GrupoProgreso = {
+  id: string;
+  etapas: Barrera[];
+  actual: Barrera;
+};
+
+function obtenerGrupoId(barrera: Barrera): string {
+  if (barrera.grupoProgresionId) return barrera.grupoProgresionId;
+  let id = barrera.id;
+  while (id.startsWith("auto_")) id = id.slice("auto_".length);
+  return id;
+}
+
+function profundidadProgresion(barrera: Barrera): number {
+  let profundidad = 0;
+  let id = barrera.id;
+  while (id.startsWith("auto_")) {
+    profundidad += 1;
+    id = id.slice("auto_".length);
+  }
+  return profundidad;
+}
+
+function agruparProgresos(barreras: Barrera[]): GrupoProgreso[] {
+  const grupos = new Map<string, Barrera[]>();
+  barreras.forEach((barrera) => {
+    const id = obtenerGrupoId(barrera);
+    grupos.set(id, [...(grupos.get(id) ?? []), barrera]);
+  });
+
+  return Array.from(grupos, ([id, etapasSinOrden]) => {
+    const etapas = [...etapasSinOrden].sort(
+      (a, b) => profundidadProgresion(a) - profundidadProgresion(b),
+    );
+    const actual =
+      [...etapas].reverse().find((etapa) => etapa.estado === "pendiente") ??
+      etapas[etapas.length - 1];
+    return { id, etapas, actual };
+  });
+}
 
 export default function ProgresoCard() {
   const { user } = useAuth();
@@ -21,9 +63,14 @@ export default function ProgresoCard() {
     );
   }
 
-  const conHistorial = barreras.filter(
-    (barrera) => barrera.historial && barrera.historial.length > 0
-  );
+  const conHistorial = agruparProgresos(barreras)
+    .map((grupo) => ({
+      ...grupo,
+      historial: grupo.etapas
+        .flatMap((etapa) => etapa.historial ?? [])
+        .sort((a, b) => a.fecha.localeCompare(b.fecha)),
+    }))
+    .filter((grupo) => grupo.historial.length > 0);
 
   return (
     <Card hover className="relative overflow-hidden p-5 bg-surface/95 backdrop-blur-md border border-white/10 shadow-xl">
@@ -62,23 +109,27 @@ export default function ProgresoCard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {conHistorial.slice(0, 3).map((barrera) => {
-              const historial = barrera.historial!;
+            {conHistorial.slice(0, 3).map((grupo) => {
+              const historial = grupo.historial;
               const primero = historial[0];
               const ultimo = historial[historial.length - 1];
               const tieneEvolucion = historial.length > 1;
+              const barrera = grupo.actual;
 
               return (
                 <div
-                  key={barrera.id}
+                  key={grupo.id}
                   className="group p-3.5 rounded-xl border border-white/10 bg-surfaceSoft/40 hover:border-primary/30 hover:bg-surfaceSoft/70 transition-all duration-200 space-y-2"
                 >
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-bold text-text group-hover:text-primary transition-colors flex items-center gap-1.5">
                       <Award className="w-3.5 h-3.5 text-primary/80 shrink-0" />
-                      {barrera.nombre}
+                      {barrera.ejercicioNombre || barrera.nombre}
                     </p>
                   </div>
+                  <p className="text-[10px] text-muted">
+                    Objetivo actual: <strong className="text-text/80">{barrera.objetivo}</strong>
+                  </p>
 
                   {tieneEvolucion ? (
                     <div className="flex items-center justify-between pt-2 border-t border-white/5">

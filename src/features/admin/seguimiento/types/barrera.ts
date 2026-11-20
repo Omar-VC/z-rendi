@@ -20,6 +20,9 @@ export interface Barrera {
   ejercicioNombre?: string;
   pesoObjetivo?: number;
   repeticionesObjetivo?: number;
+  grupoProgresionId?: string;
+  barreraAnteriorId?: string;
+  barreraSiguienteId?: string;
 
   nombre: string;
 

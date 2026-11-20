@@ -56,11 +56,11 @@ export default function NuevaBarreraModal({
     const repeticiones = Number(repeticionesObjetivo);
     if (
       !pruebaSeleccionada ||
-      (esFuerza && (!ejercicioSeleccionado || !Number.isFinite(peso) || peso <= 0 || !Number.isInteger(repeticiones) || repeticiones <= 0)) ||
+      (esFuerza && (!ejercicioSeleccionado || !Number.isInteger(peso) || peso < 5 || peso % 5 !== 0 || !Number.isInteger(repeticiones) || repeticiones <= 0)) ||
       (!esFuerza && !objetivo.trim())
     ) {
       alert(esFuerza
-        ? "Selecciona un ejercicio e ingresa el peso y las repeticiones objetivo."
+        ? "Selecciona un ejercicio, un peso entero en múltiplos de 5 kg y las repeticiones objetivo."
         : "Selecciona una prueba física e ingresa una meta u objetivo válido.");
       return;
     }
@@ -215,14 +215,14 @@ export default function NuevaBarreraModal({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-text">Peso objetivo (kg)</Label>
-                <Input type="number" min="0.5" step="0.5" value={pesoObjetivo} onChange={(e) => setPesoObjetivo(e.target.value)} disabled={guardando} placeholder="Ej: 70" />
+                <Input type="number" min="5" step="5" value={pesoObjetivo} onChange={(e) => setPesoObjetivo(e.target.value)} disabled={guardando} placeholder="Ej: 70" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-text">Repeticiones mínimas</Label>
                 <Input type="number" min="1" step="1" value={repeticionesObjetivo} onChange={(e) => setRepeticionesObjetivo(e.target.value)} disabled={guardando} placeholder="Ej: 2" />
               </div>
             </div>
-            <p className="text-[11px] text-muted">Al alcanzar la meta, se registrará como superada y se creará otra con un objetivo 10% mayor.</p>
+            <p className="text-[11px] text-muted">Al alcanzar la meta, se creará otra con al menos 10% más, redondeada al siguiente múltiplo de 5 kg.</p>
           </>
         )}
 

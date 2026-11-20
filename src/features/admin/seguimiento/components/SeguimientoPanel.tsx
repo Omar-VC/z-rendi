@@ -1,10 +1,21 @@
 import { useEffect } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+  type DocumentData,
+  type QueryDocumentSnapshot,
+} from "firebase/firestore";
 
 import { useAuth } from "../../../../auth/useAuth";
 import { db } from "../../../../firebase/firebase";
 import { useSeguimiento } from "../hooks/useSeguimiento";
-import { procesarBarrerasFuerzaDeSesion } from "../services/barrerasService";
+import {
+  normalizarObjetivosFuerza,
+  procesarBarrerasFuerzaDeSesion,
+} from "../services/barrerasService";
 
 import UltimaSesionCard from "./UltimaSesionCard";
 import RegistroSesiones from "./RegistroSesiones";
@@ -32,31 +43,81 @@ export default function SeguimientoPanel({ clienteId }: Props) {
       where("barrerasFuerzaProcesadas", "==", false),
     );
     const enProceso = new Set<string>();
-    let cola = Promise.resolve();
+    let cola: Promise<unknown> = Promise.resolve();
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      snapshot.docs.forEach((sesionDoc) => {
-        if (enProceso.has(sesionDoc.id)) return;
+    let cancelar = false;
+    let unsubscribe = () => {};
+
+    async function procesarDocumento(
+      sesionDoc: QueryDocumentSnapshot<DocumentData>,
+      yaEnProceso = false,
+    ) {
+      if (!yaEnProceso) {
+        if (enProceso.has(sesionDoc.id)) return false;
         enProceso.add(sesionDoc.id);
-        const data = sesionDoc.data();
-        cola = cola
-          .then(() => procesarBarrerasFuerzaDeSesion(sesionDoc.id, {
-            clienteId: data.clienteId,
-            preparadorId: data.preparadorId,
-            barrerasFuerzaProcesadas: data.barrerasFuerzaProcesadas,
-            fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
-            bloquesRealizados: data.bloquesRealizados ?? [],
-          }))
-          .catch((error) => {
-            console.error("No se pudieron procesar las barreras de fuerza:", error);
-          })
-          .finally(() => enProceso.delete(sesionDoc.id));
-      });
-    }, (error) => {
-      console.error("No se pudieron escuchar sesiones pendientes de evaluar:", error);
-    });
+      }
+      const data = sesionDoc.data();
+      try {
+        await procesarBarrerasFuerzaDeSesion(sesionDoc.id, {
+          clienteId: data.clienteId,
+          preparadorId: data.preparadorId,
+          barrerasFuerzaProcesadas: data.barrerasFuerzaProcesadas,
+          fecha: data.fecha?.toDate?.() ?? new Date(data.fecha),
+          bloquesRealizados: data.bloquesRealizados ?? [],
+        });
+        return true;
+      } catch (error) {
+        console.error("No se pudieron procesar las barreras de fuerza:", error);
+        return false;
+      } finally {
+        enProceso.delete(sesionDoc.id);
+      }
+    }
 
-    return unsubscribe;
+    async function iniciarSeguimiento() {
+      let inicialProcesado = true;
+      try {
+        const pendientes = await getDocs(q);
+        for (const sesionDoc of pendientes.docs) {
+          if (!(await procesarDocumento(sesionDoc))) inicialProcesado = false;
+        }
+      } catch (error) {
+        inicialProcesado = false;
+        console.error("No se pudieron cargar las sesiones pendientes:", error);
+      }
+
+      // Primero se procesan los registros pendientes con el objetivo que tenían
+      // al realizarse; luego se normalizan objetivos activos que quedaron decimales.
+      if (inicialProcesado) {
+        try {
+          await normalizarObjetivosFuerza(clienteId);
+        } catch (error) {
+          console.error("No se pudieron normalizar los objetivos de fuerza:", error);
+        }
+      }
+
+      if (cancelar) return;
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        snapshot.docs.forEach((sesionDoc) => {
+          if (enProceso.has(sesionDoc.id)) return;
+          enProceso.add(sesionDoc.id);
+          cola = cola
+            .then(() => procesarDocumento(sesionDoc, true))
+            .catch((error) => {
+              console.error("No se pudo procesar una sesión pendiente:", error);
+            });
+        });
+      }, (error) => {
+        console.error("No se pudieron escuchar sesiones pendientes de evaluar:", error);
+      });
+    }
+
+    void iniciarSeguimiento();
+
+    return () => {
+      cancelar = true;
+      unsubscribe();
+    };
   }, [clienteId, preparadorIdActual]);
 
   if (!user) return null;

@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   getDoc,
   getDocs,
@@ -11,6 +10,7 @@ import {
   updateDoc,
   arrayUnion,
   writeBatch,
+  setDoc,
 } from "firebase/firestore";
 
 import { db } from "../../../../firebase/firebase";
@@ -42,8 +42,12 @@ export async function obtenerBarreras(clienteId: string): Promise<Barrera[]> {
 }
 
 export async function crearBarrera(barrera: Omit<Barrera, "id">) {
-  await addDoc(collection(db, COLLECTION), {
+  const ref = doc(collection(db, COLLECTION));
+  await setDoc(ref, {
     ...barrera,
+    ...(barrera.ejercicioId
+      ? { grupoProgresionId: barrera.grupoProgresionId ?? ref.id }
+      : {}),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -137,6 +141,46 @@ function formatearPeso(peso: number): string {
   return Number.isInteger(peso) ? String(peso) : peso.toFixed(1);
 }
 
+function redondearAlProximoPesoDe5(peso: number): number {
+  return Math.max(5, Math.ceil((peso - 1e-9) / 5) * 5);
+}
+
+function obtenerGrupoProgresionId(barrera: Barrera): string {
+  if (barrera.grupoProgresionId) return barrera.grupoProgresionId;
+  let id = barrera.id;
+  while (id.startsWith("auto_")) id = id.slice("auto_".length);
+  return id;
+}
+
+/** Ajusta barreras automáticas activas que quedaron con objetivos fraccionarios. */
+export async function normalizarObjetivosFuerza(clienteId: string): Promise<void> {
+  const barreras = await obtenerBarreras(clienteId);
+  const batch = writeBatch(db);
+  let actualizadas = 0;
+
+  for (const barrera of barreras) {
+    if (
+      barrera.estado !== "pendiente" ||
+      barrera.categoria !== "Fuerza" ||
+      !barrera.ejercicioId ||
+      !Number.isFinite(barrera.pesoObjetivo) ||
+      !Number.isFinite(barrera.repeticionesObjetivo)
+    ) continue;
+
+    const pesoNormalizado = redondearAlProximoPesoDe5(barrera.pesoObjetivo!);
+    if (pesoNormalizado === barrera.pesoObjetivo) continue;
+
+    batch.update(doc(db, COLLECTION, barrera.id), {
+      pesoObjetivo: pesoNormalizado,
+      objetivo: `${formatearPeso(pesoNormalizado)} kg × ${barrera.repeticionesObjetivo} repeticiones`,
+      updatedAt: serverTimestamp(),
+    });
+    actualizadas += 1;
+  }
+
+  if (actualizadas > 0) await batch.commit();
+}
+
 function obtenerMejorSerieQueCumple(
   ejercicio: { series?: Array<{ peso: number; reps: number }> },
   pesoObjetivo: number,
@@ -211,13 +255,15 @@ export async function procesarBarrerasFuerzaDeSesion(
     };
     batch.update(doc(db, COLLECTION, barrera.id), {
       estado: "superada",
+      grupoProgresionId: obtenerGrupoProgresionId(barrera),
+      barreraSiguienteId: `auto_${barrera.id}`,
       resultado,
       observaciones: entradaHistorial.observaciones,
       historial: arrayUnion(entradaHistorial),
       updatedAt: serverTimestamp(),
     });
 
-    const nuevoPesoObjetivo = Math.ceil(marca.peso * 1.1 * 2) / 2;
+    const nuevoPesoObjetivo = redondearAlProximoPesoDe5(marca.peso * 1.1);
     const nuevaBarreraId = `auto_${barrera.id}`;
     batch.set(doc(db, COLLECTION, nuevaBarreraId), {
       clienteId: barrera.clienteId,
@@ -229,6 +275,8 @@ export async function procesarBarrerasFuerzaDeSesion(
       unidad: barrera.unidad,
       ejercicioId: barrera.ejercicioId,
       ejercicioNombre: barrera.ejercicioNombre,
+      grupoProgresionId: obtenerGrupoProgresionId(barrera),
+      barreraAnteriorId: barrera.id,
       pesoObjetivo: nuevoPesoObjetivo,
       repeticionesObjetivo: barrera.repeticionesObjetivo,
       objetivo: `${formatearPeso(nuevoPesoObjetivo)} kg × ${barrera.repeticionesObjetivo} repeticiones`,

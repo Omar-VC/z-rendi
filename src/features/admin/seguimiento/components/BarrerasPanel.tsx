@@ -22,6 +22,54 @@ type Props = {
   clienteId: string;
 };
 
+type GrupoBarrera = {
+  id: string;
+  etapas: Barrera[];
+  actual: Barrera;
+};
+
+function obtenerGrupoId(barrera: Barrera): string {
+  if (barrera.grupoProgresionId) return barrera.grupoProgresionId;
+  let id = barrera.id;
+  while (id.startsWith("auto_")) id = id.slice("auto_".length);
+  return id;
+}
+
+function tiempoCreacion(barrera: Barrera): number {
+  const fecha = barrera.createdAt;
+  if (!fecha) return 0;
+  if (fecha instanceof Date) return fecha.getTime();
+  return "toDate" in fecha ? fecha.toDate().getTime() : 0;
+}
+
+function profundidadProgresion(barrera: Barrera): number {
+  let profundidad = 0;
+  let id = barrera.id;
+  while (id.startsWith("auto_")) {
+    profundidad += 1;
+    id = id.slice("auto_".length);
+  }
+  return profundidad;
+}
+
+function agruparBarreras(barreras: Barrera[]): GrupoBarrera[] {
+  const grupos = new Map<string, Barrera[]>();
+  barreras.forEach((barrera) => {
+    const grupoId = obtenerGrupoId(barrera);
+    grupos.set(grupoId, [...(grupos.get(grupoId) ?? []), barrera]);
+  });
+
+  return Array.from(grupos, ([id, etapas]) => {
+    etapas.sort(
+      (a, b) =>
+        profundidadProgresion(a) - profundidadProgresion(b) ||
+        tiempoCreacion(a) - tiempoCreacion(b),
+    );
+    const actual = [...etapas].reverse().find((etapa) => etapa.estado === "pendiente") ?? etapas[etapas.length - 1];
+    return { id, etapas, actual };
+  });
+}
+
 export default function BarrerasPanel({
   clienteId,
 }: Props) {
@@ -36,6 +84,7 @@ export default function BarrerasPanel({
   const [barreraNuevoObjetivo, setBarreraNuevoObjetivo] = useState<Barrera | null>(null);
   const [barreraFuerzaPorConfigurar, setBarreraFuerzaPorConfigurar] = useState<Barrera | null>(null);
   const [barreraAbierta, setBarreraAbierta] = useState<string | null>(null);
+  const grupos = agruparBarreras(barreras);
 
   async function borrarBarrera(id: string) {
     const confirmar = window.confirm("¿Eliminar esta barrera?");
@@ -68,7 +117,7 @@ export default function BarrerasPanel({
               Barreras de Progreso
             </h3>
             <span className="text-[10px] font-bold text-muted bg-surfaceSoft px-2 py-0.5 rounded-full border border-border/40">
-              {barreras.length}
+              {grupos.length}
             </span>
           </div>
           <p className="text-xs text-muted font-medium mt-0.5">
@@ -92,25 +141,28 @@ export default function BarrerasPanel({
         </div>
       )}
 
-      {!loading && barreras.length === 0 && (
+      {!loading && grupos.length === 0 && (
         <p className="py-6 text-center text-xs text-muted font-medium">
           No hay pruebas registradas para este atleta.
         </p>
       )}
 
       {/* LISTADO DE BARRERAS */}
-      {!loading && barreras.length > 0 && (
+      {!loading && grupos.length > 0 && (
         <div className="mt-3 divide-y divide-border/30">
-          {barreras.map((barrera) => {
-            const abierta = barreraAbierta === barrera.id;
-            const evaluaciones = barrera.historial?.length ?? 0;
+          {grupos.map((grupo) => {
+            const barrera = grupo.actual;
+            const abierta = barreraAbierta === grupo.id;
+            const historialGrupo = grupo.etapas
+              .flatMap((etapa) => etapa.historial ?? [])
+              .sort((a, b) => a.fecha.localeCompare(b.fecha));
 
             return (
-              <div key={barrera.id} className="py-3">
+              <div key={grupo.id} className="py-3">
                 {/* BOTÓN REPLEGABLE / HEADER DE LA BARRERA */}
                 <button
                   type="button"
-                  onClick={() => alternarBarrera(barrera.id)}
+                  onClick={() => alternarBarrera(grupo.id)}
                   className="w-full text-left group focus:outline-none"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -148,7 +200,7 @@ export default function BarrerasPanel({
                     {/* INDICADOR DERECHO */}
                     <div className="flex items-center gap-3 shrink-0 text-xs text-muted self-end sm:self-center">
                       <span className="text-[11px] font-mono bg-surfaceSoft px-2 py-0.5 rounded border border-border/30">
-                        {evaluaciones} {evaluaciones === 1 ? "evaluación" : "evaluaciones"}
+                          {grupo.etapas.length} {grupo.etapas.length === 1 ? "objetivo" : "etapas"}
                       </span>
 
                       <div className="w-6 h-6 rounded-md bg-surfaceSoft border border-border/30 flex items-center justify-center text-[10px] group-hover:text-text transition-all">
@@ -163,7 +215,7 @@ export default function BarrerasPanel({
                 {/* DETALLE Y HISTORIAL CUANDO ESTÁ ABIERTO */}
                 {abierta && (
                   <div className="mt-3 pt-3 border-t border-border/20 animate-fadeIn space-y-4">
-                    <HistorialBarrera historial={barrera.historial} />
+                    <HistorialBarrera historial={historialGrupo} />
 
                     {/* BOTONES DE ACCIÓN */}
                     <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/20">

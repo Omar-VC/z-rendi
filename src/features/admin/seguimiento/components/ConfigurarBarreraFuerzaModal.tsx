@@ -44,12 +44,13 @@ export default function ConfigurarBarreraFuerzaModal({
 
     if (
       !ejercicio ||
-      !Number.isFinite(pesoNumero) ||
-      pesoNumero <= 0 ||
+      !Number.isInteger(pesoNumero) ||
+      pesoNumero < 5 ||
+      pesoNumero % 5 !== 0 ||
       !Number.isInteger(repeticionesNumero) ||
       repeticionesNumero <= 0
     ) {
-      alert("Selecciona un ejercicio e ingresa el peso y las repeticiones objetivo.");
+      alert("Selecciona un ejercicio, un peso entero en múltiplos de 5 kg y las repeticiones objetivo.");
       return;
     }
 
@@ -58,6 +59,7 @@ export default function ConfigurarBarreraFuerzaModal({
       await actualizarBarrera(barrera.id, {
         ejercicioId: ejercicio.id,
         ejercicioNombre: ejercicio.nombre,
+        grupoProgresionId: barrera.grupoProgresionId ?? barrera.id,
         pesoObjetivo: pesoNumero,
         repeticionesObjetivo: repeticionesNumero,
         unidad: "kg",
@@ -90,7 +92,8 @@ export default function ConfigurarBarreraFuerzaModal({
       <div className="space-y-4 text-left">
         <p className="text-xs text-muted">
           Se conservará el historial de esta barrera. Al alcanzar el nuevo objetivo,
-          se marcará como superada y se generará el siguiente con un 10% más.
+          se marcará como superada y se generará el siguiente con al menos 10% más,
+          redondeado al siguiente múltiplo de 5 kg.
         </p>
         <div className="space-y-1.5">
           <Label>Ejercicio</Label>
@@ -118,8 +121,8 @@ export default function ConfigurarBarreraFuerzaModal({
             <Label>Peso objetivo (kg)</Label>
             <Input
               type="number"
-              min="0.5"
-              step="0.5"
+              min="5"
+              step="5"
               value={peso}
               onChange={(event) => setPeso(event.target.value)}
               disabled={guardando}
