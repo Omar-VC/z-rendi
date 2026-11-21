@@ -26,6 +26,20 @@ export default function ClienteSidebar({ onLogout, onNavigate }: Props) {
           path="/cliente/ficha"
           onNavigate={onNavigate}
         />
+
+        <SidebarItem
+          label="Mi rendimiento"
+          icon="📈"
+          path="/cliente/rendimiento"
+          onNavigate={onNavigate}
+        />
+
+        <SidebarItem
+          label="Running"
+          icon="🏃"
+          path="/cliente/running"
+          onNavigate={onNavigate}
+        />
       </nav>
 
       <button

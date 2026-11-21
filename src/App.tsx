@@ -14,6 +14,8 @@ import RegistroPage from "./auth/pages/RegistroPage";
 import RelevamientosPage from "./features/admin/relevamientos/pages/RelevamientosPage";
 import RelevamientoDetallePage from "./features/admin/relevamientos/pages/RelevamientoDetallePage";
 import HoyPage from "./features/admin/hoy/pages/HoyPage";
+import MiRendimientoPage from "./features/usuario/rendimiento/pages/MiRendimientoPage";
+import RunningPage from "./features/usuario/rendimiento/pages/RunningPage";
 
 // ⚽ NUEVAS IMPORTACIONES PARA PLANTELES
 import PlantelesSelectorPage from "./features/admin/planteles/pages/PlantelesSelectorPage";
@@ -93,6 +95,12 @@ function App() {
 
           {/* Ficha */}
           <Route path="ficha" element={<MiFichaPage />} />
+
+          {/* Rendimiento */}
+          <Route path="rendimiento" element={<MiRendimientoPage />} />
+
+          {/* Running personal */}
+          <Route path="running" element={<RunningPage />} />
         </Route>
       )}
 
