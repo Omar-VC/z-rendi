@@ -1,3 +1,4 @@
+import { ChartNoAxesCombined, Footprints, House, LogOut, UserRound } from "lucide-react";
 import Sidebar from "../../../shared/components/sidebar/Sidebar";
 import SidebarItem from "../../../shared/components/sidebar/SidebarItem";
 import Logo from "../../../shared/components/sidebar/Logo";
@@ -15,28 +16,28 @@ export default function ClienteSidebar({ onLogout, onNavigate }: Props) {
       <nav className="space-y-2 mt-4">
         <SidebarItem
           label="Inicio"
-          icon="🏠"
+          icon={<House className="h-5 w-5" strokeWidth={1.8} />}
           path="/cliente"
           onNavigate={onNavigate}
         />
 
         <SidebarItem
           label="Mi ficha"
-          icon="👤"
+          icon={<UserRound className="h-5 w-5" strokeWidth={1.8} />}
           path="/cliente/ficha"
           onNavigate={onNavigate}
         />
 
         <SidebarItem
           label="Mi rendimiento"
-          icon="📈"
+          icon={<ChartNoAxesCombined className="h-5 w-5" strokeWidth={1.8} />}
           path="/cliente/rendimiento"
           onNavigate={onNavigate}
         />
 
         <SidebarItem
           label="Running"
-          icon="🏃"
+          icon={<Footprints className="h-5 w-5" strokeWidth={1.8} />}
           path="/cliente/running"
           onNavigate={onNavigate}
         />
@@ -67,7 +68,7 @@ export default function ClienteSidebar({ onLogout, onNavigate }: Props) {
           gap-2
         "
       >
-        <span>🚪</span>
+        <LogOut className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
         <span>Salir</span>
       </button>
     </Sidebar>

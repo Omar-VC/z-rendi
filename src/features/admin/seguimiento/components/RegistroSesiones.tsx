@@ -2,8 +2,9 @@ import { useState } from "react";
 
 import type { SesionEntrenamiento } from "../types/seguimiento";
 import type { SerieRealizada } from "../types/registroEjercicio";
+import { ChevronDown } from "lucide-react";
 
-import { Card, Badge, Button } from "../../../../shared/ui";
+import { Badge, Button } from "../../../../shared/ui";
 
 type Props = {
   sesiones: SesionEntrenamiento[];
@@ -68,36 +69,31 @@ export default function RegistroSesiones({ sesiones, onEliminarSesion }: Props) 
   }
 
   return (
-    <Card className="!p-4 bg-surface/70 border-border/60 transition-all duration-200">
+    <section className="border-t border-border/30 py-4">
       <button
         onClick={() => setAbierto(!abierto)}
-        className="w-full flex items-center justify-between text-left group focus:outline-none"
+        aria-expanded={abierto}
+        className="group flex w-full items-center justify-between gap-3 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       >
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-extrabold text-text group-hover:text-primary transition-colors">
-              Historial de Sesiones
+            <h3 className="text-sm font-semibold text-text group-hover:text-primary transition-colors">
+              Historial de sesiones
             </h3>
-            <span className="text-[10px] font-bold text-muted bg-surfaceSoft px-2 py-0.5 rounded-full border border-border/40">
+            <span className="rounded-full bg-surfaceSoft/65 px-2 py-0.5 text-[10px] font-semibold text-muted">
               {sesiones.length}
             </span>
           </div>
-          <p className="text-xs text-muted font-medium mt-0.5">
-            Registro detallado de cargas y esfuerzo percibido
+          <p className="mt-0.5 text-xs text-muted">
+            Consultá los detalles de cada entrenamiento.
           </p>
         </div>
 
-        <div className="w-7 h-7 rounded-lg bg-surfaceSoft border border-border/40 flex items-center justify-center text-xs text-muted group-hover:text-text transition-all">
-          <span
-            className={`transform transition-transform duration-200 ${abierto ? "rotate-180" : ""}`}
-          >
-            ▼
-          </span>
-        </div>
+        <ChevronDown className={`h-5 w-5 shrink-0 text-muted transition-transform duration-200 ${abierto ? "rotate-180" : ""}`} strokeWidth={1.8} aria-hidden="true" />
       </button>
 
       {abierto && (
-        <div className="mt-4 pt-3 border-t border-border/40 animate-fadeIn">
+        <div className="mt-4 animate-fadeIn">
           {sesiones.length === 0 ? (
             <p className="text-xs text-muted font-medium py-2 text-center">
               No hay sesiones registradas en este período.
@@ -281,6 +277,6 @@ export default function RegistroSesiones({ sesiones, onEliminarSesion }: Props) 
           )}
         </div>
       )}
-    </Card>
+    </section>
   );
 }

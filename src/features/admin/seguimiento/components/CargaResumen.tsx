@@ -1,6 +1,6 @@
 import type { SesionEntrenamiento } from "../types/seguimiento";
 
-import { Badge, Card } from "../../../../shared/ui";
+import { Badge } from "../../../../shared/ui";
 
 import { obtenerEstadoCargaSemanal } from "../utils/cargaUtils";
 
@@ -64,79 +64,47 @@ export default function CargaResumen({ sesiones }: Props) {
   });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      {/* TARJETA CARGA SEMANAL */}
-      <Card className="!p-4 bg-surface/70 border-border/60 relative overflow-hidden flex flex-col justify-between">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl pointer-events-none" />
-        
-        <div>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-muted">
-                Carga Semanal
-              </span>
-              <span className="text-[10px] font-bold text-muted/70 bg-surfaceSoft px-1.5 py-0.5 rounded">
-                {obtenerTextoSemanaActual()}
-              </span>
+    <div className="overflow-hidden rounded-2xl bg-surface/45">
+      <div className="grid divide-y divide-white/[0.06] sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:divide-white/[0.06]">
+        <section className="p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-xs font-semibold text-muted">Esta semana</p>
+              <p className="mt-0.5 text-[10px] text-muted/70">{obtenerTextoSemanaActual()}</p>
             </div>
-            <Badge variant={estadoCarga.variant} className="text-[10px] px-2 py-0.5 font-bold">
+            <Badge variant={estadoCarga.variant} className="text-[10px] px-2 py-0.5 font-semibold">
               {estadoCarga.texto}
             </Badge>
           </div>
 
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-text tracking-tight">
-              {cargaSemanal}
-            </span>
-            <span className="text-xs font-black text-primary uppercase tracking-wider">
-              UA
-            </span>
+          <div className="mt-3 flex items-baseline gap-1.5">
+            <span className="text-3xl font-bold tracking-tight text-text">{cargaSemanal}</span>
+            <span className="text-xs font-semibold text-primary">UA</span>
           </div>
-        </div>
+          <p className="mt-1 text-xs text-muted">
+            {cantidadSesionesSemana} {cantidadSesionesSemana === 1 ? "sesión" : "sesiones"}
+            <span className="mx-1.5 text-muted/50">·</span>
+            Promedio {promedioSemanal} UA
+          </p>
+        </section>
 
-        <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted font-medium">
-          <div>
-            Sesiones: <span className="font-extrabold text-text">{cantidadSesionesSemana}</span>
-          </div>
-          <div>
-            Promedio: <span className="font-extrabold text-text">{promedioSemanal} UA</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* TARJETA CARGA MENSUAL */}
-      <Card className="!p-4 bg-surface/70 border-border/60 relative overflow-hidden flex flex-col justify-between">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-xl pointer-events-none" />
-
-        <div>
+        <section className="p-4 sm:p-5">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-black uppercase tracking-wider text-muted">
-              Carga Mensual
-            </span>
-            <span className="text-[10px] font-extrabold text-muted capitalize bg-surfaceSoft px-2 py-0.5 rounded">
-              {nombreMes}
-            </span>
+            <p className="text-xs font-semibold text-muted">Este mes</p>
+            <span className="text-[10px] font-medium capitalize text-muted/70">{nombreMes}</span>
           </div>
 
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-text tracking-tight">
-              {cargaMensual}
-            </span>
-            <span className="text-xs font-black text-primary uppercase tracking-wider">
-              UA
-            </span>
+          <div className="mt-3 flex items-baseline gap-1.5">
+            <span className="text-3xl font-bold tracking-tight text-text">{cargaMensual}</span>
+            <span className="text-xs font-semibold text-primary">UA</span>
           </div>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted font-medium">
-          <div>
-            Sesiones: <span className="font-extrabold text-text">{cantidadSesionesMes}</span>
-          </div>
-          <div>
-            Promedio: <span className="font-extrabold text-text">{promedioMensual} UA</span>
-          </div>
-        </div>
-      </Card>
+          <p className="mt-1 text-xs text-muted">
+            {cantidadSesionesMes} {cantidadSesionesMes === 1 ? "sesión" : "sesiones"}
+            <span className="mx-1.5 text-muted/50">·</span>
+            Promedio {promedioMensual} UA
+          </p>
+        </section>
+      </div>
     </div>
   );
 }

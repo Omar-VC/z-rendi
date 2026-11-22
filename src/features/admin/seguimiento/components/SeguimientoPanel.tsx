@@ -125,14 +125,13 @@ export default function SeguimientoPanel({ clienteId }: Props) {
   const preparadorId = user.uid;
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      {/* CABECERA DE SEGUIMIENTO (SIN EL BOTÓN DE NUEVA SESIÓN PRESENCIAL) */}
-      <div className="pb-2 border-b border-border/40">
-        <h2 className="text-lg font-black text-text uppercase tracking-tight">
-          Seguimiento Deportivo
+    <div className="space-y-5 animate-fadeIn sm:space-y-6">
+      <div>
+        <h2 className="text-lg font-bold tracking-tight text-text">
+          Progreso y entrenamiento
         </h2>
-        <p className="text-xs text-muted font-medium mt-0.5">
-          Control de evolución, sesiones de entrenamiento y barreras del atleta.
+        <p className="mt-1 text-sm text-muted">
+          Sesiones, cargas y objetivos reunidos en un solo lugar.
         </p>
       </div>
 
@@ -144,20 +143,23 @@ export default function SeguimientoPanel({ clienteId }: Props) {
           <div className="h-48 bg-surfaceSoft/60 rounded-xl border border-border/40" />
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* PANEL DE SESIONES PENDIENTES (ACÁ ESTÁ TU BOTÓN "ASIGNAR SESIÓN") */}
+        <div className="space-y-5 sm:space-y-6">
           <SesionesPendientesPanel
             clienteId={clienteId}
             preparadorId={preparadorId}
           />
 
-          {/* MÉTRICAS & RESUMEN DE CARGAS */}
-          <CargaResumen sesiones={sesiones} />
+          <section aria-label="Carga de entrenamiento" className="space-y-2.5">
+            <h3 className="px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+              Carga de entrenamiento
+            </h3>
+            <CargaResumen sesiones={sesiones} />
+          </section>
 
-          {/* DETALLE DE ÚLTIMA SESIÓN */}
           <UltimaSesionCard sesion={sesiones[0]} />
 
-          {/* REGISTRO HISTÓRICO DE SESIONES */}
+          <BarrerasPanel clienteId={clienteId} />
+
           <RegistroSesiones
             sesiones={sesiones}
             onEliminarSesion={async (id) => {
@@ -166,8 +168,6 @@ export default function SeguimientoPanel({ clienteId }: Props) {
             }}
           />
 
-          {/* PANEL DE BARRERAS Y LIMITANTES */}
-          <BarrerasPanel clienteId={clienteId} />
         </div>
       )}
     </div>

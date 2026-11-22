@@ -38,7 +38,7 @@ function ClienteTrainingConfig({
 
   if (!editando) {
     return (
-      <Card className="!p-3 bg-surface/40 border-border/40 backdrop-blur-sm">
+      <div className="flex items-center justify-between gap-4 rounded-xl bg-surface/45 px-3 py-2.5 backdrop-blur-sm xl:w-fit">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center font-black text-primary text-xs shrink-0">
@@ -62,7 +62,7 @@ function ClienteTrainingConfig({
             Ajustar
           </Button>
         </div>
-      </Card>
+      </div>
     );
   }
 

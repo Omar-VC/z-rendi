@@ -1,3 +1,4 @@
+import { CalendarDays, ChartNoAxesCombined, ClipboardList, LibraryBig, LogOut, Shield, UsersRound } from "lucide-react";
 import Sidebar from "../../../shared/components/sidebar/Sidebar";
 import SidebarItem from "../../../shared/components/sidebar/SidebarItem";
 import Logo from "../../../shared/components/sidebar/Logo";
@@ -14,13 +15,13 @@ export default function AdminSidebar({ onLogout, onNavigate }: Props) {
       <nav className="space-y-2 mt-4">
         <SidebarItem
           label="Hoy"
-          icon="📅"
+          icon={<CalendarDays className="h-5 w-5" strokeWidth={1.8} />}
           path="/hoy"
           onNavigate={onNavigate}
         />
         <SidebarItem
           label="Clientes"
-          icon="👥"
+          icon={<UsersRound className="h-5 w-5" strokeWidth={1.8} />}
           path="/clientes"
           onNavigate={onNavigate}
         />
@@ -28,28 +29,28 @@ export default function AdminSidebar({ onLogout, onNavigate }: Props) {
         {/* ⚽ ITEM DE NAVEGACIÓN A PLANTELES */}
         <SidebarItem
           label="Equipos / Planteles"
-          icon="⚽"
+          icon={<Shield className="h-5 w-5" strokeWidth={1.8} />}
           path="/equipos"
           onNavigate={onNavigate}
         />
 
         <SidebarItem
           label="Biblioteca"
-          icon="📚"
+          icon={<LibraryBig className="h-5 w-5" strokeWidth={1.8} />}
           path="/biblioteca"
           onNavigate={onNavigate}
         />
 
         <SidebarItem
           label="Informes"
-          icon="📊"
+          icon={<ChartNoAxesCombined className="h-5 w-5" strokeWidth={1.8} />}
           path="/informes"
           onNavigate={onNavigate}
         />
 
         <SidebarItem
           label="Relevamientos"
-          icon="📋"
+          icon={<ClipboardList className="h-5 w-5" strokeWidth={1.8} />}
           path="/relevamientos"
           onNavigate={onNavigate}
         />
@@ -80,7 +81,7 @@ export default function AdminSidebar({ onLogout, onNavigate }: Props) {
           gap-2
         "
       >
-        <span>🚪</span>
+        <LogOut className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
         <span>Salir</span>
       </button>
     </Sidebar>

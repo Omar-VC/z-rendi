@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 import { useBarreras } from "../hooks/useBarreras";
 
@@ -13,7 +14,6 @@ import type { Barrera } from "../types/barrera";
 import { eliminarBarrera } from "../services/barrerasService";
 
 import {
-  Card,
   Button,
   Badge,
 } from "../../../../shared/ui";
@@ -108,29 +108,26 @@ export default function BarrerasPanel({
   }
 
   return (
-    <Card className="!p-4 bg-surface/70 border-border/60">
-      {/* CABECERA CON ACCIÓN */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
+    <section className="pt-1">
+      <div className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-extrabold text-text">
-              Barreras de Progreso
-            </h3>
-            <span className="text-[10px] font-bold text-muted bg-surfaceSoft px-2 py-0.5 rounded-full border border-border/40">
+            <h3 className="text-sm font-bold text-text">Barreras de progreso</h3>
+            <span className="rounded-full bg-surfaceSoft/65 px-2 py-0.5 text-[10px] font-semibold text-muted">
               {grupos.length}
             </span>
           </div>
-          <p className="text-xs text-muted font-medium mt-0.5">
-            Pruebas y objetivos de evolución técnica y física
+          <p className="mt-0.5 text-xs text-muted">
+            Pruebas y objetivos de evolución física y técnica.
           </p>
         </div>
 
         <Button
           variant="accent"
-          className="!min-h-0 h-8 !px-3 text-xs font-bold shadow-[0_0_12px_rgba(255,85,0,0.2)] shrink-0 self-start sm:self-auto"
+          className="!min-h-0 h-9 !px-3 text-xs font-semibold shrink-0 self-start sm:self-auto"
           onClick={() => setMostrarModal(true)}
         >
-          + Nueva Prueba
+          + Nueva prueba
         </Button>
       </div>
 
@@ -163,13 +160,14 @@ export default function BarrerasPanel({
                 <button
                   type="button"
                   onClick={() => alternarBarrera(grupo.id)}
-                  className="w-full text-left group focus:outline-none"
+                  aria-expanded={abierta}
+                  className="group w-full rounded-lg py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     {/* INFORMACIÓN PRINCIPAL */}
                     <div className="min-w-0 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-text group-hover:text-primary transition-colors">
+                      <span className="text-sm font-semibold text-text group-hover:text-primary transition-colors">
                           {barrera.ejercicioNombre || barrera.nombre}
                         </span>
 
@@ -199,26 +197,22 @@ export default function BarrerasPanel({
 
                     {/* INDICADOR DERECHO */}
                     <div className="flex items-center gap-3 shrink-0 text-xs text-muted self-end sm:self-center">
-                      <span className="text-[11px] font-mono bg-surfaceSoft px-2 py-0.5 rounded border border-border/30">
+                      <span className="text-[11px] text-muted">
                           {grupo.etapas.length} {grupo.etapas.length === 1 ? "objetivo" : "etapas"}
                       </span>
 
-                      <div className="w-6 h-6 rounded-md bg-surfaceSoft border border-border/30 flex items-center justify-center text-[10px] group-hover:text-text transition-all">
-                        <span className={`transform transition-transform duration-200 ${abierta ? "rotate-180" : ""}`}>
-                          ▼
-                        </span>
-                      </div>
+                      <ChevronDown className={`h-4 w-4 text-muted transition-transform duration-200 ${abierta ? "rotate-180" : ""}`} strokeWidth={1.8} aria-hidden="true" />
                     </div>
                   </div>
                 </button>
 
                 {/* DETALLE Y HISTORIAL CUANDO ESTÁ ABIERTO */}
                 {abierta && (
-                  <div className="mt-3 pt-3 border-t border-border/20 animate-fadeIn space-y-4">
+                  <div className="mt-3 border-t border-border/20 pt-3 animate-fadeIn space-y-4">
                     <HistorialBarrera historial={historialGrupo} />
 
                     {/* BOTONES DE ACCIÓN */}
-                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/20">
+                    <div className="flex items-center justify-end gap-2 pt-1">
                       {barrera.ejercicioId ? (
                         <span className="text-[11px] text-muted">
                           {barrera.estado === "pendiente"
@@ -311,6 +305,6 @@ export default function BarrerasPanel({
           }}
         />
       )}
-    </Card>
+    </section>
   );
 }

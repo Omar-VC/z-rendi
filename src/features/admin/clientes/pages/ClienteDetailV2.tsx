@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, CalendarCheck2, ChartNoAxesCombined, CreditCard, HeartPulse } from "lucide-react";
 
 import type { Cliente } from "../types";
 import { getClienteById } from "../services/clientes.service";
@@ -17,6 +18,13 @@ import SeguimientoPanel from "../../seguimiento/components/SeguimientoPanel";
 import Button from "../../../../shared/ui/Button";
 
 type TabOption = "seguimiento" | "asistencia" | "cuotas" | "ficha";
+
+const tabs = [
+  { id: "seguimiento", label: "Progreso", Icon: ChartNoAxesCombined },
+  { id: "asistencia", label: "Asistencia", Icon: CalendarCheck2 },
+  { id: "cuotas", label: "Pagos", Icon: CreditCard },
+  { id: "ficha", label: "Ficha médica", Icon: HeartPulse },
+] as const;
 
 function ClienteDetailV2() {
   const { id } = useParams();
@@ -49,20 +57,19 @@ function ClienteDetailV2() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4 animate-pulse">
-        <div className="h-8 w-32 bg-surfaceSoft/50 rounded-lg" />
-        <div className="h-28 w-full bg-surfaceSoft/30 rounded-2xl" />
-        <div className="h-64 w-full bg-surfaceSoft/30 rounded-2xl" />
+      <div className="space-y-5 p-2 animate-pulse">
+        <div className="h-5 w-36 rounded-lg bg-surfaceSoft/40" />
+        <div className="h-24 w-full rounded-2xl bg-surfaceSoft/30" />
+        <div className="h-12 w-full rounded-xl bg-surfaceSoft/30" />
+        <div className="h-64 w-full rounded-2xl bg-surfaceSoft/20" />
       </div>
     );
   }
 
   if (!cliente) {
     return (
-      <div className="p-8 text-center space-y-4 bg-surfaceSoft/20 rounded-2xl">
-        <p className="text-muted text-sm font-semibold">
-          Atleta no encontrado.
-        </p>
+      <div className="space-y-4 rounded-2xl bg-surfaceSoft/20 p-8 text-center">
+        <p className="text-sm font-semibold text-muted">Atleta no encontrado.</p>
         <Button variant="outline" onClick={() => navigate("/admin/clientes")}>
           Volver al listado
         </Button>
@@ -70,32 +77,28 @@ function ClienteDetailV2() {
     );
   }
 
+  const estadoAprobado = cliente.estado === "aprobado";
+
   return (
-    <div className="space-y-6 pb-12 animate-fadeIn font-sans selection:bg-primary/20 selection:text-primary">
-      {/* NAVEGACIÓN SUPERIOR & INDICADOR DE ESTADO */}
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-5 pb-12 animate-fadeIn font-sans selection:bg-primary/20 selection:text-primary sm:space-y-6">
+      <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-xs font-mono font-bold text-muted hover:text-primary transition-all active:scale-95 py-1 px-2 rounded-lg hover:bg-surfaceSoft/30"
+          className="inline-flex items-center gap-2 rounded-lg py-1.5 pr-2 text-sm font-semibold text-muted transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
         >
-          <span>←</span> VOLVER A ATLETAS
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+          <span>Volver a atletas</span>
         </button>
 
-        <div className="flex items-center gap-2 bg-surfaceSoft/30 px-3 py-1 rounded-full">
-          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted">
-            ATLETA REGISTRADO
-          </span>
+        <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${estadoAprobado ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+          <span className={`h-1.5 w-1.5 rounded-full ${estadoAprobado ? "bg-success" : "bg-warning"}`} />
+          <span>{estadoAprobado ? "Atleta activo" : `Atleta ${cliente.estado}`}</span>
         </div>
       </div>
 
-      {/* CABECERA DE ATLETA (BLOQUE CON GRADIENTE SUTIL SIN BORDES) */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-surfaceSoft/80 to-surfaceSoft/30 p-1 shadow-lg">
-        <ClienteHeader cliente={cliente} />
-      </div>
+      <ClienteHeader cliente={cliente} />
 
-      {/* CONFIGURACIÓN DE FRECUENCIA DE ENTRENAMIENTO */}
-      <div className="rounded-2xl bg-surfaceSoft/30 p-4 backdrop-blur-md">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <ClienteTrainingConfig
           clienteId={cliente.id}
           frecuenciaSemanal={cliente.frecuenciaSemanal}
@@ -103,77 +106,33 @@ function ClienteDetailV2() {
             setCliente({ ...cliente, frecuenciaSemanal: frecuencia });
           }}
         />
+
+        <nav aria-label="Secciones del atleta" className="flex items-center gap-1 overflow-x-auto rounded-xl bg-surfaceSoft/35 p-1 scrollbar-none">
+          {tabs.map(({ id: tabId, label, Icon }) => {
+            const activa = tabActiva === tabId;
+            return (
+              <button
+                key={tabId}
+                onClick={() => setTabActiva(tabId)}
+                aria-current={activa ? "page" : undefined}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 sm:px-4 sm:text-sm ${
+                  activa ? "bg-surface text-text shadow-sm" : "text-muted hover:bg-white/5 hover:text-text"
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${activa ? "text-primary" : "text-muted"}`} strokeWidth={1.8} aria-hidden="true" />
+                {label}
+                {tabId === "asistencia" && <span className="text-[10px] text-muted">{porcentaje}%</span>}
+              </button>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* NAVEGACIÓN ENTRE SECCIONES (SWITCH ULTRA-MINIMALISTA PLANO) */}
-      <nav className="flex items-center gap-6 border-b border-white/5 pb-2 overflow-x-auto scrollbar-none">
-        <button
-          onClick={() => setTabActiva("seguimiento")}
-          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
-            tabActiva === "seguimiento"
-              ? "text-primary font-bold"
-              : "text-muted hover:text-text"
-          }`}
-        >
-          <span>SEGUIMIENTO & CARGAS</span>
-          {tabActiva === "seguimiento" && (
-            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => setTabActiva("asistencia")}
-          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
-            tabActiva === "asistencia"
-              ? "text-primary font-bold"
-              : "text-muted hover:text-text"
-          }`}
-        >
-          <span>ASISTENCIA [{porcentaje}%]</span>
-          {tabActiva === "asistencia" && (
-            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => setTabActiva("cuotas")}
-          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
-            tabActiva === "cuotas"
-              ? "text-primary font-bold"
-              : "text-muted hover:text-text"
-          }`}
-        >
-          <span>CUOTAS & PAGOS</span>
-          {tabActiva === "cuotas" && (
-            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
-          )}
-        </button>
-
-        <button
-          onClick={() => setTabActiva("ficha")}
-          className={`relative pb-2 text-xs font-mono transition-all active:scale-95 shrink-0 ${
-            tabActiva === "ficha"
-              ? "text-primary font-bold"
-              : "text-muted hover:text-text"
-          }`}
-        >
-          <span>FICHA MÉDICA</span>
-          {tabActiva === "ficha" && (
-            <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
-          )}
-        </button>
-      </nav>
-
-      {/* CONTENIDO INTEGRADO (SIN CUADROS EXTERNOS) */}
-      <div className="pt-2">
-        {tabActiva === "seguimiento" && (
-          <div className="animate-fadeIn">
-            <SeguimientoPanel clienteId={id!} />
-          </div>
-        )}
+      <div className="pt-1">
+        {tabActiva === "seguimiento" && <SeguimientoPanel clienteId={id!} />}
 
         {tabActiva === "asistencia" && (
-          <div className="animate-fadeIn rounded-2xl bg-surfaceSoft/20 p-5 backdrop-blur-md">
+          <div className="rounded-2xl bg-surfaceSoft/15 p-4 sm:p-5">
             <TabAsistenciaSection
               cargando={cargandoAsistencia}
               presentes={presentes}
@@ -186,7 +145,7 @@ function ClienteDetailV2() {
         )}
 
         {tabActiva === "cuotas" && (
-          <div className="animate-fadeIn rounded-2xl bg-surfaceSoft/20 p-5 backdrop-blur-md">
+          <div className="rounded-2xl bg-surfaceSoft/15 p-4 sm:p-5">
             <TabCuotasSection
               clienteId={id!}
               clienteNombre={`${cliente.nombre} ${cliente.apellido || ""}`}
@@ -197,7 +156,7 @@ function ClienteDetailV2() {
         )}
 
         {tabActiva === "ficha" && (
-          <div className="animate-fadeIn rounded-2xl bg-surfaceSoft/20 p-5 backdrop-blur-md">
+          <div className="rounded-2xl bg-surfaceSoft/15 p-4 sm:p-5">
             <TabFichaSection
               clienteId={id!}
               ficha={ficha}

@@ -4,8 +4,9 @@ import { useSesionesPendientes } from "../hooks/useSesionesPendientes";
 import NuevaSesionPendienteModal from "./NuevaSesionPendienteModal";
 import { eliminarSesionPendiente } from "../services/sesionesPendientes.service";
 import type { SesionPendiente } from "../types/sesionPendiente";
+import { CalendarDays, CircleCheck, MessageCircle } from "lucide-react";
 
-import { Card, Button, EmptyState } from "../../../../shared/ui";
+import { Button } from "../../../../shared/ui";
 
 type Props = {
   clienteId: string;
@@ -54,93 +55,79 @@ ${enlace}`;
 
   return (
     <>
-      <Card className="!p-4 bg-surface/70 border-border/60">
-        {/* CABECERA CON BOTÓN DE ACCIÓN */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
+      <section className="rounded-2xl bg-surface/45 p-4 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-extrabold text-text">
-                Sesiones Pendientes
-              </h3>
-              <span className="text-[10px] font-bold text-warning bg-warning/10 border border-warning/30 px-2 py-0.5 rounded-full">
+              <h3 className="text-sm font-bold text-text">Sesiones pendientes</h3>
+              <span className="rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
                 {sesiones.length}
               </span>
             </div>
-            <p className="text-xs text-muted font-medium mt-0.5">
-              Entrenamientos preparados listos para enviar al atleta
+            <p className="mt-0.5 text-xs text-muted">
+              Preparadas para compartir con el atleta.
             </p>
           </div>
 
           <Button
             variant="accent"
-            className="!min-h-0 h-8 !px-3 text-xs font-bold shadow-[0_0_12px_rgba(255,85,0,0.2)] shrink-0 self-start sm:self-auto"
+            className="!min-h-0 h-9 !px-3 text-xs font-semibold shrink-0 self-start sm:self-auto"
             onClick={() => setMostrarModal(true)}
           >
-            + Asignar Sesión
+            + Asignar sesión
           </Button>
         </div>
 
         {/* LISTADO O ESTADOS DE CARGA */}
-        <div className="mt-4">
+        <div className="mt-3">
           {loading && (
-            <div className="space-y-2 animate-pulse">
-              <div className="h-16 bg-surfaceSoft/50 rounded-xl border border-border/30" />
-            </div>
+            <div className="h-14 animate-pulse rounded-xl bg-surfaceSoft/35" />
           )}
 
           {!loading && sesiones.length === 0 && (
-            <div className="py-4">
-              <EmptyState title="No hay sesiones pendientes asignadas" />
+            <div className="flex items-center gap-2 py-2 text-sm text-muted">
+              <CircleCheck className="h-4 w-4 text-success" strokeWidth={1.8} aria-hidden="true" />
+              <span>No hay sesiones pendientes asignadas.</span>
             </div>
           )}
 
           {!loading && sesiones.length > 0 && (
-            <div className="space-y-3">
+            <div className="divide-y divide-white/[0.06]">
               {sesiones.map((sesion) => (
                 <div
                   key={sesion.id}
-                  className="p-3.5 rounded-xl border border-border/50 bg-surfaceSoft/30 hover:bg-surfaceSoft/50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="flex flex-col gap-3 py-4 first:pt-1 last:pb-0 md:flex-row md:items-center md:justify-between"
                 >
                   {/* INFORMACIÓN DE LA SESIÓN */}
-                  <div className="min-w-0 space-y-2">
+                  <div className="min-w-0 space-y-1.5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-xs font-black text-text truncate">
+                      <h4 className="text-sm font-semibold text-text truncate">
                         {sesion.libroNombre}
                       </h4>
-                      <span className="text-[10px] font-mono font-bold text-muted bg-surface px-2 py-0.5 rounded border border-border/30">
-                        📅 {formatearFecha(sesion.fecha)}
+                      <span className="inline-flex items-center gap-1 text-[11px] text-muted">
+                        <CalendarDays className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
+                        {formatearFecha(sesion.fecha)}
                       </span>
                     </div>
 
-                    <p className="text-xs text-text/90 font-medium">
-                      <span className="text-muted font-bold uppercase tracking-wider text-[10px]">
-                        Objetivo:{" "}
-                      </span>
+                    <p className="text-xs leading-relaxed text-text/85">
+                      <span className="font-semibold text-muted">Objetivo: </span>
                       {sesion.objetivo}
                     </p>
 
                     {sesion.gruposMusculares.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {sesion.gruposMusculares.map((grupo, index) => (
-                          <span
-                            key={`${grupo}-${index}`}
-                            className="text-[10px] font-bold text-text/80 bg-surface border border-border/40 px-2 py-0.5 rounded-md"
-                          >
-                            {String(grupo)}
-                          </span>
-                        ))}
-                      </div>
+                      <p className="text-[11px] text-muted">{sesion.gruposMusculares.map(String).join(" · ")}</p>
                     )}
 
                     {sesion.observacionesPreparador && (
-                      <p className="text-xs text-muted/80 italic font-medium pt-1">
-                        "{sesion.observacionesPreparador}"
+                      <p className="text-xs text-muted/80 italic">
+                        {sesion.observacionesPreparador}
                       </p>
                     )}
                   </div>
 
                   {/* BOTONES DE ACCIÓN (WHATSAPP & CANCELAR) */}
-                  <div className="flex items-center gap-2 shrink-0 self-end md:self-center pt-2 md:pt-0 border-t md:border-t-0 border-border/30 w-full md:w-auto justify-end">
+                  <div className="flex w-full shrink-0 items-center justify-end gap-2 self-end md:w-auto md:self-center">
                     <Button
                       variant="danger"
                       className="!min-h-0 !h-8 !px-3 text-xs font-semibold opacity-70 hover:opacity-100"
@@ -153,7 +140,7 @@ ${enlace}`;
                       onClick={() => enviarWhatsApp(sesion)}
                       className="h-8 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all flex items-center gap-1.5 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
                     >
-                      <span>💬</span> WhatsApp
+                      <MessageCircle className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /> WhatsApp
                     </button>
                   </div>
                 </div>
@@ -161,7 +148,7 @@ ${enlace}`;
             </div>
           )}
         </div>
-      </Card>
+      </section>
 
       {mostrarModal && (
         <NuevaSesionPendienteModal
