@@ -23,3 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 serviceAccountKey.json
+
+# Generated build and Firebase CLI artifacts
+
+build/
+.firebase/
+
+# Environment variables (local secrets/configuration)
+.env
+.env.*
+!.env.example
