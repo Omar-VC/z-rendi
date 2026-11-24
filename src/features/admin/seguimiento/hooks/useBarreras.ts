@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Barrera } from "../types/barrera";
 import { obtenerBarreras } from "../services/barrerasService";
@@ -8,7 +8,7 @@ export function useBarreras(clienteId: string) {
 
   const [loading, setLoading] = useState(true);
 
-  async function cargarBarreras(){
+  const cargarBarreras = useCallback(async () => {
 
   try {
 
@@ -32,13 +32,13 @@ export function useBarreras(clienteId: string) {
 
   }
 
-}
+  }, [clienteId]);
 
   useEffect(() => {
     if (clienteId) {
       cargarBarreras();
     }
-  }, [clienteId]);
+  }, [clienteId, cargarBarreras]);
 
   return {
     barreras,

@@ -23,7 +23,14 @@ function ClienteCard({
 
   const estaActivo = cliente.estadoCuenta === "activo";
   const iniciales = `${cliente.nombre?.[0] || ""}${cliente.apellido?.[0] || ""}`.toUpperCase() || "AT";
-  const clienteDinamico = cliente as any;
+  const deporte =
+    "deporte" in cliente && typeof cliente.deporte === "string"
+      ? cliente.deporte
+      : undefined;
+  const telefono =
+    "telefono" in cliente && typeof cliente.telefono === "string"
+      ? cliente.telefono
+      : undefined;
 
   async function manejarBaja() {
     const confirmar = window.confirm(
@@ -81,14 +88,14 @@ function ClienteCard({
             </h3>
             
             <div className="flex items-center gap-2 mt-0.5 text-xs text-muted">
-              {clienteDinamico.deporte && (
+              {deporte && (
                 <span className="bg-surfaceSoft px-1.5 py-0.5 rounded text-[10px] font-semibold text-text/70 uppercase">
-                  {clienteDinamico.deporte}
+                  {deporte}
                 </span>
               )}
-              {clienteDinamico.telefono && (
+              {telefono && (
                 <span className="truncate opacity-75 hidden sm:inline">
-                  📞 {clienteDinamico.telefono}
+                  📞 {telefono}
                 </span>
               )}
             </div>

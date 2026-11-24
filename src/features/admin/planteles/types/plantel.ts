@@ -29,7 +29,7 @@ export interface Equipo {
   nombre: string; // ej: "Plantel Superior"
   deporte: string; // ej: "Fútbol", "Rugby", "Vóley"
   categoria?: string; // ej: "Primera", "M19"
-  creadoEn?: any;
+  creadoEn?: Timestamp;
   atletasCount?: number;
   proximaSesion?: string;
 }
@@ -44,7 +44,7 @@ export interface SesionEntrenamiento {
   objetivo: string;
   bloques: BloqueSesion[];
   completada: boolean;
-  creadoEn?: any;
+  creadoEn?: Timestamp;
 }
 
 export interface PlanificacionGeneral {
@@ -54,5 +54,6 @@ export interface PlanificacionGeneral {
   objetivoMesociclo: string; // Ej: "Desarrollo de fuerza base e hipertrofia funcional"
   microcicloActual: string; // Ej: "Semana 2 (MD-3)"
   objetivoMicrociclo: string; // Ej: "Carga de volumen moderado + aceleraciones cortas"
-  actualizadoEn?: any;
+  actualizadoEn?: Timestamp;
 }
+import type { Timestamp } from "firebase/firestore";

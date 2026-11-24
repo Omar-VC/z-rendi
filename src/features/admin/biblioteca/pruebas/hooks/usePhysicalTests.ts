@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { PhysicalTest } from "../types/physicalTest";
 
@@ -14,7 +14,7 @@ export function usePhysicalTests({
   const [pruebas, setPruebas] = useState<PhysicalTest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function cargarPruebas() {
+  const cargarPruebas = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -24,13 +24,13 @@ export function usePhysicalTests({
     } finally {
       setLoading(false);
     }
-  }
+  }, [preparadorId]);
 
   useEffect(() => {
     if (preparadorId) {
       cargarPruebas();
     }
-  }, [preparadorId]);
+  }, [preparadorId, cargarPruebas]);
 
   return {
     pruebas,

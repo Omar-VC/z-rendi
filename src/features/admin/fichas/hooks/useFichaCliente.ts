@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { FichaCliente } from "../types";
 import { getFichaCliente } from "../services/ficha.service";
@@ -11,7 +11,7 @@ export function useFichaCliente(clienteId?: string) {
   const [error, setError] = useState<string | null>(null);
 
 
-  const cargarFicha = async () => {
+  const cargarFicha = useCallback(async () => {
 
     if (!clienteId) return;
 
@@ -41,14 +41,14 @@ export function useFichaCliente(clienteId?: string) {
 
     }
 
-  };
+  }, [clienteId]);
 
 
   useEffect(() => {
 
     cargarFicha();
 
-  }, [clienteId]);
+  }, [cargarFicha]);
 
 
   return {

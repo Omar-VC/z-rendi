@@ -16,6 +16,7 @@ const MAX = 280;
 
 export default function EnviarAvisoModal({ clienteId, nombre, onClose }: Props) {
   const { user } = useAuth();
+  const userId = user?.uid;
 
   const [tipo, setTipo] = useState<TipoAviso>("recordatorio");
   const [texto, setTexto] = useState("");
@@ -23,9 +24,9 @@ export default function EnviarAvisoModal({ clienteId, nombre, onClose }: Props) 
   const [enviados, setEnviados] = useState<Aviso[]>([]);
 
   useEffect(() => {
-    if (!user) return;
-    return suscribirseAvisosEnviados(clienteId, user.uid, setEnviados);
-  }, [clienteId, user?.uid]);
+    if (!userId) return;
+    return suscribirseAvisosEnviados(clienteId, userId, setEnviados);
+  }, [clienteId, userId]);
 
   async function enviar() {
     if (!texto.trim()) {

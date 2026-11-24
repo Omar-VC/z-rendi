@@ -158,7 +158,7 @@ export default function CompletarSesionModal({
     return () => {
       activo = false;
     };
-  }, [clienteId, sesion.id]);
+  }, [clienteId, sesion.id, sesion.bloques]);
 
   function actualizarFila(k: string, idx: number, cambios: Partial<FilaSerie>) {
     setFilas((prev) => {

@@ -25,7 +25,7 @@ export default function Card({
           ? (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onClick(e as any);
+                e.currentTarget.click();
               }
             }
           : undefined

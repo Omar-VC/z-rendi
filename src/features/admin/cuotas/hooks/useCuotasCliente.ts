@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Cuota } from "../types";
 import { getCuotasCliente } from "../services/cuotas.service";
@@ -11,7 +11,7 @@ export function useCuotasCliente(clienteId?: string) {
   const [error, setError] = useState<string | null>(null);
 
 
-  const cargarCuotas = async () => {
+  const cargarCuotas = useCallback(async () => {
 
     if (!clienteId) return;
 
@@ -38,14 +38,14 @@ export function useCuotasCliente(clienteId?: string) {
 
     }
 
-  };
+  }, [clienteId]);
 
 
   useEffect(() => {
 
     cargarCuotas();
 
-  }, [clienteId]);
+  }, [cargarCuotas]);
 
 
   return {

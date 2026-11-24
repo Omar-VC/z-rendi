@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { obtenerAsistenciaMensual } from "../services/asistenciaService";
-
-interface RegistroAsistencia {
-  id: string;
-  clienteId: string;
-  fecha: string;
-  estado: "presente" | "falta";
-}
+import type { RegistroAsistencia } from "../types/asistencia.types";
 
 export function useAsistencia(clienteId?: string, frecuenciaSemanal?: number) {
   const [asistencias, setAsistencias] = useState<RegistroAsistencia[]>([]);
@@ -35,7 +29,7 @@ export function useAsistencia(clienteId?: string, frecuenciaSemanal?: number) {
         finMes,
       );
 
-      setAsistencias(registros as RegistroAsistencia[]);
+      setAsistencias(registros);
 
       setCargando(false);
     };

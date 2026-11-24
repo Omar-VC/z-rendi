@@ -10,38 +10,35 @@ export function useSesionesPendientes(
   clienteId: string,
   preparadorId: string,
 ) {
-  const [sesiones, setSesiones] =
-    useState<SesionPendiente[]>([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState<string | null>(null);
+  const clave = JSON.stringify([clienteId, preparadorId]);
+  const [resultado, setResultado] = useState<{
+    clave: string;
+    sesiones: SesionPendiente[];
+  } | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let activo = true;
 
     const unsubscribe =
       suscribirseSesionesPendientes(
         clienteId,
         preparadorId,
         (nuevasSesiones) => {
-          setSesiones(nuevasSesiones);
-          setLoading(false);
-          setError(null);
+          if (activo) setResultado({ clave, sesiones: nuevasSesiones });
         },
       );
 
     return () => {
+      activo = false;
       unsubscribe();
     };
-  }, [clienteId, preparadorId]);
+  }, [clienteId, preparadorId, clave]);
+
+  const resultadoActual = resultado?.clave === clave ? resultado : null;
 
   return {
-    sesiones,
-    loading,
-    error,
+    sesiones: resultadoActual?.sesiones ?? [],
+    loading: resultadoActual === null,
+    error: null,
   };
 }

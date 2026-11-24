@@ -13,7 +13,7 @@ export function usePlanteles() {
       setError(null);
       const data = await plantelesService.obtenerEquipos();
       setEquipos(data);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error al cargar planteles:", err);
       setError("No se pudieron obtener los equipos.");
     } finally { // <-- Corregido aquí
@@ -26,7 +26,7 @@ export function usePlanteles() {
       const id = await plantelesService.crearEquipo(nuevoEquipo);
       await cargarEquipos();
       return id;
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error al crear equipo:", err);
       throw err;
     }

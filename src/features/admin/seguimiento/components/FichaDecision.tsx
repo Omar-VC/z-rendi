@@ -51,18 +51,32 @@ export default function FichaDecision({
   abiertaInicial = false,
 }: Props) {
   const [abierta, setAbierta] = useState(abiertaInicial);
-  const [cargando, setCargando] = useState(true);
-  const [sesiones, setSesiones] = useState<SesionEntrenamiento[]>([]);
-  const [barreras, setBarreras] = useState<Barrera[]>([]);
-  const [ultimos, setUltimos] = useState<Record<string, RegistroEjercicio>>({});
+  const [datosCliente, setDatosCliente] = useState<{
+    clienteId: string;
+    sesiones: SesionEntrenamiento[];
+    barreras: Barrera[];
+  } | null>(null);
+  const [datosUltimos, setDatosUltimos] = useState<{
+    clave: string;
+    registros: Record<string, RegistroEjercicio>;
+  } | null>(null);
+
+  const coincideCliente = datosCliente?.clienteId === clienteId;
+  const sesiones = useMemo(
+    () => (coincideCliente ? datosCliente.sesiones : []),
+    [coincideCliente, datosCliente],
+  );
+  const barreras = useMemo(
+    () => (coincideCliente ? datosCliente.barreras : []),
+    [coincideCliente, datosCliente],
+  );
+  const cargando = !coincideCliente;
 
   // Sesiones de los últimos 35 días + barreras
   useEffect(() => {
     let activo = true;
 
     async function cargar() {
-      setCargando(true);
-
       const hoy = new Date();
       const desde = new Date(hoy.getTime() - 35 * DIA);
       const hasta = new Date(hoy.getTime() + 2 * DIA);
@@ -74,13 +88,28 @@ export default function FichaDecision({
 
       if (!activo) return;
 
-      if (resSesiones.status === "fulfilled") setSesiones(resSesiones.value);
-      else console.error("Ficha: error cargando sesiones", resSesiones.reason);
+      if (resSesiones.status === "rejected") {
+        console.error("Ficha: error cargando sesiones", resSesiones.reason);
+      }
+      if (resBarreras.status === "rejected") {
+        console.error("Ficha: error cargando barreras", resBarreras.reason);
+      }
 
-      if (resBarreras.status === "fulfilled") setBarreras(resBarreras.value);
-      else console.error("Ficha: error cargando barreras", resBarreras.reason);
-
-      setCargando(false);
+      setDatosCliente((anterior) => ({
+        clienteId,
+        sesiones:
+          resSesiones.status === "fulfilled"
+            ? resSesiones.value
+            : anterior?.clienteId === clienteId
+              ? anterior.sesiones
+              : [],
+        barreras:
+          resBarreras.status === "fulfilled"
+            ? resBarreras.value
+            : anterior?.clienteId === clienteId
+              ? anterior.barreras
+              : [],
+      }));
     }
 
     cargar();
@@ -102,24 +131,27 @@ export default function FichaDecision({
     .map((e) => e.id)
     .sort()
     .join("|");
+  const claveUltimos = JSON.stringify([clienteId, idsKey]);
 
   useEffect(() => {
     let activo = true;
-    if (!idsKey) {
-      setUltimos({});
-      return;
-    }
+    if (!idsKey) return () => { activo = false; };
 
     obtenerUltimosRegistros(clienteId, idsKey.split("|"))
       .then((res) => {
-        if (activo) setUltimos(res);
+        if (activo) setDatosUltimos({ clave: claveUltimos, registros: res });
       })
       .catch((e) => console.error("Ficha: error cargando pesos", e));
 
     return () => {
       activo = false;
     };
-  }, [clienteId, idsKey]);
+  }, [clienteId, idsKey, claveUltimos]);
+
+  const ultimos =
+    idsKey && datosUltimos?.clave === claveUltimos
+      ? datosUltimos.registros
+      : {};
 
   // Análisis de carga: últimos 7 días vs promedio semanal de los 28 días previos
   const analisis = useMemo(() => {

@@ -10,13 +10,18 @@ type Props = {
   historial?: HistorialBarreraType[];
 };
 
-function formatearFecha(fecha: any) {
+type FechaBarrera = string | Date | { toDate: () => Date };
+
+function formatearFecha(fecha: FechaBarrera | null | undefined) {
 
   if (!fecha) return "";
 
-  const date = fecha.toDate
-    ? fecha.toDate()
-    : new Date(fecha);
+  const date =
+    fecha instanceof Date
+      ? fecha
+      : typeof fecha === "string"
+        ? new Date(fecha)
+        : fecha.toDate();
 
   return date.toLocaleDateString(
     "es-AR",

@@ -2,7 +2,15 @@ import { doc, getDoc } from "firebase/firestore";
 
 import { db } from "../firebase/firebase";
 
-export async function getUsuarioActual(uid: string) {
+export interface UsuarioActual {
+  id: string;
+  rol?: string;
+  frecuenciaSemanal?: number;
+}
+
+export async function getUsuarioActual(
+  uid: string,
+): Promise<UsuarioActual | null> {
   const usuarioRef = doc(db, "usuarios", uid);
 
   const snapshot = await getDoc(usuarioRef);
@@ -14,5 +22,5 @@ export async function getUsuarioActual(uid: string) {
   return {
     id: snapshot.id,
     ...snapshot.data(),
-  };
+  } as UsuarioActual;
 }

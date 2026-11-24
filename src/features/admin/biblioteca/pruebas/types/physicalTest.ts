@@ -23,6 +23,7 @@ export interface PhysicalTest {
 
   unidad: string;
 
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
+import type { Timestamp } from "firebase/firestore";

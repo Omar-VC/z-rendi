@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CronometroWidget from "../components/CronometroWidget";
 import ModalAgregarBloque from "../components/ModalAgregarBloque";
@@ -39,22 +39,63 @@ export default function PlantelDetallePage() {
   const [objetivoMicro, setObjetivoMicro] = useState("Carga de volumen moderado + aceleraciones cortas");
 
   // Estado del historial de sesiones pasadas
-  const [historialSesiones, setHistorialSesiones] = useState<SesionEntrenamiento[]>([]);
+  const [historialEquipo, setHistorialEquipo] = useState<{
+    equipoId: string;
+    sesiones: SesionEntrenamiento[];
+  } | null>(null);
+  const historialSesiones = useMemo(
+    () =>
+      equipoId && historialEquipo?.equipoId === equipoId
+        ? historialEquipo.sesiones
+        : [],
+    [equipoId, historialEquipo],
+  );
+  const componenteMontado = useRef(false);
+
+  useEffect(() => {
+    componenteMontado.current = true;
+    return () => {
+      componenteMontado.current = false;
+    };
+  }, []);
 
   // Cargar historial de sesiones completadas desde Firestore
-  const cargarHistorial = async () => {
-    if (!equipoId) return;
+  const cargarHistorial = async (idEquipo: string | undefined = equipoId) => {
+    if (!idEquipo) return;
     try {
-      const data = await sesionesService.obtenerSesionesPorEquipo(equipoId);
+      const data = await sesionesService.obtenerSesionesPorEquipo(idEquipo);
       // Filtramos solo las que están marcadas como completadas
-      setHistorialSesiones(data.filter((s) => s.completada === true));
+      if (componenteMontado.current) {
+        setHistorialEquipo({
+          equipoId: idEquipo,
+          sesiones: data.filter((s) => s.completada === true),
+        });
+      }
     } catch (err) {
       console.error("Error al cargar el historial:", err);
     }
   };
 
   useEffect(() => {
-    cargarHistorial();
+    if (!equipoId) return;
+
+    let activo = true;
+    sesionesService.obtenerSesionesPorEquipo(equipoId)
+      .then((data) => {
+        if (activo) {
+          setHistorialEquipo({
+            equipoId,
+            sesiones: data.filter((s) => s.completada === true),
+          });
+        }
+      })
+      .catch((err) => {
+        if (activo) console.error("Error al cargar el historial:", err);
+      });
+
+    return () => {
+      activo = false;
+    };
   }, [equipoId]);
 
   // Filtrado dinámico del historial por fecha
@@ -96,10 +137,19 @@ export default function PlantelDetallePage() {
       await finalizarSesionActual();
 
       // 2. Insertar inmediatamente en el historial local
-      setHistorialSesiones((prev) => [sesionCompletada, ...prev]);
+      const idEquipo = equipoId;
+      if (idEquipo && componenteMontado.current) {
+        setHistorialEquipo((prev) => ({
+          equipoId: idEquipo,
+          sesiones: [
+            sesionCompletada,
+            ...(prev?.equipoId === idEquipo ? prev.sesiones : []),
+          ],
+        }));
+      }
 
       // 3. Recargar desde la base de datos para sincronizar
-      await cargarHistorial();
+      await cargarHistorial(idEquipo);
     }
   };
 
@@ -113,9 +163,12 @@ export default function PlantelDetallePage() {
       )
     ) {
       try {
-        await sesionesService.eliminarHistorialEquipo(equipoId);
-        setHistorialSesiones([]);
-        setFechaFiltroHistorial("");
+        const idEquipo = equipoId;
+        await sesionesService.eliminarHistorialEquipo(idEquipo);
+        if (componenteMontado.current && equipoId === idEquipo) {
+          setHistorialEquipo({ equipoId: idEquipo, sesiones: [] });
+          setFechaFiltroHistorial("");
+        }
       } catch (error) {
         console.error("Error al limpiar el historial:", error);
       }

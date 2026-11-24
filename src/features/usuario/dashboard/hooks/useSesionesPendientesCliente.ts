@@ -5,42 +5,49 @@ import {
 } from "../../../admin/seguimiento/services/sesionesPendientes.service";
 
 export function useSesionesPendientesCliente(clienteId?: string) {
-  const [sesiones, setSesiones] = useState<SesionPendiente[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [resultado, setResultado] = useState<{
+    clienteId: string;
+    sesiones: SesionPendiente[];
+    error: string | null;
+  } | null>(null);
 
   useEffect(() => {
-    if (!clienteId) {
-      setSesiones([]);
-      setLoading(false);
-      return;
-    }
+    if (!clienteId) return;
 
-    setLoading(true);
-    setError(null);
+    let activo = true;
 
     const unsubscribe = suscribirseSesionesPendientesCliente(
       clienteId,
       (nuevasSesiones) => {
-        setSesiones(nuevasSesiones);
-        setLoading(false);
-        setError(null);
+        if (activo) {
+          setResultado({ clienteId, sesiones: nuevasSesiones, error: null });
+        }
       },
       (error) => {
         console.error(error);
-        setSesiones([]);
-        setLoading(false);
-        setError("No se pudieron cargar las sesiones pendientes.");
+        if (activo) {
+          setResultado({
+            clienteId,
+            sesiones: [],
+            error: "No se pudieron cargar las sesiones pendientes.",
+          });
+        }
       }
     );
 
-    return unsubscribe;
+    return () => {
+      activo = false;
+      unsubscribe();
+    };
   }, [clienteId]);
 
+  const resultadoActual =
+    clienteId && resultado?.clienteId === clienteId ? resultado : null;
+
   return {
-    sesiones,
-    loading,
-    error,
+    sesiones: resultadoActual?.sesiones ?? [],
+    loading: Boolean(clienteId) && resultadoActual === null,
+    error: resultadoActual?.error ?? null,
     refetch: () => {}, // No hace falta ejecutar nada porque el listener actualiza en tiempo real
   };
 }

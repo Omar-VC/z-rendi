@@ -1,5 +1,6 @@
 import ResumenAsistencia from "../../asistencia/components/ResumenAsistencia";
 import HistorialAsistencia from "../../asistencia/components/HistorialAsistencia";
+import type { RegistroAsistencia } from "../../asistencia/types/asistencia.types";
 
 type Props = {
   cargando: boolean;
@@ -7,7 +8,7 @@ type Props = {
   faltas: number;
   porcentaje: number;
   frecuenciaSemanal?: number;
-  asistencias: any[];
+  asistencias: RegistroAsistencia[];
 };
 
 export default function TabAsistenciaSection({

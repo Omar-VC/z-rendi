@@ -51,6 +51,7 @@ function Escala({
 
 export default function CheckinCard() {
   const { user } = useAuth();
+  const userId = user?.uid;
   const fecha = fechaHoyISO();
 
   const [cargando, setCargando] = useState(true);
@@ -77,10 +78,10 @@ export default function CheckinCard() {
   }
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     let activo = true;
 
-    obtenerCheckin(user.uid, fecha)
+    obtenerCheckin(userId, fecha)
       .then((c) => {
         if (!activo) return;
         setGuardado(c);
@@ -92,7 +93,7 @@ export default function CheckinCard() {
     return () => {
       activo = false;
     };
-  }, [user?.uid, fecha]);
+  }, [userId, fecha]);
 
   if (!user || cargando) return null;
 

@@ -5,32 +5,34 @@ import { suscribirseUltimaSesionCliente } from "../../../admin/seguimiento/servi
 import type { SesionEntrenamiento } from "../../../admin/seguimiento/types/seguimiento";
 
 export function useUltimaSesion(clienteId?: string) {
-  const [sesion, setSesion] =
-    useState<SesionEntrenamiento | undefined>(undefined);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [resultado, setResultado] = useState<{
+    clienteId: string;
+    sesion: SesionEntrenamiento | undefined;
+  } | null>(null);
 
   useEffect(() => {
-    if (!clienteId) {
-      setSesion(undefined);
-      setLoading(false);
-      return;
-    }
+    if (!clienteId) return;
+
+    let activo = true;
 
     const unsubscribe = suscribirseUltimaSesionCliente(
       clienteId,
       (resultado) => {
-        setSesion(resultado ?? undefined);
-        setLoading(false);
+        if (activo) setResultado({ clienteId, sesion: resultado ?? undefined });
       },
     );
 
-    return unsubscribe;
+    return () => {
+      activo = false;
+      unsubscribe();
+    };
   }, [clienteId]);
 
+  const resultadoActual =
+    clienteId && resultado?.clienteId === clienteId ? resultado : null;
+
   return {
-    sesion,
-    loading,
+    sesion: resultadoActual?.sesion,
+    loading: Boolean(clienteId) && resultadoActual === null,
   };
 }

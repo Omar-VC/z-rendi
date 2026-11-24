@@ -1,10 +1,11 @@
 import { useState } from "react";
 import FichaResumen from "../../fichas/components/FichaResumen";
 import FichaForm from "../../fichas/components/FichaForm";
+import type { FichaCliente } from "../../fichas/types";
 
 type Props = {
   clienteId: string;
-  ficha: any;
+  ficha: FichaCliente | null;
   onRecargarFicha: () => Promise<void>;
 };
 

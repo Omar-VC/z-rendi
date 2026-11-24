@@ -24,11 +24,11 @@ export default function InformesGeneralesPage() {
 
       // 2. Filtramos ÚNICAMENTE los clientes con estadoCuenta activo
       const clientesActivos = listaClientes.filter(
-        (cliente: any) => cliente.estadoCuenta === "activo"
+        (cliente) => cliente.estadoCuenta === "activo"
       );
 
       // 3. Mapeamos solo los clientes activos
-      const atletas = clientesActivos.map((cliente: any) => ({
+      const atletas = clientesActivos.map((cliente) => ({
         id: cliente.id,
         nombre: `${cliente.nombre || ""} ${cliente.apellido || ""}`.trim() || "Atleta",
       }));

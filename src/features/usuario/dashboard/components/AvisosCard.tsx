@@ -9,12 +9,13 @@ import { TIPOS_AVISO, type Aviso } from "../../../avisos/types";
 
 export default function AvisosCard() {
   const { user } = useAuth();
+  const userId = user?.uid;
   const [avisos, setAvisos] = useState<Aviso[]>([]);
 
   useEffect(() => {
-    if (!user) return;
-    return suscribirseAvisosAtleta(user.uid, setAvisos);
-  }, [user?.uid]);
+    if (!userId) return;
+    return suscribirseAvisosAtleta(userId, setAvisos);
+  }, [userId]);
 
   const sinLeer = avisos.filter((a) => !a.leido);
   if (sinLeer.length === 0) return null;

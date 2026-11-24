@@ -66,7 +66,7 @@ export async function obtenerResumenAtletas(
         );
 
         const presentes = registrosAsistencia.filter(
-          (reg: any) => reg.estado === "presente"
+          (reg) => reg.estado === "presente"
         ).length;
 
         const porcentaje = Math.round((presentes / diasHabilesMes) * 100);
@@ -74,7 +74,7 @@ export async function obtenerResumenAtletas(
         // 2. Barreras de progreso guardadas en la colección "barrerasProgreso"
         const listaBarreras: Barrera[] = await obtenerBarreras(atleta.id);
 
-        const barrerasMapeadas = listaBarreras.map((b: any) => {
+        const barrerasMapeadas = listaBarreras.map((b) => {
           // Si b.resultado está vacío, intentamos obtener la última marca cargada en el historial
           let resultadoActual = b.resultado;
           if ((!resultadoActual || resultadoActual === "") && b.historial && b.historial.length > 0) {

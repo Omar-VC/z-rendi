@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { SesionEntrenamiento } from "../types/seguimiento";
 import { obtenerSesionesCliente } from "../services/seguimientoService";
@@ -7,7 +7,7 @@ export function useSeguimiento(clienteId?: string) {
   const [sesiones, setSesiones] = useState<SesionEntrenamiento[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function cargarSesiones() {
+  const cargarSesiones = useCallback(async () => {
     if (!clienteId) {
       setSesiones([]);
       setLoading(false);
@@ -23,11 +23,11 @@ export function useSeguimiento(clienteId?: string) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [clienteId]);
 
   useEffect(() => {
     cargarSesiones();
-  }, [clienteId]);
+  }, [cargarSesiones]);
 
   return {
     sesiones,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import type { SesionEntrenamiento, BloqueSesion } from "../types/plantel";
 import { sesionesService } from "../services/sesiones.service";
 
@@ -7,7 +7,7 @@ export function useSesionDelDia(equipoId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const fechaHoy = new Date().toISOString().split("T")[0];
 
-  const cargarSesion = async () => {
+  const cargarSesion = useCallback(async () => {
     if (!equipoId) return;
     try {
       setLoading(true);
@@ -18,7 +18,7 @@ export function useSesionDelDia(equipoId: string | undefined) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [equipoId, fechaHoy]);
 
   const iniciarNuevaSesion = async (objetivo: string, microciclo: string) => {
     if (!equipoId) return;
@@ -96,7 +96,7 @@ export function useSesionDelDia(equipoId: string | undefined) {
 
   useEffect(() => {
     cargarSesion();
-  }, [equipoId]);
+  }, [cargarSesion]);
 
   return { 
     sesion, 

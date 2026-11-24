@@ -17,7 +17,7 @@ export interface Equipo {
   deporte: Deporte;
   categoria?: string; // ej: "Primera / Reserva"
   jugadores: JugadorPlantel[];
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 export interface BloqueEjercicio {
@@ -50,3 +50,4 @@ export interface PlanMesocicloEquipo {
     enfoque: string;
   }[];
 }
+import type { Timestamp } from "firebase/firestore";

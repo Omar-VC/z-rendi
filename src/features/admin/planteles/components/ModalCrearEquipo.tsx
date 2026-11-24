@@ -24,7 +24,7 @@ export default function ModalCrearEquipo({ isOpen, onClose, onSubmit }: Props) {
       setNombre("");
       setCategoria("");
       onClose();
-    } catch (error) {
+    } catch {
       alert("Error al crear el plantel");
     } finally {
       setSubmitting(false);

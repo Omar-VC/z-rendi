@@ -9,7 +9,10 @@ import {
 
 import { db } from "../../../../firebase/firebase";
 
-import type { EstadoAsistencia } from "../types/asistencia.types";
+import type {
+  EstadoAsistencia,
+  RegistroAsistencia,
+} from "../types/asistencia.types";
 
 const ASISTENCIAS_COLLECTION = "asistencias";
 
@@ -63,7 +66,7 @@ export async function obtenerAsistenciaMensual(
   clienteId: string,
   inicioMes: string,
   finMes: string
-) {
+): Promise<RegistroAsistencia[]> {
   const asistenciasRef = collection(
     db,
     ASISTENCIAS_COLLECTION
@@ -78,8 +81,15 @@ export async function obtenerAsistenciaMensual(
 
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((documento) => ({
-    id: documento.id,
-    ...documento.data(),
-  }));
+  return snapshot.docs.map((documento) => {
+    const data = documento.data();
+
+    return {
+      id: documento.id,
+      ...data,
+      clienteId: data.clienteId,
+      fecha: data.fecha,
+      estado: data.estado,
+    };
+  });
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Exercise } from "../types/exercise";
 
@@ -11,7 +11,7 @@ export function useExercises(preparadorId?: string) {
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function cargarEjercicios() {
+  const cargarEjercicios = useCallback(async () => {
     if (!preparadorId) {
       setEjercicios([]);
       setLoading(false);
@@ -29,7 +29,7 @@ export function useExercises(preparadorId?: string) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [preparadorId]);
 
   async function agregarEjercicio(
     ejercicio: Omit<Exercise, "id">
@@ -41,7 +41,7 @@ export function useExercises(preparadorId?: string) {
 
   useEffect(() => {
     cargarEjercicios();
-  }, [preparadorId]);
+  }, [cargarEjercicios]);
 
   return {
     ejercicios,

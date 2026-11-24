@@ -20,15 +20,15 @@ export default function BibliotecaPruebas() {
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
-  if (!user) return null;
-
   const {
     pruebas,
     loading,
     recargar,
   } = usePhysicalTests({
-    preparadorId: user.uid,
+    preparadorId: user?.uid ?? "",
   });
+
+  if (!user) return null;
 
   return (
 

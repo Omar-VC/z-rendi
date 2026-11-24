@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { TrainingBook } from "../types/trainingBook";
 import { obtenerLibros, crearLibro } from "../services/trainingBooksService";
@@ -7,7 +7,7 @@ export function useTrainingBooks(preparadorId?: string) {
   const [libros, setLibros] = useState<TrainingBook[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function cargarLibros() {
+  const cargarLibros = useCallback(async () => {
     if (!preparadorId) {
       setLibros([]);
       setLoading(false);
@@ -25,7 +25,7 @@ export function useTrainingBooks(preparadorId?: string) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [preparadorId]);
 
   async function agregarLibro(
     libro: Omit<TrainingBook, "id">
@@ -36,7 +36,7 @@ export function useTrainingBooks(preparadorId?: string) {
 
   useEffect(() => {
     cargarLibros();
-  }, [preparadorId]);
+  }, [cargarLibros]);
 
   return {
     libros,
