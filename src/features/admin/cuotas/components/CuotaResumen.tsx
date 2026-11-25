@@ -107,6 +107,13 @@ export default function CuotaResumen({
                     >
                       Editar
                     </Button>
+                    <Button
+                      variant="danger"
+                      className="!h-9 !px-3 text-xs"
+                      onClick={() => handleEliminarCuota(cuota)}
+                    >
+                      Eliminar
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -176,14 +183,6 @@ export default function CuotaResumen({
                         cuotaId={cuota.id}
                         onRevertido={onRevertido}
                       />
-
-                      <Button
-                        variant="danger"
-                        className="!h-8 !px-3 text-xs"
-                        onClick={() => handleEliminarCuota(cuota)}
-                      >
-                        Eliminar
-                      </Button>
                     </div>
                   </div>
                 ))}
