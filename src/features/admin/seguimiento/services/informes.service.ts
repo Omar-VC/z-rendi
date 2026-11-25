@@ -111,6 +111,42 @@ export async function obtenerResumenAtletas(
   }
 }
 
+/**
+ * Genera un texto legible con los datos de un informe individual.
+ * Excluye deliberadamente cualquier nota privada del preparador.
+ */
+export function generarTextoInformeIndividual(
+  resumen: ResumenAtleta,
+  mes: number,
+  anio: number,
+): string {
+  const meses = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+  ];
+  const mesNombre = meses[mes - 1]?.charAt(0).toUpperCase() + meses[mes - 1]?.slice(1) || "";
+
+  let texto = `INFORME - ${resumen.nombre.toUpperCase()} (${mesNombre} ${anio})\n`;
+  texto += `----------------------------------------\n`;
+  texto += `Asistencia: ${resumen.asistencias.completadasMes}/${resumen.asistencias.diasHabilesMes} días hábiles (${resumen.asistencias.porcentajeMes}%)\n`;
+
+  if (resumen.barreras.length > 0) {
+    texto += `\nSeguimiento de Barreras:\n`;
+    resumen.barreras.forEach((b) => {
+      const estadoTexto = b.estado === "superada" ? "Superada" : "Pendiente";
+      const resTexto =
+        b.resultado && b.resultado !== "En progreso"
+          ? ` | Actual: ${b.resultado} ${b.unidad}`
+          : "";
+      texto += `- ${b.nombre}: Obj ${b.objetivo} ${b.unidad}${resTexto} (${estadoTexto})\n`;
+    });
+  } else {
+    texto += `\nSin barreras registradas.\n`;
+  }
+
+  return texto.trim();
+}
+
 export function generarTextoWhatsApp(resumenes: ResumenAtleta[]): string {
   const mesNombre = new Date().toLocaleString("es-AR", { month: "long" }).toUpperCase();
 
