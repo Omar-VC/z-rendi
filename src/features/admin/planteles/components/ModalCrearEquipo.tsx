@@ -1,14 +1,16 @@
 import { useState } from "react";
+import { NOMBRE_RAMA, type Rama } from "../types/plantel";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (equipo: { nombre: string; deporte: string; categoria?: string }) => Promise<void>;
+  onSubmit: (equipo: { nombre: string; deporte: string; rama: Rama; categoria?: string }) => Promise<void>;
 }
 
 export default function ModalCrearEquipo({ isOpen, onClose, onSubmit }: Props) {
   const [nombre, setNombre] = useState("");
-  const [deporte, setDeporte] = useState("Fútbol");
+  const [deporte, setDeporte] = useState("Vóley");
+  const [rama, setRama] = useState<Rama>("femenino");
   const [categoria, setCategoria] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -20,7 +22,7 @@ export default function ModalCrearEquipo({ isOpen, onClose, onSubmit }: Props) {
 
     try {
       setSubmitting(true);
-      await onSubmit({ nombre, deporte, categoria });
+      await onSubmit({ nombre, deporte, rama, categoria });
       setNombre("");
       setCategoria("");
       onClose();
@@ -74,6 +76,21 @@ export default function ModalCrearEquipo({ isOpen, onClose, onSubmit }: Props) {
               <option value="Basquet">Básquet</option>
               <option value="Hockey">Hockey</option>
               <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono font-semibold uppercase tracking-wider text-muted">
+              Rama
+            </label>
+            <select
+              value={rama}
+              onChange={(e) => setRama(e.target.value as Rama)}
+              className="w-full h-11 px-4 rounded-xl bg-background text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-inner"
+            >
+              {Object.entries(NOMBRE_RAMA).map(([valor, texto]) => (
+                <option key={valor} value={valor}>{texto}</option>
+              ))}
             </select>
           </div>
 

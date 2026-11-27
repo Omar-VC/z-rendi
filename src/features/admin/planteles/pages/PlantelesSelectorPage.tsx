@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../../shared/ui";
 import { usePlanteles } from "../hooks/usePlanteles";
 import ModalCrearEquipo from "../components/ModalCrearEquipo";
+import { NOMBRE_RAMA } from "../types/plantel";
 
 export default function PlantelesSelectorPage() {
   const navigate = useNavigate();
@@ -69,13 +70,18 @@ export default function PlantelesSelectorPage() {
                     <span className="text-xs font-bold px-3 py-1 rounded-lg bg-primary/20 text-primary">
                       {eq.deporte}
                     </span>
+                    {eq.rama && (
+                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-background/60 text-muted">
+                        {NOMBRE_RAMA[eq.rama]}
+                      </span>
+                    )}
                     {eq.categoria && (
                       <span className="text-xs font-mono px-2 py-0.5 rounded bg-background/60 text-muted">
                         {eq.categoria}
                       </span>
                     )}
                     <span className="text-xs text-text/70 font-medium">
-                      👥 {eq.atletasCount || 0} Atletas
+                      👥 {eq.atletasCount || 0} en plantel
                     </span>
                   </div>
                   <h2 className="text-xl font-bold text-text group-hover:text-primary transition-colors">

@@ -1,10 +1,26 @@
-export interface AtletaPlantel {
-  id: string;
+export type Rama = "femenino" | "masculino" | "mixto";
+
+export const NOMBRE_RAMA: Record<Rama, string> = {
+  femenino: "Femenino",
+  masculino: "Masculino",
+  mixto: "Mixto",
+};
+
+export const POSICIONES_VOLEY = [
+  "Armado",
+  "Punta receptor",
+  "Opuesto",
+  "Central",
+  "Líbero",
+];
+
+export interface Jugador {
+  id?: string;
   nombre: string;
   apellido: string;
-  posicion?: string;
-  estado: "disponible" | "diferenciado" | "ausente";
-  observaciones?: string;
+  numero?: number | null;
+  posicion: string; // posición cómoda
+  posicionAlternativa?: string;
 }
 
 export interface BloqueSesion {
@@ -29,6 +45,7 @@ export interface Equipo {
   nombre: string; // ej: "Plantel Superior"
   deporte: string; // ej: "Fútbol", "Rugby", "Vóley"
   categoria?: string; // ej: "Primera", "M19"
+  rama?: Rama;
   creadoEn?: Timestamp;
   atletasCount?: number;
   proximaSesion?: string;

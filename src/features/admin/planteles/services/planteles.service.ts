@@ -12,6 +12,8 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../../../../firebase/firebase";
 import type { Equipo } from "../types/plantel";
+import { jugadoresService } from "./jugadores.service";
+import { sesionesService } from "./sesiones.service";
 
 const COLECCION_EQUIPOS = "equipos";
 
@@ -62,8 +64,13 @@ export const plantelesService = {
     await updateDoc(docRef, datos);
   },
 
-  // Eliminar un equipo
+  // Eliminar un equipo junto con sus jugadores y sesiones.
+  // El equipo se borra al final: las reglas lo consultan para autorizar lo demás.
   async eliminarEquipo(id: string): Promise<void> {
+    const jugadores = await jugadoresService.obtener(id);
+    await Promise.all(jugadores.map((j) => jugadoresService.eliminar(id, j.id!)));
+    await sesionesService.eliminarHistorialEquipo(id);
+
     const docRef = doc(db, COLECCION_EQUIPOS, id);
     await deleteDoc(docRef);
   },

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Equipo } from "../types/plantel";
 import { plantelesService } from "../services/planteles.service";
+import { jugadoresService } from "../services/jugadores.service";
 
 export function usePlanteles() {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
@@ -12,7 +13,13 @@ export function usePlanteles() {
       setLoading(true);
       setError(null);
       const data = await plantelesService.obtenerEquipos();
-      setEquipos(data);
+      const conConteo = await Promise.all(
+        data.map(async (eq) => ({
+          ...eq,
+          atletasCount: await jugadoresService.contar(eq.id!),
+        })),
+      );
+      setEquipos(conConteo);
     } catch (err) {
       console.error("Error al cargar planteles:", err);
       setError("No se pudieron obtener los equipos.");

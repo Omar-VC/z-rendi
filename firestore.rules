@@ -277,8 +277,12 @@ match /notasPrivadasInforme/{notaId} {
         request.auth.token.role == "admin"
       );
 
-      match /{subColeccion}/{docId} {
-        allow read, write: if request.auth != null;
+      // Jugadores: solo el preparador dueño del equipo (o admin)
+      match /jugadores/{jugadorId} {
+        allow read, write: if request.auth != null && (
+          get(/databases/$(database)/documents/equipos/$(equipoId)).data.preparadorId == request.auth.uid ||
+          request.auth.token.role == "admin"
+        );
       }
     }
 

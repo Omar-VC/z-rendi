@@ -5,14 +5,46 @@ import ModalAgregarBloque from "../components/ModalAgregarBloque";
 import ModalVerSesion from "../components/ModalVerSesion";
 import { useSesionDelDia } from "../hooks/useSesionDelDia";
 import { sesionesService } from "../services/sesiones.service";
-import type { SesionEntrenamiento } from "../types/plantel";
+import JugadoresTab from "../components/JugadoresTab";
+import { plantelesService } from "../services/planteles.service";
+import { NOMBRE_RAMA, type Equipo, type SesionEntrenamiento } from "../types/plantel";
 
-type TabTipo = "dia" | "planificacion";
+type TabTipo = "jugadores" | "dia" | "planificacion";
 
 export default function PlantelDetallePage() {
   const { equipoId } = useParams();
   const navigate = useNavigate();
-  const [tabActiva, setTabActiva] = useState<TabTipo>("dia");
+  const [tabActiva, setTabActiva] = useState<TabTipo>("jugadores");
+  const [equipo, setEquipo] = useState<Equipo | null>(null);
+  const [eliminando, setEliminando] = useState(false);
+
+  useEffect(() => {
+    if (!equipoId) return;
+    let activo = true;
+    plantelesService
+      .obtenerEquipoPorId(equipoId)
+      .then((data) => {
+        if (activo) setEquipo(data);
+      })
+      .catch((err) => console.error("Error al cargar el equipo:", err));
+    return () => {
+      activo = false;
+    };
+  }, [equipoId]);
+
+  const handleEliminarEquipo = async () => {
+    if (!equipo?.id) return;
+    if (!confirm(`¿Eliminar "${equipo.nombre}" con sus jugadores y sesiones? No se puede deshacer.`)) return;
+    try {
+      setEliminando(true);
+      await plantelesService.eliminarEquipo(equipo.id);
+      navigate("/equipos");
+    } catch (err) {
+      console.error("Error al eliminar el equipo:", err);
+      alert("No se pudo eliminar el equipo completo. Probá de nuevo.");
+      setEliminando(false);
+    }
+  };
   const [modalBloqueAbierto, setModalBloqueAbierto] = useState(false);
   const [sesionVerModal, setSesionVerModal] = useState<SesionEntrenamiento | null>(null);
 
@@ -186,20 +218,43 @@ export default function PlantelDetallePage() {
           ← Volver a Planteles
         </button>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text">
-              Gestión de Plantel
+              {equipo?.nombre ?? "Gestión de Plantel"}
             </h1>
             <p className="text-[11px] text-muted font-mono">
+              {equipo &&
+                [equipo.deporte, equipo.rama && NOMBRE_RAMA[equipo.rama], equipo.categoria]
+                  .filter(Boolean)
+                  .join(" · ") + " · "}
               Fecha: {new Date().toLocaleDateString()}
             </p>
           </div>
+          {equipo && (
+            <button
+              onClick={handleEliminarEquipo}
+              disabled={eliminando}
+              className="h-9 px-3 shrink-0 text-xs font-bold rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 disabled:opacity-50"
+            >
+              {eliminando ? "Eliminando..." : "Eliminar equipo"}
+            </button>
+          )}
         </div>
       </div>
 
       {/* TABS */}
       <div className="flex gap-1.5 p-1 rounded-xl bg-background/80 shadow-inner w-full sm:w-fit">
+        <button
+          onClick={() => setTabActiva("jugadores")}
+          className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg text-xs font-bold transition-all text-center ${
+            tabActiva === "jugadores"
+              ? "bg-primary text-black shadow-md shadow-primary/25"
+              : "text-muted hover:text-text"
+          }`}
+        >
+          👥 Plantel
+        </button>
         <button
           onClick={() => setTabActiva("dia")}
           className={`flex-1 sm:flex-initial px-3 py-2 rounded-lg text-xs font-bold transition-all text-center ${
@@ -221,6 +276,14 @@ export default function PlantelDetallePage() {
           📅 Planificación
         </button>
       </div>
+
+      {tabActiva === "jugadores" && equipoId && (
+        <JugadoresTab
+          key={equipoId}
+          equipoId={equipoId}
+          esVoley={equipo?.deporte === "Vóley"}
+        />
+      )}
 
       {/* TAB 1: SESIÓN DEL DÍA */}
       {tabActiva === "dia" && (

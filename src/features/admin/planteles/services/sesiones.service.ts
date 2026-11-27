@@ -20,6 +20,7 @@ export const sesionesService = {
     try {
       const q = query(
         collection(db, COLECCION_SESIONES),
+        where("preparadorId", "==", auth.currentUser?.uid ?? ""),
         where("equipoId", "==", equipoId)
       );
       
@@ -42,6 +43,7 @@ export const sesionesService = {
     try {
       const q = query(
         collection(db, COLECCION_SESIONES),
+        where("preparadorId", "==", auth.currentUser?.uid ?? ""),
         where("equipoId", "==", equipoId),
         where("fecha", "==", fechaHoy),
         where("completada", "==", false)
@@ -87,7 +89,8 @@ export const sesionesService = {
   async eliminarHistorialEquipo(equipoId: string): Promise<void> {
     const q = query(
       collection(db, COLECCION_SESIONES),
-      where("equipoId", "==", equipoId)
+      where("preparadorId", "==", auth.currentUser?.uid ?? ""),
+        where("equipoId", "==", equipoId)
     );
     const snapshot = await getDocs(q);
     const borrados = snapshot.docs.map((docSnap) => deleteDoc(doc(db, COLECCION_SESIONES, docSnap.id)));
